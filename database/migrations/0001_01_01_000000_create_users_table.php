@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->id(); // BIGINT, UNSIGNED, PK, AUTO_INCREMENT
+            $table->string('name'); // VARCHAR(255)
+            $table->string('email')->unique(); // VARCHAR(255), UNIQUE
+            $table->timestamp('email_verified_at')->nullable(); // TIMESTAMP, NULLABLE
+            $table->string('password'); // VARCHAR(255)
+            $table->enum('role', ['admin', 'teacher', 'student'])->default('student'); // ENUM con DEFAULT
+            $table->rememberToken(); // VARCHAR(100), NULLABLE
+            $table->timestamps(); // created_at, updated_at
+
+            // Índice en role
+            $table->index('role');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

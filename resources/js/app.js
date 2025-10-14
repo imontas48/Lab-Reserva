@@ -1,30 +1,50 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * LAB-RESERVA FRONTEND APPLICATION
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Aplicación Vue 3 con:
+ * - Vue Router para navegación
+ * - Pinia para gestión de estado
+ * - Axios para comunicación con API
+ * - Tailwind CSS para estilos
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
 import './bootstrap';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import axios from 'axios';
-import Welcome from './components/Welcome.vue';
+import router from './router';
 
-// Configuración global de Axios
-window.axios = axios;
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.withCredentials = true;
-window.axios.defaults.withXSRFToken = true;
-
-// Crear instancia de Pinia
+/**
+ * Crear instancia de Pinia (gestión de estado)
+ */
 const pinia = createPinia();
 
-// Crear aplicación Vue
-const app = createApp(Welcome);
+/**
+ * Crear aplicación Vue
+ *
+ * Nota: No necesitamos importar un componente raíz específico
+ * porque usamos <router-view> directamente en app.blade.php
+ */
+const app = createApp({
+    /**
+     * Componente raíz vacío
+     * El contenido se renderiza mediante <router-view>
+     */
+    template: '<router-view />',
+});
 
-// Usar Pinia
-app.use(pinia);
+/**
+ * Usar plugins
+ */
+app.use(pinia);  // Gestión de estado
+app.use(router); // Enrutamiento
 
-// Auto-registro de componentes (opcional - puedes importar manualmente)
-// const components = import.meta.glob('./components/**/*.vue', { eager: true });
-// Object.entries(components).forEach(([path, component]) => {
-//     const componentName = path.split('/').pop().replace(/\.\w+$/, '');
-//     app.component(componentName, component.default);
-// });
-
-// Montar la aplicación
+/**
+ * Montar la aplicación en el elemento #app
+ */
 app.mount('#app');
+
+console.log('🚀 Lab-Reserva Frontend iniciado correctamente');

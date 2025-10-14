@@ -1,0 +1,452 @@
+import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CONFIGURACIÓN DE VUE ROUTER
+ * ═══════════════════════════            // ─────────────────────────────────────────────────────────────────
+            // PERFIL DE USUARIO
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/profile',
+                name: 'profile',
+                component: () => import('@/views/profile/ProfileView.vue'),
+                meta: {
+                    title: 'Mi Perfil',
+                    requiresAuth: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // TESTING & DEMOS
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/test/base-input',
+                name: 'test.base-input',
+                component: () => import('@/views/test/BaseInputTestView.vue'),
+                meta: {
+                    title: 'Test: BaseInput Component',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/test/base-select',
+                name: 'test.base-select',
+                component: () => import('@/views/test/BaseSelectTestView.vue'),
+                meta: {
+                    title: 'Test: BaseSelect Component',
+                    requiresAuth: true,
+                }
+            },
+        ]
+    },══════════════════════════════════
+ *
+ * Sistema de enrutamiento de la aplicación con protección de rutas.
+ *
+ * CARACTERÍSTICAS:
+ * - Rutas públicas (login, register)
+ * - Rutas protegidas (dashboard, etc.) que requieren autenticación
+ * - Rutas específicas por rol (admin, teacher, student)
+ * - Navigation Guards para control de acceso
+ * - Lazy loading de componentes para optimizar la carga
+ *
+ * ESTRUCTURA:
+ * - AuthLayout: Envuelve las páginas de autenticación (login, register)
+ * - AppLayout: Envuelve las páginas protegidas (dashboard, etc.)
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+const routes = [
+    // =========================================================================
+    // RUTAS PÚBLICAS (Sin autenticación)
+    // =========================================================================
+
+    /**
+     * Página de inicio / Landing
+     * Redirige a dashboard si está autenticado, a login si no
+     */
+    {
+        path: '/',
+        name: 'home',
+        redirect: (to) => {
+            const authStore = useAuthStore();
+            return authStore.isAuthenticated ? '/dashboard' : '/login';
+        }
+    },
+
+    /**
+     * Rutas de autenticación (Login, Register)
+     * Usan AuthLayout que es un diseño minimalista para auth
+     */
+    {
+        path: '/auth',
+        component: () => import('@/layouts/AuthLayout.vue'),
+        meta: { guest: true }, // Solo accesible si NO está autenticado
+        children: [
+            {
+                path: '/login',
+                name: 'login',
+                component: () => import('@/views/auth/LoginView.vue'),
+                meta: {
+                    title: 'Iniciar Sesión',
+                    guest: true,
+                }
+            },
+            {
+                path: '/register',
+                name: 'register',
+                component: () => import('@/views/auth/RegisterView.vue'),
+                meta: {
+                    title: 'Crear Cuenta',
+                    guest: true,
+                }
+            },
+        ]
+    },
+
+    // =========================================================================
+    // RUTAS PROTEGIDAS (Requieren autenticación)
+    // =========================================================================
+
+    /**
+     * Rutas de la aplicación principal
+     * Usan AppLayout que incluye navbar, sidebar, etc.
+     */
+    {
+        path: '/app',
+        component: () => import('@/layouts/AppLayout.vue'),
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: '/dashboard',
+                name: 'dashboard',
+                component: () => import('@/views/DashboardView.vue'),
+                meta: {
+                    title: 'Dashboard',
+                    requiresAuth: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // LABORATORIOS
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/labs',
+                name: 'labs.index',
+                component: () => import('@/views/labs/LabsIndexView.vue'),
+                meta: {
+                    title: 'Laboratorios',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/labs/:id',
+                name: 'labs.show',
+                component: () => import('@/views/labs/LabsShowView.vue'),
+                meta: {
+                    title: 'Detalle de Laboratorio',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/labs/create',
+                name: 'labs.create',
+                component: () => import('@/views/labs/LabsCreateEditView.vue'),
+                meta: {
+                    title: 'Crear Laboratorio',
+                    requiresAuth: true,
+                    requiresAdmin: true, // Solo administradores
+                }
+            },
+            {
+                path: '/labs/:id/edit',
+                name: 'labs.edit',
+                component: () => import('@/views/labs/LabsCreateEditView.vue'),
+                meta: {
+                    title: 'Editar Laboratorio',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // EQUIPOS
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/equipment',
+                name: 'equipment.index',
+                component: () => import('@/views/equipment/EquipmentIndexView.vue'),
+                meta: {
+                    title: 'Equipos',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/equipment/:id',
+                name: 'equipment.show',
+                component: () => import('@/views/equipment/EquipmentShowView.vue'),
+                meta: {
+                    title: 'Detalle de Equipo',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/equipment/create',
+                name: 'equipment.create',
+                component: () => import('@/views/equipment/EquipmentCreateEditView.vue'),
+                meta: {
+                    title: 'Registrar Equipo',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/equipment/:id/edit',
+                name: 'equipment.edit',
+                component: () => import('@/views/equipment/EquipmentCreateEditView.vue'),
+                meta: {
+                    title: 'Editar Equipo',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // SOFTWARE
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/software',
+                name: 'software.index',
+                component: () => import('@/views/software/SoftwareIndexView.vue'),
+                meta: {
+                    title: 'Software',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/software/:id',
+                name: 'software.show',
+                component: () => import('@/views/software/SoftwareShowView.vue'),
+                meta: {
+                    title: 'Detalle de Software',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/software/create',
+                name: 'software.create',
+                component: () => import('@/views/software/SoftwareCreateEditView.vue'),
+                meta: {
+                    title: 'Registrar Software',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/software/:id/edit',
+                name: 'software.edit',
+                component: () => import('@/views/software/SoftwareCreateEditView.vue'),
+                meta: {
+                    title: 'Editar Software',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // RESERVAS
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/reservations',
+                name: 'reservations.index',
+                component: () => import('@/views/reservations/ReservationsIndexView.vue'),
+                meta: {
+                    title: 'Mis Reservas',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/reservations/create',
+                name: 'reservations.create',
+                component: () => import('@/views/reservations/ReservationsCreateView.vue'),
+                meta: {
+                    title: 'Nueva Reserva',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/reservations/:id',
+                name: 'reservations.show',
+                component: () => import('@/views/reservations/ReservationsShowView.vue'),
+                meta: {
+                    title: 'Detalle de Reserva',
+                    requiresAuth: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // PERFIL DE USUARIO
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/profile',
+                name: 'profile',
+                component: () => import('@/views/ProfileView.vue'),
+                meta: {
+                    title: 'Mi Perfil',
+                    requiresAuth: true,
+                }
+            },
+        ]
+    },
+
+    // =========================================================================
+    // PÁGINA NO ENCONTRADA (404)
+    // =========================================================================
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'not-found',
+        component: () => import('@/views/NotFoundView.vue'),
+        meta: {
+            title: 'Página no encontrada',
+        }
+    },
+];
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CREAR INSTANCIA DEL ROUTER
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+
+    // Scroll al inicio al cambiar de ruta
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition;
+        }
+        return { top: 0 };
+    },
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * NAVIGATION GUARD GLOBAL
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Se ejecuta antes de cada navegación de ruta.
+ *
+ * RESPONSABILIDADES:
+ * 1. Verificar si la ruta requiere autenticación
+ * 2. Verificar si la ruta es solo para invitados (guest)
+ * 3. Verificar permisos específicos (admin, teacher, etc.)
+ * 4. Redirigir al login si no está autenticado
+ * 5. Redirigir al dashboard si está autenticado e intenta ir a login/register
+ * 6. Actualizar el título de la página
+ */
+router.beforeEach(async (to, from, next) => {
+    // Obtener el store de autenticación
+    const authStore = useAuthStore();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Si es la primera navegación, verificar si hay una sesión activa
+    // ─────────────────────────────────────────────────────────────────────────
+    if (from.name === undefined && !authStore.user) {
+        console.log('🔍 Primera navegación, verificando sesión...');
+        try {
+            await authStore.checkAuth();
+        } catch (error) {
+            console.log('⚠️ No hay sesión activa');
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Actualizar título de la página
+    // ─────────────────────────────────────────────────────────────────────────
+    if (to.meta.title) {
+        document.title = `${to.meta.title} | Lab-Reserva`;
+    } else {
+        document.title = 'Lab-Reserva';
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Verificar si la ruta requiere autenticación
+    // ─────────────────────────────────────────────────────────────────────────
+    if (to.meta.requiresAuth) {
+        if (!authStore.isAuthenticated) {
+            console.log('🚫 Ruta protegida, redirigiendo a login...');
+            return next({
+                name: 'login',
+                query: { redirect: to.fullPath } // Guardar la ruta a la que quería ir
+            });
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Verificar si requiere permisos de administrador
+        // ─────────────────────────────────────────────────────────────────────
+        if (to.meta.requiresAdmin && !authStore.isAdmin) {
+            console.log('🚫 Requiere permisos de administrador');
+            return next({
+                name: 'dashboard',
+                replace: true
+            });
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Verificar si requiere permisos de profesor
+        // ─────────────────────────────────────────────────────────────────────
+        if (to.meta.requiresTeacher && !authStore.isTeacher && !authStore.isAdmin) {
+            console.log('🚫 Requiere permisos de profesor');
+            return next({
+                name: 'dashboard',
+                replace: true
+            });
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Verificar si la ruta es solo para invitados (guest)
+    // ─────────────────────────────────────────────────────────────────────────
+    if (to.meta.guest && authStore.isAuthenticated) {
+        console.log('🔄 Usuario autenticado intentando acceder a ruta de invitado, redirigiendo a dashboard...');
+        return next({ name: 'dashboard', replace: true });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Si todo está bien, continuar con la navegación
+    // ─────────────────────────────────────────────────────────────────────────
+    next();
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * AFTER EACH HOOK
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Se ejecuta después de cada navegación exitosa.
+ * Útil para analytics, logging, etc.
+ */
+router.afterEach((to, from) => {
+    console.log(`📍 Navegación: ${from.name || 'inicio'} → ${to.name}`);
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * HACER EL ROUTER ACCESIBLE GLOBALMENTE
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Esto permite que el interceptor de Axios acceda al router
+ * para hacer redirecciones cuando sea necesario
+ */
+if (typeof window !== 'undefined') {
+    window.router = router;
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * EXPORTAR ROUTER
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+export default router;

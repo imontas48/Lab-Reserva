@@ -84,3 +84,195 @@
 
 Aquí tienes el código para el `StoreReservationRequest.php` como primer paso..."
 *(...y luego generas el código, explicando por qué cada regla de validación es importante...)*
+
+---
+
+## 5. Directivas Específicas para Componentes Vue 3
+
+Cuando generes componentes de Vue, sigue estas reglas estrictamente:
+
+### Uso de Componentes Existentes
+*   **SIEMPRE** busca y usa componentes base ya definidos en la aplicación antes de crear uno nuevo.
+*   Componentes disponibles: `AppSelect`, `AppTextField`, `AppDatePicker`, `AppButton`, `AppModal`, etc.
+*   Verifica la carpeta `resources/js/components/` para conocer todos los componentes disponibles.
+
+### Sintaxis y Estructura
+*   **Props y Bindings Dinámicos:**
+    *   NO uses clases o atributos de forma estática si ya existen props o bindings disponibles.
+    *   Usa `:prop="valor"` en lugar de `prop="valor"` cuando el valor sea dinámico.
+    *   Aplica `v-model` para two-way binding cuando sea apropiado.
+*   **Evita HTML Duro:**
+    *   NO generes bloques de HTML estático.
+    *   USA directivas de Vue: `v-bind`, `v-model`, `v-if`, `v-else`, `v-for`, `v-show`, `@click`, `@submit`, etc.
+    *   Ejemplo incorrecto: `<div class="active">Texto</div>`
+    *   Ejemplo correcto: `<div :class="{ active: isActive }">{{ text }}</div>`
+
+### Script Setup
+*   **OBLIGATORIO:** Usa `<script setup>` en lugar de `export default`.
+*   Define props usando `defineProps()`.
+*   Define eventos usando `defineEmits()`.
+*   Usa `ref`, `reactive`, `computed` de Vue 3.
+
+### Estilos
+*   **TailwindCSS es prioritario:** Usa clases de utilidad de Tailwind para todos los estilos.
+*   Si necesitas estilos personalizados, usa `<style scoped>`.
+*   Mantén consistencia con el diseño existente de la aplicación.
+
+### Validación de Formularios
+*   **OBLIGATORIO:** Si el componente tiene formularios, deben estar validados con **VeeValidate + Yup**.
+*   Define el schema de validación con Yup.
+*   Usa `useForm` de VeeValidate para manejar el formulario.
+*   Muestra mensajes de error de forma clara y consistente.
+
+### Interacción con el Backend
+*   **Usa Axios o Composables Existentes:**
+    *   Si el componente necesita datos del backend, usa la instancia de Axios configurada.
+    *   Verifica si existe un composable que ya maneje esa funcionalidad (ej. `useInventory`, `useReservations`, `useAuth`).
+    *   Si no existe, crea un nuevo composable en `resources/js/composables/`.
+*   **Manejo de Estados de Carga:**
+    *   Implementa estados de loading durante las peticiones.
+    *   Maneja errores de forma apropiada con mensajes claros.
+
+### Consistencia
+*   **Mantén la Estructura del Proyecto:**
+    *   Sigue la misma estructura de carpetas y nomenclatura del proyecto.
+    *   Usa los mismos patrones de diseño que los demás componentes.
+    *   Revisa componentes similares existentes para mantener consistencia.
+
+### Componente Completo y Funcional
+*   **NO generes solo HTML:** Un componente Vue 3 debe incluir:
+    *   `<template>` con directivas de Vue y componentes reutilizables
+    *   `<script setup>` con toda la lógica reactiva necesaria
+    *   `<style scoped>` si se requieren estilos personalizados
+    *   Importaciones necesarias (componentes, composables, stores)
+    *   Documentación JSDoc si la complejidad lo amerita
+
+### Ejemplo de Componente Correcto
+
+```vue
+<template>
+  <div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ title }}</h2>
+    
+    <form @submit.prevent="handleSubmit">
+      <!-- Uso de componente existente -->
+      <AppTextField
+        v-model="form.name"
+        label="Nombre"
+        :error="errors.name"
+        required
+      />
+      
+      <!-- Uso de directivas de Vue -->
+      <AppSelect
+        v-model="form.status"
+        :options="statusOptions"
+        label="Estado"
+        :error="errors.status"
+      />
+      
+      <!-- Uso de v-if para renderizado condicional -->
+      <AppDatePicker
+        v-if="showDatePicker"
+        v-model="form.date"
+        label="Fecha"
+        :error="errors.date"
+      />
+      
+      <!-- Botón con estado de loading -->
+      <AppButton
+        type="submit"
+        :loading="isLoading"
+        :disabled="!isValid"
+      >
+        Guardar
+      </AppButton>
+    </form>
+    
+    <!-- Lista con v-for -->
+    <div v-if="items.length" class="mt-6">
+      <div
+        v-for="item in items"
+        :key="item.id"
+        :class="{ 'bg-blue-50': item.isActive }"
+        class="p-4 border rounded-lg mb-2"
+      >
+        {{ item.name }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
+import AppTextField from '@/components/AppTextField.vue';
+import AppSelect from '@/components/AppSelect.vue';
+import AppDatePicker from '@/components/AppDatePicker.vue';
+import AppButton from '@/components/AppButton.vue';
+import { useInventory } from '@/composables/useInventory';
+
+// Props
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  },
+  showDatePicker: {
+    type: Boolean,
+    default: false
+  }
+});
+
+// Emits
+const emit = defineEmits(['submit', 'cancel']);
+
+// Composables
+const { createItem, isLoading } = useInventory();
+
+// Schema de validación
+const schema = yup.object({
+  name: yup.string().required('El nombre es requerido'),
+  status: yup.string().required('El estado es requerido'),
+  date: yup.date().when('showDatePicker', {
+    is: true,
+    then: (schema) => schema.required('La fecha es requerida')
+  })
+});
+
+// Formulario con VeeValidate
+const { values: form, errors, isValid, handleSubmit } = useForm({
+  validationSchema: schema
+});
+
+// Estado reactivo
+const items = ref([]);
+const statusOptions = ref([
+  { value: 'active', label: 'Activo' },
+  { value: 'inactive', label: 'Inactivo' }
+]);
+
+// Computed
+const hasItems = computed(() => items.value.length > 0);
+
+// Métodos
+const handleSubmit = async () => {
+  try {
+    await createItem(form);
+    emit('submit', form);
+  } catch (error) {
+    console.error('Error al guardar:', error);
+  }
+};
+</script>
+
+<style scoped>
+/* Solo si es absolutamente necesario */
+</style>
+```
+
+### Resumen
+**NO generes solo HTML.** Genera un **componente Vue 3 completo y funcional**, listo para integrarse en un proyecto Laravel con Vite, siguiendo todas las convenciones y mejores prácticas establecidas en este documento.
+
+---
