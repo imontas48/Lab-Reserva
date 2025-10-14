@@ -122,9 +122,11 @@
 import { reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useToast } from '@/composables/useToast';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const toast = useToast();
 
 // Formulario reactivo
 const form = reactive({
@@ -150,11 +152,21 @@ const handleSubmit = async () => {
   try {
     await authStore.register(form);
 
+    // Notificación de éxito
+    toast.success(`¡Registro exitoso! Bienvenido, ${authStore.userName}`);
+
     // Redirigir al dashboard
     router.push('/dashboard');
   } catch (error) {
     // Los errores ya están manejados en el store
     console.error('Error en registro:', error);
+
+    // Mostrar notificación de error
+    if (error.response?.status === 422) {
+      toast.error('Por favor, corrige los errores en el formulario.');
+    } else {
+      toast.error('Error al registrar la cuenta. Por favor, intenta nuevamente.');
+    }
   }
 };
 </script>

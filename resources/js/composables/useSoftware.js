@@ -122,7 +122,7 @@ export function useSoftware() {
             // - La baseURL (/api/v1)
             // - Los interceptores de CSRF
             // - El manejo de autenticación con Sanctum
-            const response = await apiClient.get('/v1/software');
+            const response = await apiClient.get('/software');
 
             // Extraer los datos de la respuesta
             // Laravel API Resources típicamente devuelven los datos en response.data.data
@@ -219,7 +219,7 @@ export function useSoftware() {
         try {
             console.log('� Creando nuevo software:', softwareData);
 
-            const response = await apiClient.post('/v1/software', softwareData);
+            const response = await apiClient.post('/software', softwareData);
             const newSoftware = response.data.data || response.data;
 
             // Agregar el nuevo software a la lista local

@@ -18,6 +18,7 @@ class LabResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'location' => $this->location,
+            'capacity' => $this->capacity,
             'description' => $this->description,
             'is_active' => (bool) $this->is_active,
 

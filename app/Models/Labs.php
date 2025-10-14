@@ -16,6 +16,7 @@ class labs extends Model
     protected $fillable = [
         'name',
         'location',
+        'capacity',
         'description',
         'is_active',
     ];
@@ -32,7 +33,7 @@ class labs extends Model
      */
     public function equipment(): HasMany
     {
-        return $this->hasMany(equipment::class);
+        return $this->hasMany(equipment::class, 'lab_id');
     }
 
     /**
@@ -40,7 +41,7 @@ class labs extends Model
      */
     public function operationalEquipment(): HasMany
     {
-        return $this->hasMany(equipment::class)->where('is_operational', true);
+        return $this->hasMany(equipment::class, 'lab_id')->where('is_operational', true);
     }
 
     /**

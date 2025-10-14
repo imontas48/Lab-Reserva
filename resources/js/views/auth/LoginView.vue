@@ -99,10 +99,12 @@
 import { reactive, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useToast } from '@/composables/useToast';
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const toast = useToast();
 
 // Formulario reactivo
 const form = reactive({
@@ -127,12 +129,22 @@ const handleSubmit = async () => {
   try {
     await authStore.login(form);
 
+    // Notificación de éxito
+    toast.success(`¡Bienvenido, ${authStore.userName}!`);
+
     // Redirigir al dashboard o a la ruta que intentaba acceder
     const redirect = route.query.redirect || '/dashboard';
     router.push(redirect);
   } catch (error) {
     // Los errores ya están manejados en el store
     console.error('Error en login:', error);
+
+    // Mostrar notificación de error
+    if (error.response?.status === 422) {
+      toast.error('Credenciales incorrectas. Por favor, verifica tus datos.');
+    } else {
+      toast.error('Error al iniciar sesión. Por favor, intenta nuevamente.');
+    }
   }
 };
 </script>

@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PERSONALIZACIÓN DE TOAST NOTIFICATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Contenedor principal del toast */
+.Vue-Toastification__toast {
+    font-family: inherit;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    min-height: auto;
+}
+
+/* Toast de éxito */
+.Vue-Toastification__toast--success {
+    background-color: #10b981;
+}
+
+/* Toast de error */
+.Vue-Toastification__toast--error {
+    background-color: #ef4444;
+}
+
+/* Toast de advertencia */
+.Vue-Toastification__toast--warning {
+    background-color: #f59e0b;
+}
+
+/* Toast de información */
+.Vue-Toastification__toast--info {
+    background-color: #3b82f6;
+}
+
+/* Barra de progreso */
+.Vue-Toastification__progress-bar {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Botón de cerrar */
+.Vue-Toastification__close-button {
+    opacity: 0.8;
+    font-weight: bold;
+}
+
+.Vue-Toastification__close-button:hover {
+    opacity: 1;
+}
+
+/* Icono del toast */
+.Vue-Toastification__icon {
+    margin-right: 0.75rem;
+}
+
+/* Personalización de SweetAlert2 */
+.swal2-popup {
+    border-radius: 0.75rem;
+    font-family: inherit;
+}
+
+.swal2-title {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.swal2-html-container {
+    color: #4b5563;
+}

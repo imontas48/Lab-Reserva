@@ -42,7 +42,7 @@ let csrfTokenPromise = null;
  * Instancia de Axios configurada para Laravel Sanctum
  */
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://lab-reserva.test/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://lab-reserva.test/api/v1',
 
     // CRÍTICO: Permite enviar y recibir cookies
     // Sin esto, Sanctum no puede establecer ni leer la cookie de sesión

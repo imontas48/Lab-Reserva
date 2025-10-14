@@ -28,7 +28,7 @@
             <!-- Título Principal -->
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    <h1 class="text-3xl font-bold text-black">
                         Inventario de Equipos
                     </h1>
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -105,42 +105,7 @@
             @edit-item="handleEdit"
             @delete-item="handleDelete"
         >
-            <!-- ═══════════════════════════════════════════════════════════════
-                 SLOT: Celda Personalizada - Identificador
-                 ═══════════════════════════════════════════════════════════════
 
-                 Renderiza el identificador del equipo con icono visual
-                 ═══════════════════════════════════════════════════════════════ -->
-            <template #cell-identifier="{ item }">
-                <div class="flex items-center">
-                    <!-- Icono de Equipo (Computadora) -->
-                    <div :class="iconWrapperClasses">
-                        <svg
-                            :class="iconClasses"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                        </svg>
-                    </div>
-
-                    <!-- Información del Equipo -->
-                    <div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ item.identifier }}
-                        </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                            ID: {{ item.id }}
-                        </div>
-                    </div>
-                </div>
-            </template>
 
             <!-- ═══════════════════════════════════════════════════════════════
                  SLOT: Celda Personalizada - Tipo de Equipo
@@ -196,81 +161,43 @@
                  Se muestran diferentes botones según el rol del usuario.
                  ═══════════════════════════════════════════════════════════════ -->
             <template #actions="{ item }">
-                <div class="flex items-center justify-end gap-2">
-                    <!-- Botón: Ver Detalles -->
-                    <button
-                        @click="handleView(item)"
-                        :class="buttonClasses.view"
-                        title="Ver detalles"
-                    >
-                        <svg
-                            class="w-4 h-4 mr-1.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                        </svg>
-                        Ver
-                    </button>
+                <div class="flex items-center justify-end space-x-2">
+          <!-- Ver -->
+          <button
+            @click="handleView(item)"
+            class="rounded p-1 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            title="Ver detalles"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
 
-                    <!-- Botón: Editar (Solo Administradores) -->
-                    <button
-                        v-if="authStore.isAdmin"
-                        @click="handleEdit(item)"
-                        :class="buttonClasses.edit"
-                        title="Editar equipo"
-                    >
-                        <svg
-                            class="w-4 h-4 mr-1.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            />
-                        </svg>
-                        Editar
-                    </button>
+          <!-- Editar (solo admin) -->
+          <button
+            v-if="authStore.isAdmin"
+            @click="handleEdit(item)"
+            class="rounded p-1 text-green-600 transition-colors hover:bg-green-50 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            title="Editar laboratorio"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+          </button>
 
-                    <!-- Botón: Eliminar (Solo Administradores) -->
-                    <button
-                        v-if="authStore.isAdmin"
-                        @click="handleDelete(item)"
-                        :class="buttonClasses.delete"
-                        title="Eliminar equipo"
-                    >
-                        <svg
-                            class="w-4 h-4 mr-1.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                        </svg>
-                        Eliminar
-                    </button>
-                </div>
+          <!-- Eliminar (solo admin) -->
+          <button
+            v-if="authStore.isAdmin"
+            @click="handleDelete(item)"
+            class="rounded p-1 text-red-600 transition-colors hover:bg-red-50 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            title="Eliminar laboratorio"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
             </template>
 
             <!-- ═══════════════════════════════════════════════════════════════
@@ -356,6 +283,10 @@ import DataTable from '@/components/ui/DataTable.vue';
 
 // Composables
 import { useEquipment } from '@/composables/useEquipment';
+import { useToast } from '@/composables/useToast';
+
+// Librerías Externas
+import Swal from 'sweetalert2';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // INSTANCIACIÓN DE SERVICIOS
@@ -377,7 +308,13 @@ const authStore = useAuthStore();
  * Composable de Equipment
  * Extrae todo el estado reactivo y los métodos para gestionar equipment
  */
-const { equipment, loading, error, fetchEquipment } = useEquipment();
+const { equipment, loading, error, fetchEquipment, deleteEquipment } = useEquipment();
+
+/**
+ * Composable de Toast
+ * Sistema de notificaciones profesional
+ */
+const toast = useToast();
 
 // ═════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN DE COLUMNAS DEL DATATABLE
@@ -421,19 +358,7 @@ const columns = [
 // COMPUTED PROPERTIES & HELPERS
 // ═════════════════════════════════════════════════════════════════════════════
 
-/**
- * Clases CSS para el wrapper del icono
- */
-const iconWrapperClasses = computed(() =>
-    'flex-shrink-0 w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mr-3'
-);
 
-/**
- * Clases CSS para los iconos SVG
- */
-const iconClasses = computed(() =>
-    'w-6 h-6 text-indigo-600 dark:text-indigo-400'
-);
 
 /**
  * Clases CSS para el botón primario
@@ -442,15 +367,7 @@ const primaryButtonClasses = computed(() =>
     'inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
 );
 
-/**
- * Clases CSS para los botones de acción
- * Centralizadas para evitar repetición y facilitar cambios globales
- */
-const buttonClasses = {
-    view: 'inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
-    edit: 'inline-flex items-center px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500',
-    delete: 'inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
-};
+
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -559,34 +476,53 @@ const handleEdit = (item) => {
  * Manejador: Eliminar Equipment
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Muestra un diálogo de confirmación antes de eliminar el equipment.
+ * Muestra un diálogo de confirmación profesional antes de eliminar el equipment.
  *
  * PERMISOS: Solo accesible por administradores
  *
- * TODO: Implementar la lógica de eliminación con:
- * - Modal de confirmación
- * - Llamada al método deleteEquipment del composable
- * - Notificación de éxito/error
- * - Actualización de la lista
+ * CARACTERÍSTICAS:
+ * - SweetAlert2 para confirmación visual
+ * - Validación de reservas activas en el backend
+ * - Toast notifications para feedback
+ * - Actualización automática de la lista
  *
  * @param {Object} item - El objeto equipment seleccionado
  */
-const handleDelete = (item) => {
+const handleDelete = async (item) => {
     console.log('🗑️ Eliminar equipment:', item.identifier);
 
-    // Por ahora, solo mostramos un alert de confirmación
-    // En una implementación completa, esto debería abrir un modal de confirmación
-    const confirmed = confirm(
-        `¿Estás seguro de que deseas eliminar el equipo "${item.identifier}"?\n\n` +
-        `Este equipo está asignado al laboratorio "${item.lab?.name || 'N/A'}".\n` +
-        `Esta acción no se puede deshacer.`
-    );
+    // Mostrar diálogo de confirmación con SweetAlert2
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        html: `Se eliminará el equipo <strong>"${item.identifier}"</strong> del laboratorio <strong>"${item.lab?.name || 'N/A'}"</strong>.<br>Esta acción no se puede deshacer.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        focusCancel: true
+    });
 
-    if (confirmed) {
-        // TODO: Implementar la llamada al composable
-        // await deleteEquipment(item.id);
+    // Si el usuario cancela, no hacer nada
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+        await deleteEquipment(item.id);
+        console.log('✅ Equipo eliminado');
+
         // Mostrar notificación de éxito
-        alert('Funcionalidad de eliminación pendiente de implementar');
+        toast.success(`Equipo "${item.identifier}" eliminado exitosamente`);
+    } catch (err) {
+        console.error('❌ Error al eliminar equipo:', err);
+
+        // Mostrar notificación de error con el mensaje del backend
+        const errorMessage = err.response?.data?.message ||
+                           'Error al eliminar el equipo. Por favor, intenta nuevamente.';
+        toast.error(errorMessage);
     }
 };
 </script>

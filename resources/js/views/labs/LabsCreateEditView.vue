@@ -285,6 +285,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLabs } from '@/composables/useLabs';
+import { useToast } from '@/composables/useToast';
 import BaseInput from '@/components/forms/BaseInput.vue';
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -293,6 +294,7 @@ import BaseInput from '@/components/forms/BaseInput.vue';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 const {
     loading,
     error,
@@ -406,32 +408,34 @@ const handleSubmit = async () => {
             // Modo edición: actualizar laboratorio existente
             console.log(`📝 Actualizando laboratorio ${route.params.id}...`);
             result = await updateLab(route.params.id, form.value);
+
+            // Notificación de éxito
+            toast.success(`Laboratorio "${result.name}" actualizado exitosamente`);
         } else {
             // Modo creación: crear nuevo laboratorio
             console.log('✨ Creando nuevo laboratorio...');
             result = await createLab(form.value);
+
+            // Notificación de éxito
+            toast.success(`Laboratorio "${result.name}" creado exitosamente`);
         }
 
         console.log('✅ Operación exitosa:', result);
 
         // Redirigir al listado de laboratorios
-        router.push({
-            name: 'labs.index',
-            // Podríamos agregar un query param para mostrar un mensaje de éxito
-            query: {
-                success: isEditing.value ? 'updated' : 'created',
-                name: result.name
-            }
-        });
+        router.push({ name: 'labs.index' });
     } catch (err) {
         console.error('❌ Error al enviar el formulario:', err);
 
-        // Los errores de validación ya están manejados en el composable
-        // y se mostrarán automáticamente en los BaseInput correspondientes
-
-        // Si no es un error de validación (422), scroll al tope para ver el mensaje
+        // Notificación de error si no es validación
         if (err.response?.status !== 422) {
+            const errorMessage = err.response?.data?.message ||
+                                `Error al ${isEditing.value ? 'actualizar' : 'crear'} el laboratorio`;
+            toast.error(errorMessage);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            // Para errores de validación, mostrar mensaje genérico
+            toast.warning('Por favor, corrige los errores en el formulario');
         }
     }
 };
@@ -450,6 +454,11 @@ onMounted(() => {
         mode: isEditing.value ? 'edit' : 'create',
         labId: route.params.id || 'N/A'
     });
+
+    // 🔧 FIX: Limpiar estado del composable al montar
+    // El composable es compartido entre vistas, así que limpiamos
+    // cualquier error o estado de carga previo
+    clearErrors();
 
     if (isEditing.value) {
         loadLabData();

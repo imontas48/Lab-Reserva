@@ -127,8 +127,8 @@ export const useAuthStore = defineStore('auth', () => {
             loading.value = true;
             errors.value = {};
 
-            // Llamar al endpoint /api/user (protegido por Sanctum)
-            const response = await apiClient.get('/user');
+            // Llamar al endpoint /api/v1/me (protegido por Sanctum)
+            const response = await apiClient.get('/me');
 
             // Almacenar los datos del usuario
             user.value = response.data.data || response.data;
@@ -178,17 +178,24 @@ export const useAuthStore = defineStore('auth', () => {
             console.log('🔐 Iniciando sesión...');
 
             // Llamar al endpoint de login
-            // El interceptor de Axios ya obtuvo el token CSRF automáticamente
-            await apiClient.post('/v1/login', {
+            const response = await apiClient.post('/login', {
                 email: credentials.email,
                 password: credentials.password,
                 remember: credentials.remember || false,
             });
 
-            console.log('✅ Login exitoso, obteniendo datos del usuario...');
+            console.log('✅ Login exitoso, guardando token...');
 
-            // Obtener los datos del usuario recién autenticado
-            await getUser();
+            // Guardar el token en localStorage
+            const token = response.data.token;
+            if (token) {
+                localStorage.setItem('auth_token', token);
+                // Configurar el token en los headers de axios
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+
+            // Guardar los datos del usuario
+            user.value = response.data.user;
 
             console.log('✅ Usuario autenticado completamente');
 
@@ -243,12 +250,20 @@ export const useAuthStore = defineStore('auth', () => {
             console.log('📝 Registrando nuevo usuario...');
 
             // Llamar al endpoint de registro
-            await apiClient.post('/v1/register', data);
+            const response = await apiClient.post('/register', data);
 
-            console.log('✅ Registro exitoso, obteniendo datos del usuario...');
+            console.log('✅ Registro exitoso, guardando token...');
 
-            // Obtener los datos del usuario recién registrado
-            await getUser();
+            // Guardar el token en localStorage
+            const token = response.data.token;
+            if (token) {
+                localStorage.setItem('auth_token', token);
+                // Configurar el token en los headers de axios
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            }
+
+            // Guardar los datos del usuario
+            user.value = response.data.user;
 
             console.log('✅ Usuario registrado completamente');
 
@@ -295,21 +310,27 @@ export const useAuthStore = defineStore('auth', () => {
 
             console.log('👋 Cerrando sesión...');
 
-            // Llamar al endpoint de logout
-            await apiClient.post('/v1/logout');
+            // Llamar al endpoint de logout (si hay token)
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                await apiClient.post('/logout');
+            }
 
             console.log('✅ Sesión cerrada en el servidor');
         } catch (error) {
             console.error('❌ Error al cerrar sesión:', error);
             // Aún así, limpiar el estado local
         } finally {
+            // Limpiar el token
+            localStorage.removeItem('auth_token');
+            delete apiClient.defaults.headers.common['Authorization'];
+
             // Resetear el estado local
             user.value = null;
             errors.value = {};
             loading.value = false;
 
             // Resetear el estado de autenticación en Axios
-            // (esto limpia el flag de CSRF token)
             resetAuth();
 
             console.log('✅ Estado local limpiado');
@@ -342,10 +363,23 @@ export const useAuthStore = defineStore('auth', () => {
      */
     const checkAuth = async () => {
         try {
-            await getUser();
-            return true;
+            // Intentar cargar el token desde localStorage
+            const token = localStorage.getItem('auth_token');
+
+            if (token) {
+                // Configurar el token en los headers
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+                // Verificar que el token sea válido obteniendo el usuario
+                await getUser();
+                return true;
+            }
+
+            return false;
         } catch (error) {
-            // Si hay error, el usuario no está autenticado
+            // Si hay error, limpiar el token inválido
+            localStorage.removeItem('auth_token');
+            delete apiClient.defaults.headers.common['Authorization'];
             return false;
         }
     };

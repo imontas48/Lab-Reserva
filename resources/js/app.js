@@ -8,14 +8,18 @@
  * - Pinia para gestión de estado
  * - Axios para comunicación con API
  * - Tailwind CSS para estilos
+ * - Vue Toastification para notificaciones
  *
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 import './bootstrap';
-import { createApp } from 'vue';
+import { createApp, h } from 'vue';
 import { createPinia } from 'pinia';
 import router from './router';
+import { RouterView } from 'vue-router';
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
 
 /**
  * Crear instancia de Pinia (gestión de estado)
@@ -23,17 +27,34 @@ import router from './router';
 const pinia = createPinia();
 
 /**
+ * Configuración de Toast
+ */
+const toastOptions = {
+    position: 'top-right',
+    timeout: 3000,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    hideProgressBar: false,
+    closeButton: 'button',
+    icon: true,
+    rtl: false,
+    transition: 'Vue-Toastification__bounce',
+    maxToasts: 5,
+    newestOnTop: true
+};
+
+/**
  * Crear aplicación Vue
  *
- * Nota: No necesitamos importar un componente raíz específico
- * porque usamos <router-view> directamente en app.blade.php
+ * Usando render function en lugar de template para evitar
+ * necesitar el compilador de Vue en runtime
  */
 const app = createApp({
-    /**
-     * Componente raíz vacío
-     * El contenido se renderiza mediante <router-view>
-     */
-    template: '<router-view />',
+    render: () => h(RouterView)
 });
 
 /**
@@ -41,6 +62,7 @@ const app = createApp({
  */
 app.use(pinia);  // Gestión de estado
 app.use(router); // Enrutamiento
+app.use(Toast, toastOptions); // Sistema de notificaciones
 
 /**
  * Montar la aplicación en el elemento #app

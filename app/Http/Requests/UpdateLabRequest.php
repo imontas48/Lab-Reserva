@@ -41,6 +41,13 @@ class UpdateLabRequest extends FormRequest
                 'string',
                 'max:255',
             ],
+            'capacity' => [
+                'sometimes',
+                'required',
+                'integer',
+                'min:1',
+                'max:1000',
+            ],
             'description' => [
                 'nullable',
                 'string',
@@ -66,6 +73,10 @@ class UpdateLabRequest extends FormRequest
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
             'location.required' => 'La ubicación del laboratorio es obligatoria.',
             'location.max' => 'La ubicación no puede exceder los 255 caracteres.',
+            'capacity.required' => 'La capacidad del laboratorio es obligatoria.',
+            'capacity.integer' => 'La capacidad debe ser un número entero.',
+            'capacity.min' => 'La capacidad debe ser al menos 1 persona.',
+            'capacity.max' => 'La capacidad no puede exceder las 1000 personas.',
             'description.max' => 'La descripción no puede exceder los 1000 caracteres.',
             'is_active.boolean' => 'El estado debe ser verdadero o falso.',
         ];
@@ -81,6 +92,7 @@ class UpdateLabRequest extends FormRequest
         return [
             'name' => 'nombre del laboratorio',
             'location' => 'ubicación',
+            'capacity' => 'capacidad',
             'description' => 'descripción',
             'is_active' => 'estado activo',
         ];

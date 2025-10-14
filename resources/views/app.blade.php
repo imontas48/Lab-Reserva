@@ -14,7 +14,7 @@
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased">
+<body class="antialiased bg-gray-100">
     <div id="app"></div>
 </body>
 </html>

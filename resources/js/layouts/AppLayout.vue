@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <!-- Navbar -->
     <nav class="border-b border-gray-200 bg-white shadow-sm">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -80,18 +80,27 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useToast } from '@/composables/useToast';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const toast = useToast();
 
 const userName = computed(() => authStore.userName || 'Usuario');
 
 const handleLogout = async () => {
   try {
     await authStore.logout();
+
+    // Notificación de éxito
+    toast.info('Sesión cerrada exitosamente');
+
     router.push('/login');
   } catch (error) {
     console.error('Error al cerrar sesión:', error);
+
+    // Notificación de error
+    toast.error('Error al cerrar sesión. Por favor, intenta nuevamente.');
   }
 };
 </script>

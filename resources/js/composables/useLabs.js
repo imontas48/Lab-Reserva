@@ -95,10 +95,15 @@ export function useLabs() {
             error.value = null;
 
             console.log('🔍 Fetching labs from API...');
-            const response = await apiClient.get('/v1/labs');
+            console.log('📍 Base URL:', apiClient.defaults.baseURL);
+            console.log('📍 Full URL:', `${apiClient.defaults.baseURL}/labs`);
+            const response = await apiClient.get('/labs');
+
+            console.log('📦 Response data type:', typeof response.data);
+            console.log('📦 Response data:', response.data);
 
             labs.value = response.data.data || response.data;
-            console.log('✅ Labs fetched successfully:', labs.value.length);
+            console.log('✅ Labs fetched successfully:', Array.isArray(labs.value) ? labs.value.length : 'NOT AN ARRAY!');
         } catch (err) {
             console.error('❌ Error fetching labs:', err);
             error.value = err.response?.data?.message || 'Error al cargar los laboratorios';
@@ -177,7 +182,7 @@ export function useLabs() {
             validationErrors.value = {};
 
             console.log('📤 Creating new lab:', labData);
-            const response = await apiClient.post('/v1/labs', labData);
+            const response = await apiClient.post('/labs', labData);
 
             const newLab = response.data.data || response.data;
             console.log('✅ Lab created successfully:', newLab);
@@ -237,7 +242,7 @@ export function useLabs() {
             validationErrors.value = {};
 
             console.log(`📤 Updating lab ${id}:`, labData);
-            const response = await apiClient.put(`/v1/labs/${id}`, labData);
+            const response = await apiClient.put(`/labs/${id}`, labData);
 
             const updatedLab = response.data.data || response.data;
             console.log('✅ Lab updated successfully:', updatedLab);
@@ -289,7 +294,7 @@ export function useLabs() {
             error.value = null;
 
             console.log(`🗑️ Deleting lab ${id}`);
-            await apiClient.delete(`/v1/labs/${id}`);
+            await apiClient.delete(`/labs/${id}`);
 
             console.log('✅ Lab deleted successfully');
 
@@ -311,7 +316,8 @@ export function useLabs() {
     /**
      * Limpiar errores
      *
-     * Resetea tanto el error general como los errores de validación.
+     * Resetea tanto el error general como los errores de validación,
+     * así como el estado de carga.
      *
      * @example
      * clearErrors();
@@ -319,6 +325,7 @@ export function useLabs() {
     const clearErrors = () => {
         error.value = null;
         validationErrors.value = {};
+        loading.value = false; // 🔧 FIX: También resetear loading
     };
 
     /**

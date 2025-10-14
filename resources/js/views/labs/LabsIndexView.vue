@@ -30,34 +30,36 @@
       @edit-item="handleEdit"
       @delete-item="handleDelete"
     >
-      <!-- Badge de estado -->
-      <template #cell-status="{ value }">
-        <span
-          :class="{
-            'bg-green-100 text-green-800': value === 'available',
-            'bg-yellow-100 text-yellow-800': value === 'maintenance',
-            'bg-red-100 text-red-800': value === 'occupied'
-          }"
-          class="inline-flex rounded-full px-2 py-1 text-xs font-semibold leading-5"
-        >
-          {{ statusLabels[value] || value }}
-        </span>
-      </template>
-
-      <!-- Capacidad con icono -->
+      <!-- Capacidad con formato -->
       <template #cell-capacity="{ value }">
         <div class="flex items-center text-sm text-gray-900">
           <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
-          {{ value }} personas
+          {{ value || 0 }} {{ value === 1 ? 'persona' : 'personas' }}
         </div>
       </template>
 
-      <!-- Equipos con contador -->
-      <template #cell-equipment_count="{ value }">
-        <span class="text-sm text-gray-900">
-          {{ value || 0 }} {{ value === 1 ? 'equipo' : 'equipos' }}
+      <!-- Descripción truncada -->
+      <template #cell-description="{ value }">
+        <span
+          class="text-sm text-gray-600"
+          :title="value || 'Sin descripción'"
+        >
+          {{ value ? (value.length > 50 ? value.substring(0, 50) + '...' : value) : 'Sin descripción' }}
+        </span>
+      </template>
+
+      <!-- Badge de estado activo/inactivo -->
+      <template #cell-is_active="{ value }">
+        <span
+          :class="{
+            'bg-green-100 text-green-800': value,
+            'bg-red-100 text-red-800': !value
+          }"
+          class="inline-flex rounded-full px-2 py-1 text-xs font-semibold leading-5"
+        >
+          {{ value ? 'Activo' : 'Inactivo' }}
         </span>
       </template>
 
@@ -131,8 +133,10 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useLabs } from '@/composables/useLabs';
+import { useToast } from '@/composables/useToast';
 import DataTable from '@/components/ui/DataTable.vue';
-import apiClient from '@/utils/api';
+import Swal from 'sweetalert2';
 
 // ============================================================================
 // COMPOSABLES Y STORES
@@ -140,14 +144,12 @@ import apiClient from '@/utils/api';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const { labs, loading, error, fetchLabs, deleteLab } = useLabs();
+const toast = useToast();
 
 // ============================================================================
 // STATE
 // ============================================================================
-
-const labs = ref([]);
-const loading = ref(false);
-const error = ref(null);
 
 // ============================================================================
 // CONFIGURACIÓN DE LA TABLA
@@ -160,14 +162,9 @@ const columns = ref([
     headerClass: 'w-1/4'
   },
   {
-    key: 'building',
-    label: 'Edificio',
-    headerClass: 'w-1/6'
-  },
-  {
-    key: 'floor',
-    label: 'Piso',
-    headerClass: 'w-24'
+    key: 'location',
+    label: 'Ubicación',
+    headerClass: 'w-1/3'
   },
   {
     key: 'capacity',
@@ -175,45 +172,20 @@ const columns = ref([
     headerClass: 'w-32'
   },
   {
-    key: 'equipment_count',
-    label: 'Equipos',
-    headerClass: 'w-32'
+    key: 'description',
+    label: 'Descripción',
+    headerClass: 'w-1/4'
   },
   {
-    key: 'status',
+    key: 'is_active',
     label: 'Estado',
-    headerClass: 'w-32'
+    headerClass: 'w-24'
   }
 ]);
-
-const statusLabels = {
-  available: 'Disponible',
-  maintenance: 'Mantenimiento',
-  occupied: 'Ocupado'
-};
 
 // ============================================================================
 // MÉTODOS
 // ============================================================================
-
-/**
- * Carga la lista de laboratorios desde la API
- */
-const loadLabs = async () => {
-  loading.value = true;
-  error.value = null;
-
-  try {
-    const response = await apiClient.get('/labs');
-    labs.value = response.data.data || response.data;
-    console.log('✅ Laboratorios cargados:', labs.value.length);
-  } catch (err) {
-    console.error('❌ Error al cargar laboratorios:', err);
-    error.value = 'Error al cargar los laboratorios. Por favor, intenta nuevamente.';
-  } finally {
-    loading.value = false;
-  }
-};
 
 /**
  * Maneja el evento de ver un laboratorio
@@ -233,22 +205,36 @@ const handleEdit = (lab) => {
  * Maneja el evento de eliminar un laboratorio
  */
 const handleDelete = async (lab) => {
-  if (!confirm(`¿Estás seguro de que deseas eliminar el laboratorio "${lab.name}"?`)) {
+  // Mostrar diálogo de confirmación con SweetAlert2
+  const result = await Swal.fire({
+    title: '¿Estás seguro?',
+    html: `Se eliminará el laboratorio <strong>"${lab.name}"</strong>.<br>Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    reverseButtons: true,
+    focusCancel: true
+  });
+
+  // Si el usuario cancela, no hacer nada
+  if (!result.isConfirmed) {
     return;
   }
 
   try {
-    await apiClient.delete(`/labs/${lab.id}`);
+    await deleteLab(lab.id);
     console.log('✅ Laboratorio eliminado');
 
-    // Recargar la lista
-    await loadLabs();
-
-    // TODO: Mostrar notificación de éxito
+    // Mostrar notificación de éxito
+    toast.success(`Laboratorio "${lab.name}" eliminado exitosamente`);
   } catch (err) {
     console.error('❌ Error al eliminar laboratorio:', err);
-    // TODO: Mostrar notificación de error
-    alert('Error al eliminar el laboratorio. Por favor, intenta nuevamente.');
+
+    // Mostrar notificación de error
+    toast.error('Error al eliminar el laboratorio. Por favor, intenta nuevamente.');
   }
 };
 
@@ -257,6 +243,6 @@ const handleDelete = async (lab) => {
 // ============================================================================
 
 onMounted(() => {
-  loadLabs();
+  fetchLabs();
 });
 </script>

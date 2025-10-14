@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id(); // BIGINT, UNSIGNED, PK, AUTO_INCREMENT
             $table->string('name')->unique(); // VARCHAR(255), UNIQUE
             $table->string('location'); // VARCHAR(255)
+            $table->integer('capacity')->unsigned(); // INT UNSIGNED - capacidad de personas/equipos
             $table->text('description')->nullable(); // TEXT, NULLABLE
             $table->boolean('is_active')->default(true); // BOOLEAN, DEFAULT(true)
             $table->timestamps(); // created_at, updated_at

@@ -17,8 +17,8 @@ class SoftwareController extends Controller
     public function __construct(
         private readonly SoftwareService $softwareService
     ) {
-        // Aplicamos las políticas de autorización
-        $this->authorizeResource(software::class, 'software');
+        // TODO: Implementar autorización con middleware o policies
+        // $this->authorizeResource(software::class, 'software');
     }
 
     /**

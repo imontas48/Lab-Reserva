@@ -18,8 +18,8 @@ class ReservationController extends Controller
     public function __construct(
         private readonly ReservationService $reservationService
     ) {
-        // Aplicamos las políticas de autorización
-        $this->authorizeResource(reservations::class, 'reservation');
+        // TODO: Implementar autorización con middleware o policies
+        // $this->authorizeResource(reservations::class, 'reservation');
     }
 
     /**

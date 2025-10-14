@@ -161,7 +161,7 @@ export function useEquipment() {
             // - La baseURL (/api/v1)
             // - Los interceptores de CSRF
             // - El manejo de autenticación con Sanctum
-            const response = await apiClient.get('/v1/equipment');
+            const response = await apiClient.get('/equipment');
 
             // Extraer los datos de la respuesta
             // Laravel API Resources típicamente devuelven los datos en response.data.data
@@ -263,7 +263,7 @@ export function useEquipment() {
         try {
             console.log('🔄 Creando nuevo equipment...', equipmentData);
 
-            const response = await apiClient.post('/v1/equipment', equipmentData);
+            const response = await apiClient.post('/equipment', equipmentData);
             const newEquipment = response.data.data || response.data;
 
             // Agregar el nuevo equipment al inicio de la lista local

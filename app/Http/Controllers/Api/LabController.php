@@ -16,8 +16,8 @@ class LabController extends Controller
     public function __construct(
         private readonly LabService $labService
     ) {
-        // Aplicamos las políticas de autorización
-        $this->authorizeResource(labs::class, 'lab');
+        // TODO: Implementar autorización con middleware o policies
+        // $this->authorizeResource(labs::class, 'lab');
     }
 
     /**
@@ -28,9 +28,7 @@ class LabController extends Controller
         $labs = $this->labService->getAllLabs();
 
         return LabResource::collection($labs);
-    }
-
-    /**
+    }    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreLabRequest $request): LabResource

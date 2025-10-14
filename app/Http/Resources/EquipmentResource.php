@@ -22,6 +22,12 @@ class EquipmentResource extends JsonResource
             'specifications' => $this->specifications,
             'is_operational' => (bool) $this->is_operational,
 
+            // Estado actual calculado dinámicamente
+            'status' => $this->getCurrentStatus(),
+
+            // Compatibilidad legacy (deprecated - usar 'status' en su lugar)
+            'is_available' => $this->getCurrentStatus()['status'] === 'available',
+
             // Relación con el laboratorio (solo si está cargada)
             'lab' => new LabResource($this->whenLoaded('lab')),
 
