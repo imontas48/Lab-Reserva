@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Mis Reservas</h1>
         <p class="mt-2 text-gray-600">Gestiona tus reservas de laboratorio</p>
       </div>
-      
+
       <router-link
         to="/reservations/create"
         class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -131,7 +131,7 @@
               ></span>
               {{ getStatusLabel(reservation) }}
             </span>
-            
+
             <span class="text-xs text-gray-500">#{{ reservation.id }}</span>
           </div>
 
@@ -145,7 +145,7 @@
                 {{ reservation.equipment?.identifier || `Equipo #${reservation.equipment_id}` }}
               </span>
             </div>
-            
+
             <div v-if="reservation.equipment?.lab" class="mt-1 flex items-center text-sm text-gray-500">
               <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -162,7 +162,7 @@
               </svg>
               <span>{{ formatDate(reservation.start_time) }}</span>
             </div>
-            
+
             <div class="flex items-center text-sm text-gray-700">
               <svg class="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -303,7 +303,7 @@ const handleCancelReservation = async (reservation) => {
 
   try {
     const success = await cancelMyReservation(reservation.id);
-    
+
     if (success) {
       toast.success('Reserva cancelada exitosamente');
       // Recargar la lista

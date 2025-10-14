@@ -38,13 +38,13 @@ foreach ($reservations as $res) {
     echo "  Inicio: {$res->start_time}\n";
     echo "  Fin: {$res->end_time}\n";
     echo "  Estado: {$res->status}\n";
-    
+
     // Calcular estados
     $now = now();
     $isActive = $now->between($res->start_time, $res->end_time);
     $isFuture = $now->lessThan($res->start_time);
     $isPast = $now->greaterThan($res->end_time);
-    
+
     echo "  Estado calculado: ";
     if ($res->status === 'cancelled') {
         echo "Cancelada\n";
