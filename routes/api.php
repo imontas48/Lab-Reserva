@@ -31,6 +31,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout'])->name('api.logout');
     Route::get('/me', [App\Http\Controllers\Api\AuthController::class, 'me'])->name('api.me');
 
+    // Dashboard
+    Route::get('/dashboard/stats', [App\Http\Controllers\Api\DashboardController::class, 'stats'])->name('api.dashboard.stats');
+
     // Laboratorios
     Route::apiResource('labs', App\Http\Controllers\Api\LabController::class);
 

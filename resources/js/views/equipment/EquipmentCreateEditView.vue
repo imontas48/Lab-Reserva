@@ -34,21 +34,21 @@
                 <span class="mx-2">/</span>
                 <router-link
                     to="/equipment"
-                    class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    class="hover:text-indigo-600 transition-colors"
                 >
                     Equipos
                 </router-link>
                 <span class="mx-2">/</span>
-                <span class="text-gray-900 dark:text-white font-medium">
+                <span class="text-gray-900 font-medium">
                     {{ isEditing ? 'Editar' : 'Nuevo' }}
                 </span>
             </nav>
 
             <!-- Título dinámico -->
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 class="text-3xl font-bold text-gray-900">
                 {{ isEditing ? 'Editar Equipo' : 'Añadir Nuevo Equipo' }}
             </h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">
+            <p class="mt-2 text-gray-600">
                 {{ isEditing
                     ? 'Modifica los datos del equipo en el formulario a continuación'
                     : 'Completa el formulario para registrar un nuevo equipo en el sistema'
@@ -112,8 +112,8 @@
                          SECCIÓN 1: INFORMACIÓN BÁSICA
                          ═════════════════════════════════════════════════════════ -->
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
                             </svg>
@@ -147,8 +147,8 @@
                          SECCIÓN 2: ASIGNACIÓN Y RELACIONES
                          ═════════════════════════════════════════════════════════ -->
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
                             </svg>
                             Asignación
@@ -187,8 +187,8 @@
                          SECCIÓN 3: DETALLES TÉCNICOS
                          ═════════════════════════════════════════════════════════ -->
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
                             </svg>
                             Especificaciones Técnicas
@@ -223,8 +223,8 @@
                          SECCIÓN 4: ESTADO OPERACIONAL
                          ═════════════════════════════════════════════════════════ -->
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                             Estado Operacional

@@ -114,7 +114,7 @@
                  Muestra el tipo de equipo con formateo capitalizado
                  ═══════════════════════════════════════════════════════════════ -->
             <template #cell-type="{ item }">
-                <span class="text-sm text-gray-900 dark:text-white capitalize">
+                <span class="text-sm text-gray-900 capitalize">
                     {{ formatEquipmentType(item.type) }}
                 </span>
             </template>
@@ -132,7 +132,7 @@
                 <span :class="getOperationalBadgeClasses(value)">
                     <!-- Icono de estado -->
                     <svg
-                        class="w-3 h-3 mr-1.5"
+                        class="w-4 h-4 mr-1.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                     >
@@ -383,12 +383,12 @@ const primaryButtonClasses = computed(() =>
  * @returns {String} Clases CSS para el badge
  */
 const getOperationalBadgeClasses = (isOperational) => {
-    const baseClasses = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
+    const baseClasses = 'inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold';
 
     if (isOperational) {
-        return `${baseClasses} bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400`;
+        return `${baseClasses} bg-green-100 text-green-800 border border-green-200`;
     } else {
-        return `${baseClasses} bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400`;
+        return `${baseClasses} bg-red-100 text-red-800 border border-red-200`;
     }
 };
 
@@ -466,7 +466,7 @@ const handleEdit = (item) => {
     console.log('✏️ Editar equipment:', item.identifier);
 
     router.push({
-        name: 'equipment-edit',
+        name: 'equipment.edit',
         params: { id: item.id }
     });
 };

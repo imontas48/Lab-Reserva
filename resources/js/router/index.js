@@ -359,8 +359,6 @@ router.beforeEach(async (to, from, next) => {
             await authStore.checkAuth();
         } catch (error) {
             console.log('⚠️ No hay sesión activa');
-            // Asegurarse de que el usuario esté en null si hay error
-            authStore.user = null;
         }
     }
 
@@ -371,18 +369,6 @@ router.beforeEach(async (to, from, next) => {
         document.title = `${to.meta.title} | Lab-Reserva`;
     } else {
         document.title = 'Lab-Reserva';
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Permitir acceso a rutas públicas sin verificar autenticación
-    // ─────────────────────────────────────────────────────────────────────────
-    if (!to.meta.requiresAuth) {
-        // Si está autenticado e intenta ir a login/register, redirigir al dashboard
-        if ((to.name === 'login' || to.name === 'register') && authStore.isAuthenticated) {
-            console.log('✅ Ya autenticado, redirigiendo a dashboard...');
-            return next({ name: 'dashboard' });
-        }
-        return next();
     }
 
     // ─────────────────────────────────────────────────────────────────────────

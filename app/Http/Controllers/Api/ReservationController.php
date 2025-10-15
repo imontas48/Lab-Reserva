@@ -141,8 +141,14 @@ class ReservationController extends Controller
      */
     public function cancel(reservations $reservation): ReservationResource
     {
+        // TODO: Implementar autorización con Policy
         // La autorización se maneja en la Policy (método update)
-        $this->authorize('update', $reservation);
+        // $this->authorize('update', $reservation);
+
+        // Por ahora, verificar que el usuario sea dueño de la reserva
+        if ($reservation->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para cancelar esta reserva.');
+        }
 
         $cancelledReservation = $this->reservationService->cancelReservation($reservation);
 
