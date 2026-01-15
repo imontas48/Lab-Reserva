@@ -3,21 +3,21 @@
     <!-- =========================================================================
          ESTADO DE CARGA
          ========================================================================= -->
-    <div v-if="loading" class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
+    <div v-if="loading" class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
       <!-- Slot personalizable para el estado de carga -->
       <slot name="loading">
         <!-- Skeleton loader por defecto -->
         <div class="animate-pulse">
           <!-- Header del skeleton -->
-          <div class="border-b border-gray-200 bg-gray-50 px-6 py-3">
+          <div class="border-b border-gray-200 bg-gray-50 px-6 py-3 dark:border-gray-700 dark:bg-gray-700">
             <div class="flex items-center space-x-4">
-              <div v-for="col in columns" :key="col.key" class="h-4 flex-1 rounded bg-gray-300"></div>
+              <div v-for="col in columns" :key="col.key" class="h-4 flex-1 rounded bg-gray-300 dark:bg-gray-600"></div>
             </div>
           </div>
           <!-- Filas del skeleton -->
-          <div v-for="i in 5" :key="i" class="border-b border-gray-100 px-6 py-4">
+          <div v-for="i in 5" :key="i" class="border-b border-gray-100 px-6 py-4 dark:border-gray-700">
             <div class="flex items-center space-x-4">
-              <div v-for="col in columns" :key="col.key" class="h-4 flex-1 rounded bg-gray-200"></div>
+              <div v-for="col in columns" :key="col.key" class="h-4 flex-1 rounded bg-gray-200 dark:bg-gray-600"></div>
             </div>
           </div>
         </div>
@@ -29,7 +29,7 @@
          ========================================================================= -->
     <div
       v-else-if="error"
-      class="rounded-lg border border-red-200 bg-red-50 px-6 py-12 text-center"
+      class="rounded-lg border border-red-200 bg-red-50 px-6 py-12 text-center dark:border-red-800 dark:bg-red-900/20"
     >
       <svg
         class="mx-auto h-12 w-12 text-red-400"
@@ -44,10 +44,10 @@
           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
         />
       </svg>
-      <h3 class="mt-4 text-lg font-medium text-red-900">
+      <h3 class="mt-4 text-lg font-medium text-red-900 dark:text-red-300">
         Error al cargar los datos
       </h3>
-      <p class="mt-2 text-sm text-red-700">{{ error }}</p>
+      <p class="mt-2 text-sm text-red-700 dark:text-red-400">{{ error }}</p>
     </div>
 
     <!-- =========================================================================
@@ -55,12 +55,12 @@
          ========================================================================= -->
     <div
       v-else-if="!items || items.length === 0"
-      class="rounded-lg border border-gray-200 bg-white px-6 py-12 text-center"
+      class="rounded-lg border border-gray-200 bg-white px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-800"
     >
       <!-- Slot personalizable para el estado vacío -->
       <slot name="empty">
         <svg
-          class="mx-auto h-12 w-12 text-gray-400"
+          class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -72,10 +72,10 @@
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
           />
         </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900">
+        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
           No hay datos disponibles
         </h3>
-        <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
           No se encontraron registros para mostrar.
         </p>
       </slot>
@@ -84,19 +84,19 @@
     <!-- =========================================================================
          TABLA CON DATOS
          ========================================================================= -->
-    <div v-else class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
+    <div v-else class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <!-- ===================================================================
                HEADER DE LA TABLA
                =================================================================== -->
-          <thead class="bg-gray-50">
+          <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th
                 v-for="column in columns"
                 :key="column.key"
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
                 :class="column.headerClass"
               >
                 {{ column.label }}
@@ -105,7 +105,7 @@
               <th
                 v-if="hasActionsSlot"
                 scope="col"
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500"
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
               >
                 Acciones
               </th>
@@ -115,11 +115,11 @@
           <!-- ===================================================================
                BODY DE LA TABLA
                =================================================================== -->
-          <tbody class="divide-y divide-gray-200 bg-white">
+          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
             <tr
               v-for="(item, index) in items"
               :key="getItemKey(item, index)"
-              class="transition-colors hover:bg-gray-50"
+              class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
               :class="rowClass"
             >
               <!-- Celdas de datos -->
@@ -154,7 +154,7 @@
                   <div class="flex items-center justify-end space-x-2">
                     <button
                       @click="handleView(item)"
-                      class="text-blue-600 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      class="text-blue-600 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-blue-400 dark:hover:text-blue-300 dark:focus:ring-offset-gray-800"
                       title="Ver detalles"
                     >
                       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +174,7 @@
                     </button>
                     <button
                       @click="handleEdit(item)"
-                      class="text-green-600 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      class="text-green-600 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:text-green-400 dark:hover:text-green-300 dark:focus:ring-offset-gray-800"
                       title="Editar"
                     >
                       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +188,7 @@
                     </button>
                     <button
                       @click="handleDelete(item)"
-                      class="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      class="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:text-red-400 dark:hover:text-red-300 dark:focus:ring-offset-gray-800"
                       title="Eliminar"
                     >
                       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,7 +431,7 @@ const getCellTextClass = (item, column) => {
   }
 
   // Clase por defecto
-  return 'text-gray-900';
+  return 'text-gray-900 dark:text-gray-100';
 };
 
 // ============================================================================

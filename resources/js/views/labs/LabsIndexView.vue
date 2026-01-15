@@ -3,15 +3,15 @@
     <!-- Encabezado -->
     <div class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">Laboratorios</h1>
-        <p class="mt-2 text-sm text-gray-600">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Laboratorios</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Gestión de laboratorios de cómputo
         </p>
       </div>
       <router-link
         v-if="authStore.isAdmin"
         to="/labs/create"
-        class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
       >
         <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -32,8 +32,8 @@
     >
       <!-- Capacidad con formato -->
       <template #cell-capacity="{ value }">
-        <div class="flex items-center text-sm text-gray-900">
-          <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center text-sm text-gray-900 dark:text-gray-100">
+          <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
           {{ value || 0 }} {{ value === 1 ? 'persona' : 'personas' }}
@@ -43,7 +43,7 @@
       <!-- Descripción truncada -->
       <template #cell-description="{ value }">
         <span
-          class="text-sm text-gray-600"
+          class="text-sm text-gray-600 dark:text-gray-400"
           :title="value || 'Sin descripción'"
         >
           {{ value ? (value.length > 50 ? value.substring(0, 50) + '...' : value) : 'Sin descripción' }}
@@ -54,8 +54,8 @@
       <template #cell-is_active="{ value }">
         <span
           :class="{
-            'bg-green-100 text-green-800': value,
-            'bg-red-100 text-red-800': !value
+            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': value,
+            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': !value
           }"
           class="inline-flex rounded-full px-2 py-1 text-xs font-semibold leading-5"
         >
@@ -69,7 +69,7 @@
           <!-- Ver -->
           <button
             @click="handleView(item)"
-            class="rounded p-1 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            class="rounded p-1 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300 dark:focus:ring-offset-gray-800"
             title="Ver detalles"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@
           <button
             v-if="authStore.isAdmin"
             @click="handleEdit(item)"
-            class="rounded p-1 text-green-600 transition-colors hover:bg-green-50 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            class="rounded p-1 text-green-600 transition-colors hover:bg-green-50 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:text-green-400 dark:hover:bg-green-900/30 dark:hover:text-green-300 dark:focus:ring-offset-gray-800"
             title="Editar laboratorio"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@
           <button
             v-if="authStore.isAdmin"
             @click="handleDelete(item)"
-            class="rounded p-1 text-red-600 transition-colors hover:bg-red-50 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded p-1 text-red-600 transition-colors hover:bg-red-50 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300 dark:focus:ring-offset-gray-800"
             title="Eliminar laboratorio"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,13 +107,13 @@
       <!-- Estado vacío personalizado -->
       <template #empty>
         <div class="py-12 text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
           </svg>
-          <h3 class="mt-4 text-lg font-medium text-gray-900">
+          <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
             No hay laboratorios registrados
           </h3>
-          <p class="mt-2 text-sm text-gray-500">
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Comienza creando tu primer laboratorio.
           </p>
           <router-link

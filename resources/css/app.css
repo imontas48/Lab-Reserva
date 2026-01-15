@@ -7,12 +7,45 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @layer base {
+    /* Transición suave al cambiar de tema */
+    html {
+        @apply transition-colors duration-200;
+    }
+
     body {
-        @apply bg-gray-50;
+        @apply bg-gray-50 text-gray-900;
+        @apply dark:bg-gray-900 dark:text-gray-100;
     }
 
     #app {
         @apply bg-gray-50 min-h-screen;
+        @apply dark:bg-gray-900;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPONENTES CON SOPORTE DARK MODE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+    /* Cards */
+    .card {
+        @apply bg-white border border-gray-200 rounded-lg shadow-sm;
+        @apply dark:bg-gray-800 dark:border-gray-700;
+    }
+
+    /* Inputs */
+    .input-base {
+        @apply bg-white border border-gray-300 text-gray-900;
+        @apply dark:bg-gray-700 dark:border-gray-600 dark:text-white;
+        @apply focus:ring-blue-500 focus:border-blue-500;
+        @apply dark:focus:ring-blue-500 dark:focus:border-blue-500;
+    }
+
+    /* Links */
+    .link {
+        @apply text-blue-600 hover:text-blue-800;
+        @apply dark:text-blue-400 dark:hover:text-blue-300;
     }
 }
 
@@ -27,6 +60,11 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     padding: 1rem 1.25rem;
     min-height: auto;
+}
+
+/* Dark mode para toasts */
+.dark .Vue-Toastification__toast {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
 /* Toast de éxito */
@@ -69,7 +107,10 @@
     margin-right: 0.75rem;
 }
 
-/* Personalización de SweetAlert2 */
+/* ═══════════════════════════════════════════════════════════════════════════
+   PERSONALIZACIÓN DE SWEETALERT2
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .swal2-popup {
     border-radius: 0.75rem;
     font-family: inherit;
@@ -82,4 +123,17 @@
 
 .swal2-html-container {
     color: #4b5563;
+}
+
+/* Dark mode para SweetAlert2 */
+.dark .swal2-popup {
+    background-color: #1f2937;
+}
+
+.dark .swal2-title {
+    color: #f3f4f6;
+}
+
+.dark .swal2-html-container {
+    color: #d1d5db;
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gray-900">Registrar Software</h1>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Registrar Software</h1>
     <!-- TODO: Implementar formulario de registro -->
   </div>
 </template>

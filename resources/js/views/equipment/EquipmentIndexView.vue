@@ -28,7 +28,7 @@
             <!-- Título Principal -->
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-black">
+                    <h1 class="text-3xl font-bold text-black dark:text-white">
                         Inventario de Equipos
                     </h1>
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -114,7 +114,7 @@
                  Muestra el tipo de equipo con formateo capitalizado
                  ═══════════════════════════════════════════════════════════════ -->
             <template #cell-type="{ item }">
-                <span class="text-sm text-gray-900 capitalize">
+                <span class="text-sm text-gray-900 dark:text-gray-100 capitalize">
                     {{ formatEquipmentType(item.type) }}
                 </span>
             </template>
@@ -165,7 +165,7 @@
           <!-- Ver -->
           <button
             @click="handleView(item)"
-            class="rounded p-1 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            class="rounded p-1 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300 dark:focus:ring-offset-gray-800"
             title="Ver detalles"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +178,7 @@
           <button
             v-if="authStore.isAdmin"
             @click="handleEdit(item)"
-            class="rounded p-1 text-green-600 transition-colors hover:bg-green-50 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            class="rounded p-1 text-green-600 transition-colors hover:bg-green-50 hover:text-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:text-green-400 dark:hover:bg-green-900/30 dark:hover:text-green-300 dark:focus:ring-offset-gray-800"
             title="Editar laboratorio"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@
           <button
             v-if="authStore.isAdmin"
             @click="handleDelete(item)"
-            class="rounded p-1 text-red-600 transition-colors hover:bg-red-50 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded p-1 text-red-600 transition-colors hover:bg-red-50 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300 dark:focus:ring-offset-gray-800"
             title="Eliminar laboratorio"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

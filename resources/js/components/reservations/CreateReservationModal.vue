@@ -21,7 +21,7 @@
         >
           <div
             v-if="show"
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm transition-opacity"
+            class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm transition-opacity dark:bg-gray-900 dark:bg-opacity-80"
             @click="closeModal"
           ></div>
         </Transition>
@@ -40,7 +40,7 @@
         >
           <div
             v-if="show"
-            class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle"
+            class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:align-middle"
           >
             <!-- Header del Modal -->
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
@@ -68,74 +68,74 @@
             </div>
 
             <!-- Body del Modal -->
-            <div class="bg-white px-6 py-5">
+            <div class="bg-white px-6 py-5 dark:bg-gray-800">
               <!-- Mensaje de introducción -->
-              <p class="mb-6 text-sm text-gray-600">
+              <p class="mb-6 text-sm text-gray-600 dark:text-gray-300">
                 Estás a punto de reservar el siguiente equipo. Por favor, verifica los detalles antes de confirmar.
               </p>
 
               <!-- Tarjeta con detalles de la reserva -->
-              <div class="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-5">
+              <div class="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-5 dark:border-gray-600 dark:bg-gray-700">
                 <!-- Equipo -->
                 <div class="flex items-start">
-                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100">
-                    <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+                    <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                   </div>
                   <div class="ml-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Equipo</p>
-                    <p class="mt-1 text-base font-semibold text-gray-900">{{ equipmentName }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Equipo</p>
+                    <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ equipmentName }}</p>
                   </div>
                 </div>
 
                 <!-- Separador -->
-                <div class="border-t border-gray-200"></div>
+                <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                 <!-- Inicio -->
                 <div class="flex items-start">
-                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-100">
-                    <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
+                    <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </div>
                   <div class="ml-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Inicio</p>
-                    <p class="mt-1 text-sm font-medium text-gray-900">{{ formattedStartDate }}</p>
-                    <p class="text-sm text-gray-600">{{ formattedStartTime }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Inicio</p>
+                    <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">{{ formattedStartDate }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ formattedStartTime }}</p>
                   </div>
                 </div>
 
                 <!-- Separador -->
-                <div class="border-t border-gray-200"></div>
+                <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                 <!-- Fin -->
                 <div class="flex items-start">
-                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-orange-100">
-                    <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
+                    <svg class="h-5 w-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </div>
                   <div class="ml-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Fin</p>
-                    <p class="mt-1 text-sm font-medium text-gray-900">{{ formattedEndDate }}</p>
-                    <p class="text-sm text-gray-600">{{ formattedEndTime }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Fin</p>
+                    <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">{{ formattedEndDate }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ formattedEndTime }}</p>
                   </div>
                 </div>
 
                 <!-- Separador -->
-                <div class="border-t border-gray-200"></div>
+                <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                 <!-- Duración -->
                 <div class="flex items-start">
-                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100">
-                    <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
+                    <svg class="h-5 w-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                   </div>
                   <div class="ml-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Duración</p>
-                    <p class="mt-1 text-sm font-medium text-gray-900">{{ durationText }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Duración</p>
+                    <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">{{ durationText }}</p>
                   </div>
                 </div>
               </div>
@@ -143,7 +143,7 @@
               <!-- Sección de Errores (solo si hay errores) -->
               <div
                 v-if="hasValidationErrors"
-                class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4"
+                class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/30"
               >
                 <div class="flex">
                   <div class="flex-shrink-0">
@@ -152,10 +152,10 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
                       No se pudo confirmar la reserva
                     </h3>
-                    <div class="mt-2 text-sm text-red-700">
+                    <div class="mt-2 text-sm text-red-700 dark:text-red-400">
                       <p v-if="generalError">{{ generalError }}</p>
                       <ul v-else class="list-disc space-y-1 pl-5">
                         <li v-for="(errors, field) in validationErrors" :key="field">
@@ -169,7 +169,7 @@
             </div>
 
             <!-- Footer del Modal (Acciones) -->
-            <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse sm:gap-3">
+            <div class="bg-gray-50 px-6 py-4 dark:bg-gray-700 sm:flex sm:flex-row-reverse sm:gap-3">
               <!-- Botón Confirmar -->
               <button
                 @click="handleConfirm"
@@ -197,7 +197,7 @@
               <button
                 @click="closeModal"
                 :disabled="loading"
-                class="mt-3 inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-0 sm:w-auto sm:text-sm"
+                class="mt-3 inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto sm:text-sm"
               >
                 Cancelar
               </button>

@@ -9,6 +9,7 @@
  * - Axios para comunicación con API
  * - Tailwind CSS para estilos
  * - Vue Toastification para notificaciones
+ * - Soporte para modo claro/oscuro
  *
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -63,6 +64,14 @@ const app = createApp({
 app.use(pinia);  // Gestión de estado
 app.use(router); // Enrutamiento
 app.use(Toast, toastOptions); // Sistema de notificaciones
+
+/**
+ * Inicializar el tema antes de montar la aplicación
+ * Esto evita el "flash" de contenido con el tema incorrecto
+ */
+import { useThemeStore } from './stores/theme';
+const themeStore = useThemeStore();
+themeStore.initializeTheme();
 
 /**
  * Montar la aplicación en el elemento #app

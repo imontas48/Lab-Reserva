@@ -2,8 +2,8 @@
   <div>
     <!-- Encabezado -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-      <p class="mt-2 text-sm text-gray-600">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
         Bienvenido de nuevo, {{ userName }}
       </p>
     </div>
@@ -31,7 +31,7 @@
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-        <p class="mt-4 text-sm text-gray-500">Cargando datos...</p>
+        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Cargando datos...</p>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
       <!-- Grid de estadísticas -->
       <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <!-- Card: Laboratorios -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
           <div class="p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0">
@@ -60,20 +60,20 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="truncate text-sm font-medium text-gray-500">
+                  <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                     Laboratorios Disponibles
                   </dt>
-                  <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                  <dd class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
                     {{ stats.available_labs }}
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
-          <div class="bg-gray-50 px-6 py-3">
+          <div class="bg-gray-50 px-6 py-3 dark:bg-gray-700">
             <router-link
               to="/labs"
-              class="text-sm font-medium text-blue-600 hover:text-blue-500"
+              class="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
             >
               Ver todos
             </router-link>
@@ -81,7 +81,7 @@
         </div>
 
         <!-- Card: Equipos -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
           <div class="p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0">
@@ -101,20 +101,20 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="truncate text-sm font-medium text-gray-500">
+                  <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                     Equipos Registrados
                   </dt>
-                  <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                  <dd class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
                     {{ stats.total_equipment }}
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
-          <div class="bg-gray-50 px-6 py-3">
+          <div class="bg-gray-50 px-6 py-3 dark:bg-gray-700">
             <router-link
               to="/equipment"
-              class="text-sm font-medium text-green-600 hover:text-green-500"
+              class="text-sm font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
             >
               Ver todos
             </router-link>
@@ -123,7 +123,7 @@
 
         <!-- Card: Mis Reservas -->
       <!-- Card: Mis Reservas -->
-      <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
         <div class="p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -143,20 +143,20 @@
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>
-                <dt class="truncate text-sm font-medium text-gray-500">
+                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                   Mis Reservas Activas
                 </dt>
-                <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                <dd class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
                   {{ stats.active_reservations }}
                 </dd>
               </dl>
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-6 py-3">
+        <div class="bg-gray-50 px-6 py-3 dark:bg-gray-700">
           <router-link
             to="/reservations"
-            class="text-sm font-medium text-purple-600 hover:text-purple-500"
+            class="text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"
           >
             Ver todas
           </router-link>
@@ -164,7 +164,7 @@
       </div>
 
       <!-- Card: Software -->
-      <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
         <div class="p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -184,20 +184,20 @@
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>
-                <dt class="truncate text-sm font-medium text-gray-500">
+                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                   Software Disponible
                 </dt>
-                <dd class="mt-1 text-3xl font-semibold text-gray-900">
+                <dd class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
                   {{ stats.available_software }}
                 </dd>
               </dl>
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-6 py-3">
+        <div class="bg-gray-50 px-6 py-3 dark:bg-gray-700">
           <router-link
             to="/software"
-            class="text-sm font-medium text-orange-600 hover:text-orange-500"
+            class="text-sm font-medium text-orange-600 hover:text-orange-500 dark:text-orange-400 dark:hover:text-orange-300"
           >
             Ver todo
           </router-link>
@@ -207,16 +207,16 @@
 
     <!-- Acciones rápidas -->
     <div class="mb-8">
-      <h2 class="mb-4 text-xl font-semibold text-gray-900">
+      <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Acciones Rápidas
       </h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <router-link
           to="/reservations/create"
-          class="flex items-center rounded-lg border-2 border-dashed border-gray-300 p-6 transition-colors hover:border-blue-500 hover:bg-blue-50"
+          class="flex items-center rounded-lg border-2 border-dashed border-gray-300 p-6 transition-colors hover:border-blue-500 hover:bg-blue-50 dark:border-gray-600 dark:hover:border-blue-400 dark:hover:bg-blue-900/20"
         >
           <svg
-            class="mr-3 h-8 w-8 text-blue-600"
+            class="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -229,8 +229,8 @@
             />
           </svg>
           <div>
-            <h3 class="text-sm font-medium text-gray-900">Nueva Reserva</h3>
-            <p class="mt-1 text-xs text-gray-500">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Nueva Reserva</h3>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Reservar un laboratorio
             </p>
           </div>
@@ -238,10 +238,10 @@
 
         <router-link
           to="/labs"
-          class="flex items-center rounded-lg border-2 border-dashed border-gray-300 p-6 transition-colors hover:border-green-500 hover:bg-green-50"
+          class="flex items-center rounded-lg border-2 border-dashed border-gray-300 p-6 transition-colors hover:border-green-500 hover:bg-green-50 dark:border-gray-600 dark:hover:border-green-400 dark:hover:bg-green-900/20"
         >
           <svg
-            class="mr-3 h-8 w-8 text-green-600"
+            class="mr-3 h-8 w-8 text-green-600 dark:text-green-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -254,8 +254,8 @@
             />
           </svg>
           <div>
-            <h3 class="text-sm font-medium text-gray-900">Buscar Laboratorio</h3>
-            <p class="mt-1 text-xs text-gray-500">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Buscar Laboratorio</h3>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Explorar laboratorios disponibles
             </p>
           </div>
@@ -263,10 +263,10 @@
 
         <router-link
           to="/equipment"
-          class="flex items-center rounded-lg border-2 border-dashed border-gray-300 p-6 transition-colors hover:border-purple-500 hover:bg-purple-50"
+          class="flex items-center rounded-lg border-2 border-dashed border-gray-300 p-6 transition-colors hover:border-purple-500 hover:bg-purple-50 dark:border-gray-600 dark:hover:border-purple-400 dark:hover:bg-purple-900/20"
         >
           <svg
-            class="mr-3 h-8 w-8 text-purple-600"
+            class="mr-3 h-8 w-8 text-purple-600 dark:text-purple-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -279,8 +279,8 @@
             />
           </svg>
           <div>
-            <h3 class="text-sm font-medium text-gray-900">Ver Equipos</h3>
-            <p class="mt-1 text-xs text-gray-500">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Ver Equipos</h3>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Consultar equipos disponibles
             </p>
           </div>
@@ -290,13 +290,13 @@
 
     <!-- Próximas reservas -->
     <div>
-      <h2 class="mb-4 text-xl font-semibold text-gray-900">
+      <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Próximas Reservas
       </h2>
-      <div class="overflow-hidden rounded-lg bg-white shadow">
+      <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
         <!-- Sin reservas -->
         <div v-if="upcomingReservations.length === 0" class="p-6">
-          <p class="text-center text-sm text-gray-500">
+          <p class="text-center text-sm text-gray-500 dark:text-gray-400">
             No tienes reservas próximas.
           </p>
           <div class="mt-4 text-center">
@@ -310,21 +310,21 @@
         </div>
 
         <!-- Lista de reservas -->
-        <div v-else class="divide-y divide-gray-200">
+        <div v-else class="divide-y divide-gray-200 dark:divide-gray-700">
           <div
             v-for="reservation in upcomingReservations"
             :key="reservation.id"
-            class="p-6 hover:bg-gray-50"
+            class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             <div class="flex items-center justify-between">
               <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-900">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white">
                   {{ reservation.lab_name }}
                 </h3>
-                <p class="mt-1 text-sm text-gray-500">
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {{ reservation.equipment_name }}
                 </p>
-                <div class="mt-2 flex items-center text-xs text-gray-500">
+                <div class="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400">
                   <svg
                     class="mr-1 h-4 w-4"
                     fill="none"

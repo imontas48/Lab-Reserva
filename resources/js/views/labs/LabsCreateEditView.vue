@@ -44,16 +44,16 @@
                         Laboratorios
                     </router-link>
                     <span>/</span>
-                    <span class="text-gray-900">
+                    <span class="text-gray-900 dark:text-white">
                         {{ isEditing ? 'Editar' : 'Crear' }}
                     </span>
                 </nav>
 
                 <!-- Título dinámico -->
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                     {{ isEditing ? 'Editar Laboratorio' : 'Crear Nuevo Laboratorio' }}
                 </h1>
-                <p class="text-gray-600">
+                <p class="text-gray-600 dark:text-gray-300">
                     {{ isEditing
                         ? 'Modifica los datos del laboratorio existente'
                         : 'Completa el formulario para agregar un nuevo laboratorio al sistema'

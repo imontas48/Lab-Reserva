@@ -2,10 +2,10 @@
   <div class="reservation-calendar-container">
     <!-- Encabezado del Calendario -->
     <div class="mb-4">
-      <h3 class="text-lg font-semibold text-gray-900">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
         Disponibilidad del Equipo
       </h3>
-      <p class="mt-1 text-sm text-gray-600">
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
         Selecciona un rango de tiempo disponible para tu reserva
       </p>
     </div>
@@ -33,14 +33,14 @@
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-        <p class="mt-4 text-sm text-gray-600">Cargando disponibilidad...</p>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">Cargando disponibilidad...</p>
       </div>
     </div>
 
     <!-- Error State -->
     <div
       v-else-if="error"
-      class="rounded-lg border border-red-200 bg-red-50 p-4"
+      class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/30"
     >
       <div class="flex">
         <svg
@@ -57,10 +57,10 @@
           />
         </svg>
         <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800">
+          <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
             Error al cargar disponibilidad
           </h3>
-          <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+          <p class="mt-1 text-sm text-red-700 dark:text-red-400">{{ error }}</p>
         </div>
       </div>
     </div>
@@ -74,17 +74,17 @@
     <div class="mt-4 flex items-center justify-center space-x-6 text-sm">
       <div class="flex items-center">
         <div class="mr-2 h-4 w-4 rounded bg-red-500"></div>
-        <span class="text-gray-700">Reservado</span>
+        <span class="text-gray-700 dark:text-gray-300">Reservado</span>
       </div>
       <div class="flex items-center">
         <div class="mr-2 h-4 w-4 rounded bg-green-500"></div>
-        <span class="text-gray-700">Disponible</span>
+        <span class="text-gray-700 dark:text-gray-300">Disponible</span>
       </div>
       <div class="flex items-center">
-        <svg class="mr-2 h-4 w-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
         </svg>
-        <span class="text-gray-700">Haz clic y arrastra para seleccionar</span>
+        <span class="text-gray-700 dark:text-gray-300">Haz clic y arrastra para seleccionar</span>
       </div>
     </div>
   </div>
@@ -406,7 +406,7 @@ onMounted(() => {
  */
 
 .reservation-calendar-container {
-  @apply rounded-lg bg-white p-6 shadow-sm border border-gray-200;
+  @apply rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700;
 }
 
 .calendar-wrapper {
@@ -419,7 +419,7 @@ onMounted(() => {
 }
 
 .calendar-wrapper :deep(.fc-toolbar-title) {
-  @apply text-xl font-semibold text-gray-900;
+  @apply text-xl font-semibold text-gray-900 dark:text-white;
 }
 
 .calendar-wrapper :deep(.fc-button) {
@@ -433,22 +433,22 @@ onMounted(() => {
 
 .calendar-wrapper :deep(.fc-daygrid-day-number),
 .calendar-wrapper :deep(.fc-col-header-cell-cushion) {
-  @apply text-gray-700 no-underline;
+  @apply text-gray-700 no-underline dark:text-gray-300;
 }
 
 .calendar-wrapper :deep(.fc-timegrid-slot-label) {
-  @apply text-gray-600;
+  @apply text-gray-600 dark:text-gray-400;
 }
 
 /* Estilo para slots seleccionables (hover) */
 .calendar-wrapper :deep(.fc-timegrid-slot):hover {
-  @apply bg-blue-50;
+  @apply bg-blue-50 dark:bg-blue-900/30;
   cursor: pointer;
 }
 
 /* Estilo para el área de selección */
 .calendar-wrapper :deep(.fc-highlight) {
-  @apply bg-blue-100 opacity-50;
+  @apply bg-blue-100 opacity-50 dark:bg-blue-800/50;
 }
 
 /* Eventos de reserva */
@@ -463,7 +463,7 @@ onMounted(() => {
 
 /* Día actual destacado */
 .calendar-wrapper :deep(.fc-day-today) {
-  @apply bg-yellow-50;
+  @apply bg-yellow-50 dark:bg-yellow-900/20;
 }
 
 /* Responsive */
