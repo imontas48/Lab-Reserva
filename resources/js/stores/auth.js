@@ -97,6 +97,23 @@ export const useAuthStore = defineStore('auth', () => {
     });
 
     /**
+     * Obtiene la etiqueta legible del rol del usuario
+     * @returns {string}
+     */
+    const userRoleLabel = computed(() => {
+        const role = user.value?.role;
+        const roleMap = {
+            admin: 'Admin',
+            teacher: 'Profesor',
+            profesor: 'Profesor',
+            student: 'Estudiante',
+            estudiante: 'Estudiante',
+        };
+        if (user.value?.is_admin) return 'Admin';
+        return roleMap[role] || role || '';
+    });
+
+    /**
      * Obtiene el email del usuario
      * @returns {string}
      */
@@ -400,6 +417,7 @@ export const useAuthStore = defineStore('auth', () => {
         isTeacher,
         isStudent,
         userName,
+        userRoleLabel,
         userEmail,
 
         // Actions

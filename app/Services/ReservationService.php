@@ -213,6 +213,59 @@ class ReservationService
     }
 
     /**
+     * Get reservations filtered by the user's role (admin only).
+     *
+     * Permite al administrador ver todas las reservas hechas por
+     * un tipo de usuario específico (student o teacher).
+     *
+     * @param string $role - 'student' | 'teacher'
+     * @param array $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
+    public function getReservationsByUserRole(string $role, array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = reservations::with(['user', 'equipment.lab'])
+            ->whereHas('user', function ($q) use ($role) {
+                $q->where('role', $role);
+            });
+
+        // Filtrar por estado
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Filtrar por rango de fechas
+        if (isset($filters['start_date']) && isset($filters['end_date'])) {
+            $query->betweenDates($filters['start_date'], $filters['end_date']);
+        } elseif (isset($filters['start_date'])) {
+            $query->where('start_time', '>=', $filters['start_date']);
+        } elseif (isset($filters['end_date'])) {
+            $query->where('end_time', '<=', $filters['end_date']);
+        }
+
+        // Búsqueda general
+        if (isset($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', "%{$search}%")
+                              ->orWhere('email', 'like', "%{$search}%");
+                })
+                ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
+                    $equipmentQuery->where('identifier', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $sortBy = $filters['sort_by'] ?? 'start_time';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        return $query->paginate($perPage);
+    }
+
+    /**
      * Get reservations for a specific equipment.
      * Útil para calendarios y visualización de disponibilidad.
      *

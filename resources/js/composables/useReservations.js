@@ -37,6 +37,12 @@ export function useReservations() {
   const reservations = ref([]);
 
   /**
+   * Metadatos de paginación para el listado actual (by-role)
+   * @type {Ref<Object|null>}
+   */
+  const paginationMeta = ref(null);
+
+  /**
    * Estado de carga para operaciones asíncronas
    * @type {Ref<boolean>}
    */
@@ -307,17 +313,47 @@ export function useReservations() {
   // RETORNO DEL COMPOSABLE
   // ============================================================================
 
+  /**
+   * Obtiene todas las reservas de usuarios con un rol específico (solo admin).
+   *
+   * @param {'student'|'teacher'} role - Rol de los usuarios cuyas reservas se quieren ver.
+   * @param {Object} params - Parámetros opcionales (status, search, start_date, end_date, etc.)
+   * @returns {Promise<boolean>} - true si se cargaron con éxito, false si hubo error
+   */
+  const fetchReservationsByRole = async (role, params = {}) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.get(`/reservations/by-role/${role}`, { params });
+      reservations.value = response.data.data || response.data;
+      paginationMeta.value = response.data.meta || null;
+      return true;
+
+    } catch (err) {
+      handleApiError(err, `Error al cargar las reservas de ${role === 'student' ? 'estudiantes' : 'maestros'}`);
+      reservations.value = [];
+      paginationMeta.value = null;
+      return false;
+
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     // Estado reactivo
     reservations,
     loading,
     error,
     validationErrors,
+    paginationMeta,
 
     // Métodos
     fetchReservationsForEquipment,
     createReservation,
     fetchMyReservations,
-    cancelMyReservation
+    cancelMyReservation,
+    fetchReservationsByRole,
   };
 }

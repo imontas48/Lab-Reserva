@@ -17,10 +17,7 @@ class ReservationController extends Controller
 {
     public function __construct(
         private readonly ReservationService $reservationService
-    ) {
-        // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(reservations::class, 'reservation');
-    }
+    ) {}
 
     /**
      * Display a listing of all reservations (admin only).
@@ -28,6 +25,8 @@ class ReservationController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', reservations::class);
+
         $filters = [
             'search' => $request->input('search'),
             'user_id' => $request->input('user_id'),
@@ -114,7 +113,8 @@ class ReservationController extends Controller
      */
     public function show(reservations $reservation): ReservationResource
     {
-        // Cargamos las relaciones necesarias
+        $this->authorize('view', $reservation);
+
         $reservation->load(['user', 'equipment.lab']);
 
         return new ReservationResource($reservation);
@@ -127,6 +127,8 @@ class ReservationController extends Controller
      */
     public function update(UpdateReservationRequest $request, reservations $reservation): ReservationResource
     {
+        $this->authorize('update', $reservation);
+
         $updatedReservation = $this->reservationService->updateReservation(
             $reservation,
             $request->validated()
@@ -141,18 +143,43 @@ class ReservationController extends Controller
      */
     public function cancel(reservations $reservation): ReservationResource
     {
-        // TODO: Implementar autorización con Policy
-        // La autorización se maneja en la Policy (método update)
-        // $this->authorize('update', $reservation);
-
-        // Por ahora, verificar que el usuario sea dueño de la reserva
-        if ($reservation->user_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para cancelar esta reserva.');
-        }
+        $this->authorize('cancel', $reservation);
 
         $cancelledReservation = $this->reservationService->cancelReservation($reservation);
 
         return new ReservationResource($cancelledReservation);
+    }
+
+    /**
+     * Display reservations filtered by user role (admin only).
+     * GET /api/v1/reservations/by-role/{role}
+     *
+     * @param Request $request
+     * @param string $role - 'student' | 'teacher'
+     */
+    public function indexByRole(Request $request, string $role): AnonymousResourceCollection
+    {
+        $this->authorize('viewAny', reservations::class);
+
+        // Validar que el rol solicitado sea válido
+        if (!in_array($role, ['student', 'teacher'])) {
+            abort(422, 'Rol no válido. Debe ser "student" o "teacher".');
+        }
+
+        $filters = [
+            'search'     => $request->input('search'),
+            'status'     => $request->input('status'),
+            'start_date' => $request->input('start_date'),
+            'end_date'   => $request->input('end_date'),
+            'sort_by'    => $request->input('sort_by', 'start_time'),
+            'sort_order' => $request->input('sort_order', 'desc'),
+        ];
+
+        $perPage = $request->integer('per_page', 15);
+
+        $reservations = $this->reservationService->getReservationsByUserRole($role, $filters, $perPage);
+
+        return ReservationResource::collection($reservations);
     }
 
     /**
@@ -161,6 +188,8 @@ class ReservationController extends Controller
      */
     public function destroy(reservations $reservation): JsonResponse
     {
+        $this->authorize('delete', $reservation);
+
         $this->reservationService->deleteReservation($reservation);
 
         return response()->json([

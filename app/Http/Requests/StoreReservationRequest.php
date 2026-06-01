@@ -9,11 +9,11 @@ class StoreReservationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     * La autorización fina se manejará en la Policy.
+     * Delega la autorización a ReservationPolicy@create.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', reservations::class);
     }
 
     /**

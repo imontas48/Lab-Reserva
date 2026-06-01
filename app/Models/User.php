@@ -128,4 +128,24 @@ class User extends Authenticatable
     {
         return in_array($this->role, ['admin', 'teacher']);
     }
+
+    // =========================================================================
+    // RELACIONES RBAC
+    // =========================================================================
+
+    /**
+     * Asignaciones individuales de roles de este usuario.
+     */
+    public function userRoles(): HasMany
+    {
+        return $this->hasMany(UserRole::class);
+    }
+
+    /**
+     * Sobreescrituras de permisos de este usuario.
+     */
+    public function permissionOverrides(): HasMany
+    {
+        return $this->hasMany(PermissionOverride::class);
+    }
 }

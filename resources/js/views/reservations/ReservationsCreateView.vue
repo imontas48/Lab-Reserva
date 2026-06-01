@@ -192,9 +192,9 @@ const handleEquipmentSelection = () => {
             v-for="eq in labEquipment"
             :key="eq.id"
             :value="eq.id"
-            :disabled="eq.status?.status !== 'available'"
+            :disabled="eq.status?.status === 'out_of_service'"
           >
-            {{ eq.name || eq.identifier }} - {{ eq.status?.details || 'Cargando...' }}
+            {{ eq.name || eq.identifier }} — {{ eq.status?.details || 'Cargando...' }}
           </option>
         </select>
 
@@ -233,8 +233,34 @@ const handleEquipmentSelection = () => {
               {{ selectedEquipmentPreview.status.details }}
             </span>
           </div>
+          <!-- Aviso informativo cuando hay reservas en otros horarios (no bloquea) -->
+          <div
+            v-if="selectedEquipmentPreview?.status?.status === 'reserved' || selectedEquipmentPreview?.status?.status === 'in_use'"
+            class="mt-3 rounded-lg bg-blue-50 border border-blue-200 p-3 dark:bg-blue-900/30 dark:border-blue-800"
+          >
+            <p class="text-sm text-blue-800 dark:text-blue-300">
+              <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Este equipo tiene reservas en algunos horarios. En el calendario podrás elegir un horario libre disponible.
+            </p>
+          </div>
+
+          <!-- Aviso de fuera de servicio (bloquea la selección) -->
+          <div
+            v-else-if="selectedEquipmentPreview?.status?.status === 'out_of_service'"
+            class="mt-3 rounded-lg bg-red-50 border border-red-200 p-3 dark:bg-red-900/30 dark:border-red-800"
+          >
+            <p class="text-sm text-red-800 dark:text-red-300">
+              <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              Este equipo está en mantenimiento y no puede ser reservado. Por favor selecciona otro.
+            </p>
+          </div>
+
           <button
-            v-if="selectedEquipmentPreview?.status?.status === 'available'"
+            v-if="selectedEquipmentPreview?.status?.status !== 'out_of_service'"
             @click="confirmEquipmentSelection"
             class="mt-4 w-full inline-flex justify-center items-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
@@ -243,16 +269,6 @@ const handleEquipmentSelection = () => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
           </button>
-
-          <!-- Mensaje cuando no está disponible -->
-          <div v-else class="mt-4 rounded-lg bg-yellow-50 border border-yellow-200 p-3 dark:bg-yellow-900/30 dark:border-yellow-800">
-            <p class="text-sm text-yellow-800 dark:text-yellow-300">
-              <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-              </svg>
-              Este equipo no está disponible en este momento. Por favor selecciona otro.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -343,8 +359,102 @@ const handleEquipmentSelection = () => {
           Selecciona tu Horario
         </h2>
         <p class="text-sm text-gray-600 dark:text-gray-300 ml-11">
-          Haz clic y arrastra en el calendario para seleccionar el rango de tiempo que necesitas
+          Usa el formulario para elegir fecha y hora, o haz clic y arrastra directamente en el calendario
         </p>
+      </div>
+
+      <!-- ===== Formulario de selección rápida ===== -->
+      <div class="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <svg class="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          Selección rápida de fecha y hora
+        </h3>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <!-- Fecha -->
+          <div>
+            <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Fecha
+            </label>
+            <VueDatePicker
+              v-model="quickDate"
+              :dark="isDark"
+              :min-date="today"
+              locale="es"
+              :format="'dd/MM/yyyy'"
+              :enable-time-picker="false"
+              :clearable="true"
+              auto-apply
+              placeholder="dd/mm/aaaa"
+            />
+          </div>
+
+          <!-- Hora de inicio -->
+          <div>
+            <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Hora de inicio
+            </label>
+            <VueDatePicker
+              v-model="quickStartTime"
+              :dark="isDark"
+              time-picker
+              :clearable="true"
+              :minutes-increment="15"
+              :min-time="{ hours: 7, minutes: 0 }"
+              :max-time="{ hours: 21, minutes: 30 }"
+              placeholder="HH:mm"
+            />
+          </div>
+
+          <!-- Hora de fin -->
+          <div>
+            <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Hora de fin
+            </label>
+            <VueDatePicker
+              v-model="quickEndTime"
+              :dark="isDark"
+              time-picker
+              :clearable="true"
+              :minutes-increment="15"
+              :min-time="{ hours: 7, minutes: 30 }"
+              :max-time="{ hours: 22, minutes: 0 }"
+              placeholder="HH:mm"
+            />
+          </div>
+        </div>
+
+        <!-- Error de validación -->
+        <p v-if="quickSelectError" class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+          <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ quickSelectError }}
+        </p>
+
+        <!-- Vista previa del horario -->
+        <div
+          v-if="quickDate && quickStartTime && quickEndTime && !quickSelectError"
+          class="mt-3 rounded-lg bg-purple-50 border border-purple-200 px-4 py-2.5 text-sm text-purple-800 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-300 flex items-center gap-2"
+        >
+          <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ formatQuickPreview }}
+        </div>
+
+        <button
+          :disabled="!quickDate || !quickStartTime || !quickEndTime || !!quickSelectError"
+          @click="handleQuickSelect"
+          class="mt-4 inline-flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-800"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Confirmar este horario
+        </button>
       </div>
 
       <!-- Calendario de disponibilidad -->
@@ -374,6 +484,8 @@ import { useLabs } from '@/composables/useLabs';
 import { useToast } from '@/composables/useToast';
 import ReservationCalendar from '@/components/reservations/ReservationCalendar.vue';
 import CreateReservationModal from '@/components/reservations/CreateReservationModal.vue';
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 // ============================================================================
 // COMPOSABLES
@@ -426,6 +538,24 @@ const showModal = ref(false);
  */
 const reservationDetails = ref(null);
 
+// --- Selección rápida de fecha/hora (Paso 3) ---
+/** Fecha elegida en el formulario rápido (objeto Date o null) */
+const quickDate = ref(null);
+/** Hora de inicio elegida ({ hours, minutes } o null) */
+const quickStartTime = ref(null);
+/** Hora de fin elegida ({ hours, minutes } o null) */
+const quickEndTime = ref(null);
+/** Fecha mínima permitida en el datepicker (hoy) */
+const today = new Date();
+/** Detecta el tema oscuro activo para pasárselo al datepicker */
+const isDark = ref(document.documentElement.classList.contains('dark'));
+const themeObserver = new MutationObserver(() => {
+  isDark.value = document.documentElement.classList.contains('dark');
+});
+onMounted(() => {
+  themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
+});
+
 // ============================================================================
 // COMPUTED
 // ============================================================================
@@ -453,6 +583,61 @@ const labEquipment = computed(() => {
 const selectedEquipmentPreview = computed(() => {
   if (!selectedEquipmentId.value) return null;
   return labEquipment.value.find(eq => eq.id === selectedEquipmentId.value);
+});
+
+/**
+ * Convierte el valor del datepicker de tiempo ({ hours, minutes }) a 'HH:mm'.
+ */
+const timeToString = (t) => {
+  if (!t) return '';
+  const h = String(t.hours).padStart(2, '0');
+  const m = String(t.minutes).padStart(2, '0');
+  return `${h}:${m}`;
+};
+
+/**
+ * Valida la selección rápida de fecha/hora en tiempo real.
+ * Retorna un mensaje de error o null si todo está bien.
+ */
+const quickSelectError = computed(() => {
+  if (!quickDate.value || !quickStartTime.value || !quickEndTime.value) return null;
+
+  const dateStr = quickDate.value instanceof Date
+    ? quickDate.value.toISOString().split('T')[0]
+    : quickDate.value;
+  const startStr = timeToString(quickStartTime.value);
+  const endStr   = timeToString(quickEndTime.value);
+
+  const start = new Date(`${dateStr}T${startStr}`);
+  const end   = new Date(`${dateStr}T${endStr}`);
+
+  if (start < new Date()) return 'La fecha y hora de inicio no puede estar en el pasado.';
+  if (end <= start) return 'La hora de fin debe ser posterior a la hora de inicio.';
+
+  const diffMinutes = (end - start) / 60000;
+  if (diffMinutes < 30) return 'La reserva debe tener al menos 30 minutos de duración.';
+  if (diffMinutes > 480) return 'La reserva no puede superar las 8 horas.';
+
+  return null;
+});
+
+/**
+ * Muestra una vista previa legible del horario seleccionado con el formulario rápido.
+ */
+const formatQuickPreview = computed(() => {
+  if (!quickDate.value || !quickStartTime.value || !quickEndTime.value) return '';
+
+  const dateStr = quickDate.value instanceof Date
+    ? quickDate.value.toISOString().split('T')[0]
+    : quickDate.value;
+  const startStr = timeToString(quickStartTime.value);
+  const endStr   = timeToString(quickEndTime.value);
+
+  const dateLabel = new Intl.DateTimeFormat('es-ES', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  }).format(new Date(`${dateStr}T${startStr}`));
+
+  return `${dateLabel} · ${startStr} – ${endStr} hrs`;
 });
 
 // ============================================================================
@@ -503,15 +688,8 @@ const confirmEquipmentSelection = () => {
   }
 
   // Validación usando el nuevo sistema de estados dinámicos
-  if (equipment.status?.status !== 'available') {
-    const statusMessages = {
-      'in_use': 'Este equipo está actualmente en uso',
-      'reserved': 'Este equipo ya tiene una reserva programada',
-      'out_of_service': 'Este equipo está fuera de servicio'
-    };
-
-    const message = statusMessages[equipment.status?.status] || 'Este equipo no está disponible';
-    toast.error(message);
+  if (equipment.status?.status === 'out_of_service') {
+    toast.error('Este equipo está en mantenimiento y no puede ser reservado.');
     return;
   }
 
@@ -528,6 +706,9 @@ const clearEquipmentSelection = () => {
   selectedEquipmentId.value = null;
   reservationDetails.value = null;
   showModal.value = false;
+  quickDate.value = null;
+  quickStartTime.value = null;
+  quickEndTime.value = null;
 };
 
 /**
@@ -544,6 +725,25 @@ const handleSlotSelected = (slot) => {
   };
 
   showModal.value = true;
+};
+
+/**
+ * Construye las fechas ISO desde el formulario de selección rápida
+ * y abre el mismo modal de confirmación que el calendario.
+ */
+const handleQuickSelect = () => {
+  if (quickSelectError.value) return;
+
+  const dateStr = quickDate.value instanceof Date
+    ? quickDate.value.toISOString().split('T')[0]
+    : quickDate.value;
+  const startStr = timeToString(quickStartTime.value);
+  const endStr   = timeToString(quickEndTime.value);
+
+  const start = new Date(`${dateStr}T${startStr}`).toISOString();
+  const end   = new Date(`${dateStr}T${endStr}`).toISOString();
+
+  handleSlotSelected({ start, end });
 };
 
 /**
@@ -593,5 +793,70 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Estilos adicionales si son necesarios */
+/* ─── VueDatePicker — integración con el tema de la app ─── */
+
+/* Modo claro: variables de color */
+:deep(.dp__theme_light) {
+  --dp-background-color: #ffffff;
+  --dp-text-color: #111827;
+  --dp-hover-color: #f3f4f6;
+  --dp-hover-text-color: #111827;
+  --dp-hover-icon-color: #6b7280;
+  --dp-primary-color: #7c3aed;          /* purple-700 — acento de la sección */
+  --dp-primary-text-color: #ffffff;
+  --dp-secondary-color: #e5e7eb;
+  --dp-border-color: #d1d5db;           /* gray-300 */
+  --dp-menu-border-color: #d1d5db;
+  --dp-border-color-hover: #9ca3af;     /* gray-400 */
+  --dp-border-color-focus: #7c3aed;     /* purple-700 */
+  --dp-disabled-color: #f3f4f6;
+  --dp-scroll-bar-background: #f3f4f6;
+  --dp-scroll-bar-color: #d1d5db;
+  --dp-success-color: #16a34a;
+  --dp-success-color-disabled: #bbf7d0;
+  --dp-icon-color: #6b7280;
+  --dp-danger-color: #dc2626;
+  --dp-highlight-color: #ede9fe;        /* purple-100 */
+  --dp-font-size: 0.875rem;
+  --dp-border-radius: 0.5rem;
+}
+
+/* Modo oscuro: variables de color */
+:deep(.dp__theme_dark) {
+  --dp-background-color: #111827;       /* gray-900 */
+  --dp-text-color: #f9fafb;
+  --dp-hover-color: #1f2937;            /* gray-800 */
+  --dp-hover-text-color: #f9fafb;
+  --dp-hover-icon-color: #9ca3af;
+  --dp-primary-color: #8b5cf6;          /* purple-500 */
+  --dp-primary-text-color: #ffffff;
+  --dp-secondary-color: #374151;
+  --dp-border-color: #4b5563;           /* gray-600 */
+  --dp-menu-border-color: #374151;
+  --dp-border-color-hover: #6b7280;     /* gray-500 */
+  --dp-border-color-focus: #8b5cf6;
+  --dp-disabled-color: #1f2937;
+  --dp-scroll-bar-background: #1f2937;
+  --dp-scroll-bar-color: #374151;
+  --dp-success-color: #22c55e;
+  --dp-success-color-disabled: #166534;
+  --dp-icon-color: #9ca3af;
+  --dp-danger-color: #ef4444;
+  --dp-highlight-color: #4c1d95;        /* purple-900 */
+  --dp-font-size: 0.875rem;
+  --dp-border-radius: 0.5rem;
+}
+
+/* Input trigger: mismo alto y padding que BaseInput */
+:deep(.dp__input) {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Quitar el anillo de foco nativo; VueDatePicker aplica el suyo con variables */
+:deep(.dp__input:focus) {
+  outline: none;
+}
 </style>

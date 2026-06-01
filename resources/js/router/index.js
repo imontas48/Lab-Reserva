@@ -267,6 +267,26 @@ const routes = [
                 }
             },
             {
+                path: '/reservations/students',
+                name: 'reservations.students',
+                component: () => import('@/views/reservations/ReservationsStudentsView.vue'),
+                meta: {
+                    title: 'Reservas de Estudiantes',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/reservations/teachers',
+                name: 'reservations.teachers',
+                component: () => import('@/views/reservations/ReservationsTeachersView.vue'),
+                meta: {
+                    title: 'Reservas de Maestros',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
                 path: '/reservations/create',
                 name: 'reservations.create',
                 component: () => import('@/views/reservations/ReservationsCreateView.vue'),
@@ -295,6 +315,60 @@ const routes = [
                 meta: {
                     title: 'Mi Perfil',
                     requiresAuth: true,
+                }
+            },
+
+            // ─────────────────────────────────────────────────────────────────
+            // GESTIÓN DE ROLES Y PERMISOS (Solo administradores)
+            // ─────────────────────────────────────────────────────────────────
+            {
+                path: '/roles',
+                name: 'roles.index',
+                component: () => import('@/views/roles/RolesIndexView.vue'),
+                meta: {
+                    title: 'Roles',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/roles/create',
+                name: 'roles.create',
+                component: () => import('@/views/roles/RolesCreateEditView.vue'),
+                meta: {
+                    title: 'Crear Rol',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/roles/:id/edit',
+                name: 'roles.edit',
+                component: () => import('@/views/roles/RolesCreateEditView.vue'),
+                meta: {
+                    title: 'Editar Rol',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/permissions',
+                name: 'permissions.index',
+                component: () => import('@/views/roles/PermissionsIndexView.vue'),
+                meta: {
+                    title: 'Permisos del Sistema',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/group-role-assignments',
+                name: 'group-role-assignments.index',
+                component: () => import('@/views/roles/GroupRoleAssignmentsView.vue'),
+                meta: {
+                    title: 'Reglas de Grupo',
+                    requiresAuth: true,
+                    requiresAdmin: true,
                 }
             },
         ]
