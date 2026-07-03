@@ -27,7 +27,7 @@ class AdminUserSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        $this->command->info('✅ Usuario administrador creado:');
+        $this->command->info(' Usuario administrador creado:');
         $this->command->info('   Email: admin@lab-reserva.test');
         $this->command->info('   Password: password');
     }

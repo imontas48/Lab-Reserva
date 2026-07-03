@@ -1,6 +1,6 @@
-# 🔧 Fix: ReservationResource Not Found
+#  Fix: ReservationResource Not Found
 
-## ❌ Problema
+##  Problema
 
 Al presionar "Continuar con este equipo", se producía un error 500:
 
@@ -10,7 +10,7 @@ File: C:\laragon\www\Lab-Reserva\app\Http\Controllers\Api\ReservationController.
 Line: 92
 ```
 
-## 🔍 Diagnóstico
+##  Diagnóstico
 
 1. El `ReservationController` estaba intentando usar `ReservationResource::collection()` en el método `indexForEquipment()`
 2. La clase `App\Http\Resources\ReservationResource` **no existía** en el proyecto
@@ -20,7 +20,7 @@ Line: 92
    ```
 4. Pero la clase real no había sido creada
 
-## ✅ Solución
+##  Solución
 
 Se creó el archivo `app/Http/Resources/ReservationResource.php` con la siguiente estructura:
 
@@ -78,7 +78,7 @@ class ReservationResource extends JsonResource
 }
 ```
 
-## 📊 Características del Resource
+##  Características del Resource
 
 ### Campos Básicos
 - `id`, `user_id`, `equipment_id`, `status`
@@ -94,7 +94,7 @@ class ReservationResource extends JsonResource
 - `is_past`: ¿Ya terminó? (end < NOW)
 - `is_future`: ¿Aún no empieza? (start > NOW)
 
-## 🎯 Uso en el Controller
+##  Uso en el Controller
 
 ```php
 public function indexForEquipment(
@@ -116,7 +116,7 @@ public function indexForEquipment(
 }
 ```
 
-## 🔬 Testing
+##  Testing
 
 ### Verificar Reservas Existentes
 ```bash
@@ -149,7 +149,7 @@ Query params:
   - status (default: confirmed)
 ```
 
-## 📱 Integración con Frontend
+##  Integración con Frontend
 
 El composable `useReservations.js` ya está configurado para consumir este endpoint:
 
@@ -190,16 +190,16 @@ const calendarEvents = computed(() => {
 });
 ```
 
-## ✅ Estado Final
+##  Estado Final
 
-- ✅ `ReservationResource.php` creado
-- ✅ Controller importando correctamente
-- ✅ Formato compatible con FullCalendar (ISO 8601)
-- ✅ Campos calculados para facilitar lógica frontend
-- ✅ Relaciones condicionales para evitar N+1
-- ✅ Scripts de testing creados
+-  `ReservationResource.php` creado
+-  Controller importando correctamente
+-  Formato compatible con FullCalendar (ISO 8601)
+-  Campos calculados para facilitar lógica frontend
+-  Relaciones condicionales para evitar N+1
+-  Scripts de testing creados
 
-## 🚀 Próximos Pasos
+##  Próximos Pasos
 
 1. Refrescar la página en el navegador
 2. Volver a intentar el flujo completo:
@@ -209,7 +209,7 @@ const calendarEvents = computed(() => {
 3. Intentar con equipo que tiene reservas (LAB-PC-001):
    - Debería mostrar bloque rojo en el calendario
 
-## 📝 Notas
+##  Notas
 
 - El equipo PC-DEMO-002 (ID: 3) NO tiene reservas, por eso la API devuelve array vacío `{"data": []}`
 - Esto es **correcto** y no debe producir error 500

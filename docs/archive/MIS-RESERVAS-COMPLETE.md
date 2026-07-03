@@ -1,6 +1,6 @@
-# ✅ Vista "Mis Reservas" - IMPLEMENTACIÓN COMPLETA
+#  Vista "Mis Reservas" - IMPLEMENTACIÓN COMPLETA
 
-## 📋 Resumen
+##  Resumen
 
 Se ha implementado exitosamente la vista completa de **"Mis Reservas"** (`ReservationsIndexView.vue`) que permite a los usuarios:
 - Ver todas sus reservas con información detallada
@@ -8,13 +8,13 @@ Se ha implementado exitosamente la vista completa de **"Mis Reservas"** (`Reserv
 - Cancelar reservas futuras
 - Navegar para crear nuevas reservas
 
-## 🎯 Características Implementadas
+##  Características Implementadas
 
 ### 1. **Sistema de Tabs/Filtros**
-- 🟢 **Próximas**: Reservas futuras confirmadas
-- 🔵 **Activas**: Reservas en uso ahora mismo
-- ⚫ **Pasadas**: Reservas completadas
-- 🔴 **Canceladas**: Reservas canceladas
+-  **Próximas**: Reservas futuras confirmadas
+-  **Activas**: Reservas en uso ahora mismo
+-  **Pasadas**: Reservas completadas
+-  **Canceladas**: Reservas canceladas
 
 Cada tab muestra el conteo de reservas en tiempo real.
 
@@ -69,7 +69,7 @@ Cada reserva se muestra en una tarjeta con:
 - Espaciado y márgenes optimizados
 - Transiciones suaves en hover
 
-## 📁 Estructura del Código
+##  Estructura del Código
 
 ### Template
 ```vue
@@ -128,7 +128,7 @@ onMounted(async () => {
 });
 ```
 
-## 🔌 Backend Integration
+##  Backend Integration
 
 ### Endpoint
 ```
@@ -199,7 +199,7 @@ return [
 ];
 ```
 
-## 🧪 Datos de Prueba
+##  Datos de Prueba
 
 ### Verificar Reservas del Usuario
 ```bash
@@ -208,15 +208,15 @@ php check-my-reservations.php
 
 ### Resultado
 ```
-✅ Usuario: Administrador (ID: 1)
-📊 Total de reservas del usuario: 3
+ Usuario: Administrador (ID: 1)
+ Total de reservas del usuario: 3
 
-Reserva #3 - PC-DEMO-002 - PROGRAMADA (Futura) 🟢
-Reserva #2 - PC-DEMO-001 - PROGRAMADA (Futura) 🟢
-Reserva #1 - LAB-PC-001 - ACTIVA (En uso ahora) 🔵
+Reserva #3 - PC-DEMO-002 - PROGRAMADA (Futura) 
+Reserva #2 - PC-DEMO-001 - PROGRAMADA (Futura) 
+Reserva #1 - LAB-PC-001 - ACTIVA (En uso ahora) 
 ```
 
-## 🎨 UI/UX Highlights
+##  UI/UX Highlights
 
 ### Color Scheme
 - **Verde** (`bg-green-100 text-green-800`): Reservas futuras/programadas
@@ -225,11 +225,11 @@ Reserva #1 - LAB-PC-001 - ACTIVA (En uso ahora) 🔵
 - **Rojo** (`bg-red-100 text-red-800`): Reservas canceladas
 
 ### Iconografía
-- 📅 Calendario: Fechas
-- 🕐 Reloj: Horarios
-- 💻 Computadora: Equipos
-- 🏢 Edificio: Laboratorios
-- ✖️ Cruz: Cancelar
+-  Calendario: Fechas
+-  Reloj: Horarios
+-  Computadora: Equipos
+-  Edificio: Laboratorios
+- ️ Cruz: Cancelar
 
 ### Transiciones
 - Hover en cards: `hover:shadow-md`
@@ -237,7 +237,7 @@ Reserva #1 - LAB-PC-001 - ACTIVA (En uso ahora) 🔵
 - Loading spinners animados
 - Estado deshabilitado en botones durante acciones
 
-## 📊 Ejemplo de Response API
+##  Ejemplo de Response API
 
 ```json
 GET /api/v1/my-reservations
@@ -278,7 +278,7 @@ GET /api/v1/my-reservations
 }
 ```
 
-## 🚀 Flujo de Usuario
+##  Flujo de Usuario
 
 ### 1. Entrar a "Mis Reservas"
 ```
@@ -296,7 +296,7 @@ http://lab-reserva.test/reservations
 - Laboratorio: Computo 1
 - Fecha: martes, 15 de octubre de 2025
 - Horario: 08:30 - 10:30 (120 min)
-- Estado: 🟢 Programada
+- Estado:  Programada
 
 ### 4. Cancelar Reserva
 1. Click en "Cancelar Reserva"
@@ -308,7 +308,7 @@ http://lab-reserva.test/reservations
 - Click en botón "Nueva Reserva" (header)
 - Redirige a `/reservations/create`
 
-## ✅ Checklist de Funcionalidades
+##  Checklist de Funcionalidades
 
 - [x] Cargar reservas del usuario autenticado
 - [x] Mostrar loading state durante carga
@@ -331,7 +331,7 @@ http://lab-reserva.test/reservations
 - [x] Integración con composable useToast
 - [x] Eager loading de relaciones (equipment.lab)
 
-## 📝 Próximas Mejoras Sugeridas
+##  Próximas Mejoras Sugeridas
 
 - [ ] Paginación (ya soportada por backend)
 - [ ] Filtros adicionales por fecha
@@ -342,15 +342,15 @@ http://lab-reserva.test/reservations
 - [ ] Notificaciones de recordatorio
 - [ ] Historial de cambios en la reserva
 
-## 🎉 Conclusión
+##  Conclusión
 
 La vista **"Mis Reservas"** está completamente funcional y proporciona:
-- ✅ Visualización clara y organizada de todas las reservas
-- ✅ Filtrado intuitivo por estado
-- ✅ Información completa de cada reserva
-- ✅ Capacidad de cancelar reservas futuras
-- ✅ Estados de carga y error bien manejados
-- ✅ Diseño responsive y moderno
-- ✅ Integración completa con backend
+-  Visualización clara y organizada de todas las reservas
+-  Filtrado intuitivo por estado
+-  Información completa de cada reserva
+-  Capacidad de cancelar reservas futuras
+-  Estados de carga y error bien manejados
+-  Diseño responsive y moderno
+-  Integración completa con backend
 
 El usuario ahora puede gestionar fácilmente todas sus reservas desde una sola vista.

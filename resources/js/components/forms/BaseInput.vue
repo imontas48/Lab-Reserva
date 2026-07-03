@@ -8,11 +8,11 @@
          Proporciona validación visual, accesibilidad y compatibilidad con v-model.
 
          CARACTERÍSTICAS:
-         - ✅ v-model compatible
-         - ✅ Accesibilidad (A11y) garantizada
-         - ✅ Estados visuales (normal, focus, error, disabled)
-         - ✅ Validación visual integrada
-         - ✅ Tailwind CSS con soporte dark mode
+         -  v-model compatible
+         -  Accesibilidad (A11y) garantizada
+         -  Estados visuales (normal, focus, error, disabled)
+         -  Validación visual integrada
+         -  Tailwind CSS con soporte dark mode
 
          USO:
          <BaseInput

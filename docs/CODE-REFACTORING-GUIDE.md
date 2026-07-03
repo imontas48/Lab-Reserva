@@ -1,12 +1,12 @@
-# 📚 Guía de Refactorización: Código Limpio en Vue 3
+#  Guía de Refactorización: Código Limpio en Vue 3
 
-## 🎯 Objetivo
+##  Objetivo
 
 Esta guía documenta las mejores prácticas aplicadas al refactorizar `SoftwareIndexView.vue` para mejorar la **legibilidad**, **mantenibilidad** y **reutilización** del código.
 
 ---
 
-## ❌ Problemas Identificados en el Código Original
+##  Problemas Identificados en el Código Original
 
 ### 1. **Clases CSS Extensas y Repetitivas**
 
@@ -16,10 +16,10 @@ Esta guía documenta las mejores prácticas aplicadas al refactorizar `SoftwareI
 ```
 
 **Problemas:**
-- ❌ Línea de 150+ caracteres (difícil de leer)
-- ❌ Dificulta cambios globales (hay que buscar/reemplazar en múltiples lugares)
-- ❌ Aumenta el riesgo de inconsistencias visuales
-- ❌ Viola el principio DRY (Don't Repeat Yourself)
+-  Línea de 150+ caracteres (difícil de leer)
+-  Dificulta cambios globales (hay que buscar/reemplazar en múltiples lugares)
+-  Aumenta el riesgo de inconsistencias visuales
+-  Viola el principio DRY (Don't Repeat Yourself)
 
 ---
 
@@ -37,13 +37,13 @@ Esta guía documenta las mejores prácticas aplicadas al refactorizar `SoftwareI
 ```
 
 **Análisis:**
-- ⚠️ El path SVG es necesario, pero el **icono decorativo** puede ser opcional
-- ⚠️ Para un badge de "versión", el icono no aporta valor semántico crítico
-- ✅ **Decisión**: Simplificar eliminando iconos redundantes en badges
+- ️ El path SVG es necesario, pero el **icono decorativo** puede ser opcional
+- ️ Para un badge de "versión", el icono no aporta valor semántico crítico
+-  **Decisión**: Simplificar eliminando iconos redundantes en badges
 
 ---
 
-## ✅ Soluciones Implementadas
+##  Soluciones Implementadas
 
 ### **Solución 1: Computed Properties para Clases CSS**
 
@@ -67,10 +67,10 @@ const badgeClasses = computed(() =>
 ```
 
 **Beneficios:**
-- ✅ Template más limpio (1 línea vs 5 líneas)
-- ✅ Cambios globales en un solo lugar
-- ✅ Fácil de testear
-- ✅ Mejor autocomplete en IDEs
+-  Template más limpio (1 línea vs 5 líneas)
+-  Cambios globales en un solo lugar
+-  Fácil de testear
+-  Mejor autocomplete en IDEs
 
 ---
 
@@ -104,9 +104,9 @@ const buttonClasses = {
 ```
 
 **Beneficios:**
-- ✅ Fácil agregar nuevas variantes
-- ✅ Consistencia visual garantizada
-- ✅ Refactoring simple (extraer a composable global si es necesario)
+-  Fácil agregar nuevas variantes
+-  Consistencia visual garantizada
+-  Refactoring simple (extraer a composable global si es necesario)
 
 ---
 
@@ -135,13 +135,13 @@ const getEquipmentCountClasses = (count) => {
 ```
 
 **Beneficios:**
-- ✅ Lógica condicional centralizada
-- ✅ Testeable unitariamente
-- ✅ Fácil de extender con más condiciones
+-  Lógica condicional centralizada
+-  Testeable unitariamente
+-  Fácil de extender con más condiciones
 
 ---
 
-## 🏗️ Estructura Recomendada del Script
+## ️ Estructura Recomendada del Script
 
 ```vue
 <script setup>
@@ -187,13 +187,13 @@ const handleAction = (item) => { ... };
 
 ---
 
-## 🎨 Cuándo Usar Cada Patrón
+##  Cuándo Usar Cada Patrón
 
 ### **1. Computed Properties**
 **Usar cuando:**
-- ✅ Las clases son estáticas (no dependen de props/params)
-- ✅ Se usan en múltiples lugares del template
-- ✅ Quieres reactividad (aunque en clases estáticas no es necesario)
+-  Las clases son estáticas (no dependen de props/params)
+-  Se usan en múltiples lugares del template
+-  Quieres reactividad (aunque en clases estáticas no es necesario)
 
 **Ejemplo:**
 ```javascript
@@ -206,9 +206,9 @@ const cardClasses = computed(() =>
 
 ### **2. Objetos de Configuración**
 **Usar cuando:**
-- ✅ Hay múltiples variantes de un mismo elemento
-- ✅ Las clases son estáticas pero diferentes entre variantes
-- ✅ Quieres un "design system" interno
+-  Hay múltiples variantes de un mismo elemento
+-  Las clases son estáticas pero diferentes entre variantes
+-  Quieres un "design system" interno
 
 **Ejemplo:**
 ```javascript
@@ -224,9 +224,9 @@ const alertClasses = {
 
 ### **3. Funciones Helper**
 **Usar cuando:**
-- ✅ Las clases dependen de parámetros/datos
-- ✅ Hay lógica condicional compleja
-- ✅ Quieres testear la lógica de estilos
+-  Las clases dependen de parámetros/datos
+-  Hay lógica condicional compleja
+-  Quieres testear la lógica de estilos
 
 **Ejemplo:**
 ```javascript
@@ -248,21 +248,21 @@ const getStatusClasses = (status, priority) => {
 
 ---
 
-## 🚫 Antipatrones a Evitar
+##  Antipatrones a Evitar
 
-### ❌ **1. Clases Inline Largas**
+###  **1. Clases Inline Largas**
 ```vue
 <!-- MAL -->
 <div class="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
 ```
 
-### ❌ **2. Lógica de Clases en el Template**
+###  **2. Lógica de Clases en el Template**
 ```vue
 <!-- MAL -->
 <span :class="`font-medium text-sm ${item.count > 0 ? 'text-green-600' : 'text-gray-400'} ${item.active ? 'font-bold' : ''}`">
 ```
 
-### ❌ **3. Computed Properties para Todo**
+###  **3. Computed Properties para Todo**
 ```vue
 <!-- INNECESARIO (solo se usa una vez) -->
 <script setup>
@@ -281,23 +281,23 @@ const uniqueClass = computed(() => 'text-red-500');
 
 ---
 
-## 📊 Métricas de Mejora
+##  Métricas de Mejora
 
 ### **Antes de Refactorizar:**
-- 📏 Longitud promedio de línea: **120 caracteres**
-- 🔄 Clases duplicadas: **15 ocurrencias**
-- 📖 Legibilidad: **6/10**
-- 🛠️ Mantenibilidad: **5/10**
+-  Longitud promedio de línea: **120 caracteres**
+-  Clases duplicadas: **15 ocurrencias**
+-  Legibilidad: **6/10**
+- ️ Mantenibilidad: **5/10**
 
 ### **Después de Refactorizar:**
-- 📏 Longitud promedio de línea: **60 caracteres**
-- 🔄 Clases duplicadas: **0 ocurrencias**
-- 📖 Legibilidad: **9/10**
-- 🛠️ Mantenibilidad: **9/10**
+-  Longitud promedio de línea: **60 caracteres**
+-  Clases duplicadas: **0 ocurrencias**
+-  Legibilidad: **9/10**
+- ️ Mantenibilidad: **9/10**
 
 ---
 
-## 🎯 Reglas de Oro
+##  Reglas de Oro
 
 1. **DRY (Don't Repeat Yourself)**: Si una clase aparece 3+ veces, extráela
 2. **Single Responsibility**: Una función/computed debe tener un solo propósito
@@ -307,14 +307,14 @@ const uniqueClass = computed(() => 'text-red-500');
 
 ---
 
-## 🔄 Plan de Refactorización para el Proyecto
+##  Plan de Refactorización para el Proyecto
 
-### **Fase 1: Auditoría** (Completada ✅)
+### **Fase 1: Auditoría** (Completada )
 - [x] Identificar clases CSS repetidas
 - [x] Detectar lógica de estilos en templates
 - [x] Analizar complejidad de componentes
 
-### **Fase 2: Implementación** (Completada ✅)
+### **Fase 2: Implementación** (Completada )
 - [x] Refactorizar SoftwareIndexView
 - [x] Documentar patrones y mejores prácticas
 - [ ] Aplicar mismo patrón a LabsIndexView
@@ -327,7 +327,7 @@ const uniqueClass = computed(() => 'text-red-500');
 
 ---
 
-## 📚 Referencias
+##  Referencias
 
 - [Vue 3 Style Guide](https://vuejs.org/style-guide/)
 - [Tailwind CSS Best Practices](https://tailwindcss.com/docs/reusing-styles)

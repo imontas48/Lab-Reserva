@@ -9,12 +9,12 @@
          con v-model.
 
          CARACTERÍSTICAS:
-         - ✅ v-model compatible
-         - ✅ Accesibilidad (A11y) garantizada
-         - ✅ Estados visuales (normal, focus, error, disabled)
-         - ✅ Validación visual integrada
-         - ✅ Soporte para relaciones (options con value/text)
-         - ✅ Tailwind CSS con soporte dark mode
+         -  v-model compatible
+         -  Accesibilidad (A11y) garantizada
+         -  Estados visuales (normal, focus, error, disabled)
+         -  Validación visual integrada
+         -  Soporte para relaciones (options con value/text)
+         -  Tailwind CSS con soporte dark mode
 
          USO:
          <BaseSelect

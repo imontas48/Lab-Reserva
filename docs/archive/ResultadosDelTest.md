@@ -6,7 +6,7 @@
 
 ---
 
-## ✅ Qué funcionó correctamente
+##  Qué funcionó correctamente
 
 | # | Componente | Resultado |
 |---|---|---|
@@ -20,7 +20,7 @@
 
 ---
 
-## ⚠️ Fallas y Observaciones para Mitigar
+## ️ Fallas y Observaciones para Mitigar
 
 ### FALLA-01 — Paginación no implementada en las vistas admin
 **Severidad:** Media  
@@ -92,16 +92,16 @@ Toda la autorización se hace con `abort(403, ...)` hardcodeados en lugar de usa
 ### FALLA-06 — Nombre inconsistente del composable en las vistas admin
 **Severidad:** Baja  
 **Descripción:**  
-Las dos nuevas vistas usan `const { reservations, loading, error, fetchReservationsByRole } = useReservations()`. Sin embargo, el composable no usa estado local por instancia — si ambas vistas estuviesen montadas simultáneamente (ej. en un layout de tabs), compartirían el mismo `ref` internamente porque `useReservations` no implementa aislamiento de estado por llamada (los `ref` se crean dentro de la función, por lo que sí están aislados en realidad). ✅ No es un problema real, solo una observación de arquitectura.
+Las dos nuevas vistas usan `const { reservations, loading, error, fetchReservationsByRole } = useReservations()`. Sin embargo, el composable no usa estado local por instancia — si ambas vistas estuviesen montadas simultáneamente (ej. en un layout de tabs), compartirían el mismo `ref` internamente porque `useReservations` no implementa aislamiento de estado por llamada (los `ref` se crean dentro de la función, por lo que sí están aislados en realidad).  No es un problema real, solo una observación de arquitectura.
 
 ---
 
-## 📋 Resumen de Prioridades
+##  Resumen de Prioridades
 
 | Prioridad | Falla | Acción |
 |---|---|---|
-| 🔴 Alta | FALLA-04 | Proteger `index()` — seguridad |
-| 🟡 Media | FALLA-05 | Implementar `ReservationPolicy` completa |
-| 🟡 Media | FALLA-03 | Permitir admin cancelar cualquier reserva |
-| 🟡 Media | FALLA-01 | Agregar paginación en vistas admin |
-| 🟢 Baja | FALLA-02 | Eliminar import `useToast` sin uso |
+|  Alta | FALLA-04 | Proteger `index()` — seguridad |
+|  Media | FALLA-05 | Implementar `ReservationPolicy` completa |
+|  Media | FALLA-03 | Permitir admin cancelar cualquier reserva |
+|  Media | FALLA-01 | Agregar paginación en vistas admin |
+|  Baja | FALLA-02 | Eliminar import `useToast` sin uso |

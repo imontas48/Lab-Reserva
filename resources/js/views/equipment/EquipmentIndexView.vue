@@ -425,7 +425,7 @@ const formatEquipmentType = (type) => {
  * Aquí cargamos los datos iniciales de equipment desde la API.
  */
 onMounted(() => {
-    console.log('🖥️ EquipmentIndexView montado. Cargando equipos...');
+    console.log('️ EquipmentIndexView montado. Cargando equipos...');
     fetchEquipment();
 });
 
@@ -443,7 +443,7 @@ onMounted(() => {
  * @param {Object} item - El objeto equipment seleccionado
  */
 const handleView = (item) => {
-    console.log('👁️ Ver detalles de equipment:', item.identifier);
+    console.log('️ Ver detalles de equipment:', item.identifier);
 
     router.push({
         name: 'equipment-show',
@@ -463,7 +463,7 @@ const handleView = (item) => {
  * @param {Object} item - El objeto equipment seleccionado
  */
 const handleEdit = (item) => {
-    console.log('✏️ Editar equipment:', item.identifier);
+    console.log('️ Editar equipment:', item.identifier);
 
     router.push({
         name: 'equipment.edit',
@@ -489,7 +489,7 @@ const handleEdit = (item) => {
  * @param {Object} item - El objeto equipment seleccionado
  */
 const handleDelete = async (item) => {
-    console.log('🗑️ Eliminar equipment:', item.identifier);
+    console.log('️ Eliminar equipment:', item.identifier);
 
     // Mostrar diálogo de confirmación con SweetAlert2
     const result = await Swal.fire({
@@ -512,12 +512,12 @@ const handleDelete = async (item) => {
 
     try {
         await deleteEquipment(item.id);
-        console.log('✅ Equipo eliminado');
+        console.log(' Equipo eliminado');
 
         // Mostrar notificación de éxito
         toast.success(`Equipo "${item.identifier}" eliminado exitosamente`);
     } catch (err) {
-        console.error('❌ Error al eliminar equipo:', err);
+        console.error(' Error al eliminar equipo:', err);
 
         // Mostrar notificación de error con el mensaje del backend
         const errorMessage = err.response?.data?.message ||

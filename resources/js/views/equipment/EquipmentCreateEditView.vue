@@ -176,7 +176,7 @@
 
                         <!-- Mensaje si no hay laboratorios -->
                         <p v-if="!isLoadingLabs && labOptions.length === 0" class="mt-2 text-sm text-amber-600 dark:text-amber-400">
-                            ⚠️ No hay laboratorios disponibles.
+                            ️ No hay laboratorios disponibles.
                             <router-link to="/labs/create" class="underline hover:text-amber-700 dark:hover:text-amber-300">
                                 Crea uno primero
                             </router-link>
@@ -407,8 +407,8 @@ const labOptions = computed(() => {
  * Valores como strings para compatibilidad con la API Laravel
  */
 const operationalStatusOptions = [
-    { value: '1', text: '✅ Operacional - Equipo funcionando correctamente' },
-    { value: '0', text: '❌ Fuera de Servicio - Equipo requiere mantenimiento o reparación' }
+    { value: '1', text: ' Operacional - Equipo funcionando correctamente' },
+    { value: '0', text: ' Fuera de Servicio - Equipo requiere mantenimiento o reparación' }
 ];
 
 /**
@@ -439,19 +439,19 @@ const getFieldError = (fieldName) => {
  */
 
 onMounted(async () => {
-    console.log('🚀 EquipmentCreateEditView montado');
-    console.log('📝 Modo:', isEditing.value ? 'EDICIÓN' : 'CREACIÓN');
+    console.log(' EquipmentCreateEditView montado');
+    console.log(' Modo:', isEditing.value ? 'EDICIÓN' : 'CREACIÓN');
 
     try {
         // PASO 1: Cargar laboratorios (SIEMPRE necesario para el BaseSelect)
-        console.log('📦 Paso 1: Cargando laboratorios...');
+        console.log(' Paso 1: Cargando laboratorios...');
         await fetchLabs();
-        console.log(`✅ Laboratorios cargados: ${labs.value.length}`);
+        console.log(` Laboratorios cargados: ${labs.value.length}`);
 
         // PASO 2: Si estamos en modo edición, cargar datos del equipment
         if (isEditing.value) {
             const equipmentId = route.params.id;
-            console.log(`📦 Paso 2: Cargando equipment ID ${equipmentId}...`);
+            console.log(` Paso 2: Cargando equipment ID ${equipmentId}...`);
 
             const equipment = await fetchEquipmentById(equipmentId);
 
@@ -465,16 +465,16 @@ onMounted(async () => {
                     is_operational: String(equipment.is_operational ? '1' : '0')
                 };
 
-                console.log('✅ Formulario poblado con datos del equipment');
-                console.log('📋 Datos:', form.value);
+                console.log(' Formulario poblado con datos del equipment');
+                console.log(' Datos:', form.value);
             } else {
-                console.error('❌ No se pudo cargar el equipment');
+                console.error(' No se pudo cargar el equipment');
             }
         } else {
-            console.log('✅ Modo creación: Formulario con valores por defecto');
+            console.log(' Modo creación: Formulario con valores por defecto');
         }
     } catch (error) {
-        console.error('❌ Error en la inicialización:', error);
+        console.error(' Error en la inicialización:', error);
     }
 });
 
@@ -495,12 +495,12 @@ onMounted(async () => {
  * 5. En caso de error: mostrar errores de validación
  */
 const handleSubmit = async () => {
-    console.log('📤 Enviando formulario...');
-    console.log('📋 Datos del formulario:', form.value);
+    console.log(' Enviando formulario...');
+    console.log(' Datos del formulario:', form.value);
 
     // Prevenir envíos múltiples
     if (isSubmitting.value) {
-        console.log('⚠️ Ya hay un envío en progreso');
+        console.log('️ Ya hay un envío en progreso');
         return;
     }
 
@@ -516,25 +516,25 @@ const handleSubmit = async () => {
             is_operational: Number(form.value.is_operational)
         };
 
-        console.log('📦 Datos a enviar:', dataToSend);
+        console.log(' Datos a enviar:', dataToSend);
 
         let result;
         let successMessage;
 
         if (isEditing.value) {
             // MODO EDICIÓN
-            console.log(`🔄 Actualizando equipment ID ${route.params.id}...`);
+            console.log(` Actualizando equipment ID ${route.params.id}...`);
             result = await updateEquipment(route.params.id, dataToSend);
             successMessage = 'updated';
         } else {
             // MODO CREACIÓN
-            console.log('🔄 Creando nuevo equipment...');
+            console.log(' Creando nuevo equipment...');
             result = await createEquipment(dataToSend);
             successMessage = 'created';
         }
 
         // Si llegamos aquí, la operación fue exitosa
-        console.log('✅ Operación exitosa:', result);
+        console.log(' Operación exitosa:', result);
 
         // Redirigir a la lista con mensaje de éxito
         router.push({
@@ -544,7 +544,7 @@ const handleSubmit = async () => {
     } catch (error) {
         // Los errores ya fueron manejados por el composable
         // Solo logueamos para debugging
-        console.error('❌ Error en handleSubmit:', error);
+        console.error(' Error en handleSubmit:', error);
 
         // El banner de error ya se mostrará automáticamente
         // gracias al binding de equipmentError en el template

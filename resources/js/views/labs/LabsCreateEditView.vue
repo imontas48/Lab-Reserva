@@ -8,12 +8,12 @@
          ambos modos (create/edit) reutilizando la misma UI y lógica.
 
          CARACTERÍSTICAS:
-         - ✅ Modo dual: Crear/Editar basado en route.params.id
-         - ✅ Validación en tiempo real con BaseInput
-         - ✅ Manejo de errores de validación (422)
-         - ✅ Estados de carga visual
-         - ✅ Navegación automática después del éxito
-         - ✅ Composable pattern con useLabs
+         -  Modo dual: Crear/Editar basado en route.params.id
+         -  Validación en tiempo real con BaseInput
+         -  Manejo de errores de validación (422)
+         -  Estados de carga visual
+         -  Navegación automática después del éxito
+         -  Composable pattern con useLabs
 
          RUTAS:
          - /labs/create → Modo creación
@@ -368,7 +368,7 @@ const loadLabData = async () => {
         initialLoading.value = true;
         loadError.value = null;
 
-        console.log('🔍 Cargando datos del laboratorio para edición...');
+        console.log(' Cargando datos del laboratorio para edición...');
         const lab = await fetchLabById(route.params.id);
 
         // Poblar el formulario con los datos obtenidos
@@ -379,9 +379,9 @@ const loadLabData = async () => {
             description: lab.description || ''
         };
 
-        console.log('✅ Datos cargados en el formulario:', form.value);
+        console.log(' Datos cargados en el formulario:', form.value);
     } catch (err) {
-        console.error('❌ Error al cargar datos del laboratorio:', err);
+        console.error(' Error al cargar datos del laboratorio:', err);
         loadError.value = err.response?.data?.message || 'No se pudieron cargar los datos del laboratorio';
     } finally {
         initialLoading.value = false;
@@ -397,7 +397,7 @@ const handleSubmit = async () => {
         // Limpiar errores previos
         clearErrors();
 
-        console.log('📤 Enviando formulario...', {
+        console.log(' Enviando formulario...', {
             mode: isEditing.value ? 'edit' : 'create',
             data: form.value
         });
@@ -406,26 +406,26 @@ const handleSubmit = async () => {
 
         if (isEditing.value) {
             // Modo edición: actualizar laboratorio existente
-            console.log(`📝 Actualizando laboratorio ${route.params.id}...`);
+            console.log(` Actualizando laboratorio ${route.params.id}...`);
             result = await updateLab(route.params.id, form.value);
 
             // Notificación de éxito
             toast.success(`Laboratorio "${result.name}" actualizado exitosamente`);
         } else {
             // Modo creación: crear nuevo laboratorio
-            console.log('✨ Creando nuevo laboratorio...');
+            console.log(' Creando nuevo laboratorio...');
             result = await createLab(form.value);
 
             // Notificación de éxito
             toast.success(`Laboratorio "${result.name}" creado exitosamente`);
         }
 
-        console.log('✅ Operación exitosa:', result);
+        console.log(' Operación exitosa:', result);
 
         // Redirigir al listado de laboratorios
         router.push({ name: 'labs.index' });
     } catch (err) {
-        console.error('❌ Error al enviar el formulario:', err);
+        console.error(' Error al enviar el formulario:', err);
 
         // Notificación de error si no es validación
         if (err.response?.status !== 422) {
@@ -450,12 +450,12 @@ const handleSubmit = async () => {
  * - Si estamos en modo creación, el formulario ya está limpio
  */
 onMounted(() => {
-    console.log('🎬 LabsCreateEditView montado', {
+    console.log(' LabsCreateEditView montado', {
         mode: isEditing.value ? 'edit' : 'create',
         labId: route.params.id || 'N/A'
     });
 
-    // 🔧 FIX: Limpiar estado del composable al montar
+    //  FIX: Limpiar estado del composable al montar
     // El composable es compartido entre vistas, así que limpiamos
     // cualquier error o estado de carga previo
     clearErrors();

@@ -1,6 +1,6 @@
-# 📢 Sistema de Notificaciones - Lab-Reserva
+#  Sistema de Notificaciones - Lab-Reserva
 
-## 🎯 Descripción General
+##  Descripción General
 
 Sistema de notificaciones profesional implementado en toda la aplicación usando:
 - **vue-toastification** para notificaciones toast
@@ -8,7 +8,7 @@ Sistema de notificaciones profesional implementado en toda la aplicación usando
 
 ---
 
-## 📦 Dependencias Instaladas
+##  Dependencias Instaladas
 
 ```bash
 npm install vue-toastification@next
@@ -17,7 +17,7 @@ npm install sweetalert2
 
 ---
 
-## ⚙️ Configuración
+## ️ Configuración
 
 ### 1. Configuración Global (`resources/js/app.js`)
 
@@ -52,7 +52,7 @@ Estilos personalizados para que combinen con el diseño de la aplicación (Tailw
 
 ---
 
-## 🔧 Composable `useToast`
+##  Composable `useToast`
 
 ### Ubicación
 `resources/js/composables/useToast.js`
@@ -92,9 +92,9 @@ toast.clear();
 
 ---
 
-## 🚀 Implementación en la Aplicación
+##  Implementación en la Aplicación
 
-### ✅ Autenticación
+###  Autenticación
 
 #### LoginView (`resources/js/views/auth/LoginView.vue`)
 ```javascript
@@ -120,7 +120,7 @@ toast.error('Error al registrar la cuenta. Por favor, intenta nuevamente.');
 toast.info('Sesión cerrada exitosamente');
 ```
 
-### ✅ Laboratorios
+###  Laboratorios
 
 #### LabsCreateEditView (`resources/js/views/labs/LabsCreateEditView.vue`)
 ```javascript
@@ -162,17 +162,17 @@ toast.error('Error al eliminar el laboratorio. Por favor, intenta nuevamente.');
 
 ---
 
-## 🎨 Tipos de Notificaciones
+##  Tipos de Notificaciones
 
 ### 1. Toast Notifications
 
 **Características:**
-- ✅ Aparecen en la esquina superior derecha
-- ✅ Se auto-cierran después de 3-5 segundos
-- ✅ Tienen barra de progreso animada
-- ✅ Se pueden cerrar manualmente
-- ✅ Se pueden arrastrar
-- ✅ Máximo 5 notificaciones simultáneas
+-  Aparecen en la esquina superior derecha
+-  Se auto-cierran después de 3-5 segundos
+-  Tienen barra de progreso animada
+-  Se pueden cerrar manualmente
+-  Se pueden arrastrar
+-  Máximo 5 notificaciones simultáneas
 
 **Cuándo usar:**
 - Confirmación de acciones exitosas
@@ -183,11 +183,11 @@ toast.error('Error al eliminar el laboratorio. Por favor, intenta nuevamente.');
 ### 2. SweetAlert2 Dialogs
 
 **Características:**
-- ✅ Modal centrado en la pantalla
-- ✅ Bloquea la interacción con el resto de la página
-- ✅ Botones personalizados
-- ✅ Iconos intuitivos
-- ✅ Soporte para HTML en el contenido
+-  Modal centrado en la pantalla
+-  Bloquea la interacción con el resto de la página
+-  Botones personalizados
+-  Iconos intuitivos
+-  Soporte para HTML en el contenido
 
 **Cuándo usar:**
 - Confirmación de acciones destructivas (eliminar)
@@ -196,44 +196,44 @@ toast.error('Error al eliminar el laboratorio. Por favor, intenta nuevamente.');
 
 ---
 
-## 📋 Guía de Buenas Prácticas
+##  Guía de Buenas Prácticas
 
 ### 1. **Mensajes Claros y Concisos**
 ```javascript
-// ✅ Bueno
+//  Bueno
 toast.success('Laboratorio creado exitosamente');
 
-// ❌ Evitar
+//  Evitar
 toast.success('Se ha creado correctamente el laboratorio en el sistema');
 ```
 
 ### 2. **Incluir Contexto Relevante**
 ```javascript
-// ✅ Bueno
+//  Bueno
 toast.success(`Laboratorio "${lab.name}" eliminado exitosamente`);
 
-// ❌ Evitar
+//  Evitar
 toast.success('Eliminado');
 ```
 
 ### 3. **Elegir el Tipo Correcto**
 ```javascript
-// ✅ Éxito - verde
+//  Éxito - verde
 toast.success('Operación completada');
 
-// ✅ Error - rojo
+//  Error - rojo
 toast.error('No se pudo completar la operación');
 
-// ✅ Advertencia - naranja
+//  Advertencia - naranja
 toast.warning('Por favor, corrige los errores');
 
-// ✅ Información - azul
+//  Información - azul
 toast.info('Sesión cerrada');
 ```
 
 ### 4. **Usar SweetAlert2 para Confirmaciones Destructivas**
 ```javascript
-// ✅ Bueno
+//  Bueno
 const result = await Swal.fire({
     title: '¿Estás seguro?',
     text: 'Esta acción no se puede deshacer',
@@ -248,7 +248,7 @@ if (result.isConfirmed) {
 
 ---
 
-## 🔄 Extensión Futura
+##  Extensión Futura
 
 Para agregar notificaciones a nuevos módulos:
 
@@ -274,20 +274,20 @@ try {
 
 ---
 
-## 📊 Resumen de Implementación
+##  Resumen de Implementación
 
 | Módulo | Toast Success | Toast Error | Toast Warning | SweetAlert2 |
 |--------|--------------|-------------|---------------|-------------|
-| Login | ✅ | ✅ | - | - |
-| Register | ✅ | ✅ | - | - |
-| Logout | ✅ (info) | ✅ | - | - |
-| Labs Create | ✅ | ✅ | ✅ | - |
-| Labs Edit | ✅ | ✅ | ✅ | - |
-| Labs Delete | ✅ | ✅ | - | ✅ |
+| Login |  |  | - | - |
+| Register |  |  | - | - |
+| Logout |  (info) |  | - | - |
+| Labs Create |  |  |  | - |
+| Labs Edit |  |  |  | - |
+| Labs Delete |  |  | - |  |
 
 ---
 
-## 🎯 Siguiente Paso
+##  Siguiente Paso
 
 Implementar el mismo sistema en los módulos de:
 - **Equipos** (Equipment)

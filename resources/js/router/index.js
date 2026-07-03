@@ -393,11 +393,11 @@ router.beforeEach(async (to, from, next) => {
     // Si es la primera navegación, verificar si hay una sesión activa
     // ─────────────────────────────────────────────────────────────────────────
     if (from.name === undefined && !authStore.user) {
-        console.log('🔍 Primera navegación, verificando sesión...');
+        console.log(' Primera navegación, verificando sesión...');
         try {
             await authStore.checkAuth();
         } catch (error) {
-            console.log('⚠️ No hay sesión activa');
+            console.log('️ No hay sesión activa');
         }
     }
 
@@ -415,7 +415,7 @@ router.beforeEach(async (to, from, next) => {
     // ─────────────────────────────────────────────────────────────────────────
     if (to.meta.requiresAuth) {
         if (!authStore.isAuthenticated) {
-            console.log('🚫 Ruta protegida, redirigiendo a login...');
+            console.log(' Ruta protegida, redirigiendo a login...');
             return next({
                 name: 'login',
                 query: { redirect: to.fullPath } // Guardar la ruta a la que quería ir
@@ -426,7 +426,7 @@ router.beforeEach(async (to, from, next) => {
         // Verificar si requiere permisos de administrador
         // ─────────────────────────────────────────────────────────────────────
         if (to.meta.requiresAdmin && !authStore.isAdmin) {
-            console.log('🚫 Requiere permisos de administrador');
+            console.log(' Requiere permisos de administrador');
             return next({
                 name: 'dashboard',
                 replace: true
@@ -437,7 +437,7 @@ router.beforeEach(async (to, from, next) => {
         // Verificar si requiere permisos de profesor
         // ─────────────────────────────────────────────────────────────────────
         if (to.meta.requiresTeacher && !authStore.isTeacher && !authStore.isAdmin) {
-            console.log('🚫 Requiere permisos de profesor');
+            console.log(' Requiere permisos de profesor');
             return next({
                 name: 'dashboard',
                 replace: true
@@ -449,7 +449,7 @@ router.beforeEach(async (to, from, next) => {
     // Verificar si la ruta es solo para invitados (guest)
     // ─────────────────────────────────────────────────────────────────────────
     if (to.meta.guest && authStore.isAuthenticated) {
-        console.log('🔄 Usuario autenticado intentando acceder a ruta de invitado, redirigiendo a dashboard...');
+        console.log(' Usuario autenticado intentando acceder a ruta de invitado, redirigiendo a dashboard...');
         return next({ name: 'dashboard', replace: true });
     }
 
@@ -468,7 +468,7 @@ router.beforeEach(async (to, from, next) => {
  * Útil para analytics, logging, etc.
  */
 router.afterEach((to, from) => {
-    console.log(`📍 Navegación: ${from.name || 'inicio'} → ${to.name}`);
+    console.log(` Navegación: ${from.name || 'inicio'} → ${to.name}`);
 });
 
 /**

@@ -226,12 +226,12 @@ const handleDelete = async (lab) => {
 
   try {
     await deleteLab(lab.id);
-    console.log('✅ Laboratorio eliminado');
+    console.log(' Laboratorio eliminado');
 
     // Mostrar notificación de éxito
     toast.success(`Laboratorio "${lab.name}" eliminado exitosamente`);
   } catch (err) {
-    console.error('❌ Error al eliminar laboratorio:', err);
+    console.error(' Error al eliminar laboratorio:', err);
 
     // Mostrar notificación de error
     toast.error('Error al eliminar el laboratorio. Por favor, intenta nuevamente.');

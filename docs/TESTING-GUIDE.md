@@ -1,14 +1,14 @@
-# 🧪 Guía de Pruebas - Frontend Lab-Reserva
+#  Guía de Pruebas - Frontend Lab-Reserva
 
-## ✅ Estado Actual
+##  Estado Actual
 
-**Servidor de desarrollo activo**: ✅ 
+**Servidor de desarrollo activo**:  
 - Vite corriendo en `http://localhost:5173/`
 - Laravel app URL: `http://lab-reserva.test`
 
 ---
 
-## 🚀 Instrucciones para Probar
+##  Instrucciones para Probar
 
 ### 1️⃣ **Preparación del Backend**
 
@@ -40,7 +40,7 @@ Deberías ver la página de login.
 
 ---
 
-## 🔐 Flujo de Prueba de Autenticación
+##  Flujo de Prueba de Autenticación
 
 ### **Escenario 1: Registro de Usuario**
 
@@ -102,7 +102,7 @@ Deberías ver la página de login.
 
 ---
 
-## 🧪 Pruebas de la API (desde la consola del navegador)
+##  Pruebas de la API (desde la consola del navegador)
 
 Abre las **DevTools** (F12) y ve a la pestaña **Console**.
 
@@ -133,7 +133,7 @@ Deberías ver:
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### **Problema 1: Error 419 (CSRF Token Mismatch)**
 
@@ -219,9 +219,9 @@ Route::get('/{any}', function () {
 
 ---
 
-## 📊 Verificación de Funcionalidad
+##  Verificación de Funcionalidad
 
-### ✅ Checklist de Pruebas
+###  Checklist de Pruebas
 
 - [ ] **Página de Login carga correctamente**
 - [ ] **Registro de usuario funciona**
@@ -241,7 +241,7 @@ Route::get('/{any}', function () {
 
 ---
 
-## 🔍 Inspección en DevTools
+##  Inspección en DevTools
 
 ### **Network Tab**
 
@@ -263,18 +263,18 @@ Al hacer login, deberías ver estas peticiones en orden:
 
 Deberías ver logs de:
 ```
-🔐 Obteniendo token CSRF de Sanctum...
-✅ Token CSRF obtenido correctamente
-🔐 Iniciando sesión...
-✅ Login exitoso, obteniendo datos del usuario...
-✅ Usuario autenticado: {name: "Juan Pérez", ...}
-✅ Usuario autenticado completamente
-📍 Navegación: login → dashboard
+ Obteniendo token CSRF de Sanctum...
+ Token CSRF obtenido correctamente
+ Iniciando sesión...
+ Login exitoso, obteniendo datos del usuario...
+ Usuario autenticado: {name: "Juan Pérez", ...}
+ Usuario autenticado completamente
+ Navegación: login → dashboard
 ```
 
 ---
 
-## 🎯 Próximas Pruebas (Cuando se implementen las vistas)
+##  Próximas Pruebas (Cuando se implementen las vistas)
 
 ### **Laboratorios**
 - [ ] Listar laboratorios
@@ -298,7 +298,7 @@ Deberías ver logs de:
 
 ---
 
-## 📝 Notas Importantes
+##  Notas Importantes
 
 ### **1. Dominio Local**
 
@@ -326,7 +326,7 @@ automáticamente sin recargar la página completa.
 
 ---
 
-## 🔧 Comandos Útiles Durante el Desarrollo
+##  Comandos Útiles Durante el Desarrollo
 
 ### **Laravel**
 ```bash
@@ -355,7 +355,7 @@ php artisan view:clear
 
 ---
 
-## ✨ Características Implementadas para Probar
+##  Características Implementadas para Probar
 
 ### **1. Auto-renovación de CSRF Token**
 - El token se obtiene automáticamente antes de la primera petición POST
@@ -379,6 +379,6 @@ php artisan view:clear
 
 ---
 
-**¡Listo para probar!** 🚀
+**¡Listo para probar!** 
 
 Si encuentras algún problema, consulta la sección de **Troubleshooting** o revisa los logs en la consola del navegador y en `storage/logs/laravel.log`.

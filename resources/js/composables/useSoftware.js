@@ -115,7 +115,7 @@ export function useSoftware() {
         error.value = null;
 
         try {
-            console.log('🔄 Obteniendo lista de software...');
+            console.log(' Obteniendo lista de software...');
 
             // Realizar petición GET a la API
             // La instancia apiClient ya tiene configurados:
@@ -129,10 +129,10 @@ export function useSoftware() {
             // Si no existe, usa response.data directamente
             software.value = response.data.data || response.data;
 
-            console.log(`✅ Software cargado: ${software.value.length} registros`);
+            console.log(` Software cargado: ${software.value.length} registros`);
         } catch (err) {
             // Capturar y procesar el error
-            console.error('❌ Error al cargar software:', err);
+            console.error(' Error al cargar software:', err);
 
             // Construir mensaje de error amigable para el usuario
             if (err.response) {
@@ -178,16 +178,16 @@ export function useSoftware() {
         error.value = null;
 
         try {
-            console.log(`🔄 Obteniendo software con ID: ${id}...`);
+            console.log(` Obteniendo software con ID: ${id}...`);
 
             const response = await apiClient.get(`/software/${id}`);
             const softwareItem = response.data.data || response.data;
 
-            console.log('✅ Software obtenido:', softwareItem);
+            console.log(' Software obtenido:', softwareItem);
 
             return softwareItem;
         } catch (err) {
-            console.error('❌ Error al obtener software:', err);
+            console.error(' Error al obtener software:', err);
 
             if (err.response?.status === 404) {
                 error.value = 'Software no encontrado.';
@@ -225,17 +225,17 @@ export function useSoftware() {
             // Agregar el nuevo software a la lista local
             software.value.unshift(newSoftware);
 
-            console.log('✅ Software creado exitosamente:', newSoftware);
+            console.log(' Software creado exitosamente:', newSoftware);
 
             return newSoftware;
         } catch (err) {
-            console.error('❌ Error al crear software:', err);
+            console.error(' Error al crear software:', err);
 
             // Manejar errores de validación (422)
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log('📋 Validation errors:', validationErrors.value);
+                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al crear el software';
             }
@@ -274,17 +274,17 @@ export function useSoftware() {
                 software.value[index] = updatedSoftware;
             }
 
-            console.log('✅ Software actualizado exitosamente:', updatedSoftware);
+            console.log(' Software actualizado exitosamente:', updatedSoftware);
 
             return updatedSoftware;
         } catch (err) {
-            console.error(`❌ Error al actualizar software ${id}:`, err);
+            console.error(` Error al actualizar software ${id}:`, err);
 
             // Manejar errores de validación (422)
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log('📋 Validation errors:', validationErrors.value);
+                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al actualizar el software';
             }
@@ -310,18 +310,18 @@ export function useSoftware() {
         error.value = null;
 
         try {
-            console.log(`🔄 Eliminando software con ID: ${id}...`);
+            console.log(` Eliminando software con ID: ${id}...`);
 
             await apiClient.delete(`/software/${id}`);
 
             // Remover el software de la lista local
             software.value = software.value.filter(s => s.id !== id);
 
-            console.log('✅ Software eliminado exitosamente');
+            console.log(' Software eliminado exitosamente');
 
             return true;
         } catch (err) {
-            console.error('❌ Error al eliminar software:', err);
+            console.error(' Error al eliminar software:', err);
 
             if (err.response?.status === 404) {
                 error.value = 'Software no encontrado.';

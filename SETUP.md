@@ -1,6 +1,6 @@
 # Pasos Finales de Configuración
 
-## ⚠️ REQUIERE: Extensión PHP fileinfo habilitada
+## ️ REQUIERE: Extensión PHP fileinfo habilitada
 
 Estos pasos solo pueden completarse después de habilitar la extensión `fileinfo` en PHP.
 
@@ -124,11 +124,11 @@ http://lab-reserva.test
 ```
 
 Deberías ver la pantalla de bienvenida de Lab-Reserva con:
-- ✅ Laravel 12 LTS
-- ✅ Vue 3 + Composition API
-- ✅ Tailwind CSS
-- ✅ Pinia State Management
-- ✅ Axios HTTP Client
+-  Laravel 12 LTS
+-  Vue 3 + Composition API
+-  Tailwind CSS
+-  Pinia State Management
+-  Axios HTTP Client
 
 ## Solución de Problemas
 

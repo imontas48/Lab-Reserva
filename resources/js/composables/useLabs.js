@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import apiClient from '@/utils/api';
 
 /**
- * ════════════════════════════════════════════════════            console.log(`🔍 Fetching lab with ID: ${id}...`);
+ * ════════════════════════════════════════════════════            console.log(` Fetching lab with ID: ${id}...`);
             const response = await apiClient.get(`/v1/labs/${id}`);
 
             const lab = response.data.data || response.data;═══════════════════
@@ -94,18 +94,18 @@ export function useLabs() {
             loading.value = true;
             error.value = null;
 
-            console.log('🔍 Fetching labs from API...');
-            console.log('📍 Base URL:', apiClient.defaults.baseURL);
-            console.log('📍 Full URL:', `${apiClient.defaults.baseURL}/labs`);
+            console.log(' Fetching labs from API...');
+            console.log(' Base URL:', apiClient.defaults.baseURL);
+            console.log(' Full URL:', `${apiClient.defaults.baseURL}/labs`);
             const response = await apiClient.get('/labs');
 
-            console.log('📦 Response data type:', typeof response.data);
-            console.log('📦 Response data:', response.data);
+            console.log(' Response data type:', typeof response.data);
+            console.log(' Response data:', response.data);
 
             labs.value = response.data.data || response.data;
-            console.log('✅ Labs fetched successfully:', Array.isArray(labs.value) ? labs.value.length : 'NOT AN ARRAY!');
+            console.log(' Labs fetched successfully:', Array.isArray(labs.value) ? labs.value.length : 'NOT AN ARRAY!');
         } catch (err) {
-            console.error('❌ Error fetching labs:', err);
+            console.error(' Error fetching labs:', err);
             error.value = err.response?.data?.message || 'Error al cargar los laboratorios';
         } finally {
             loading.value = false;
@@ -130,15 +130,15 @@ export function useLabs() {
             loading.value = true;
             error.value = null;
 
-            console.log(`🔍 Fetching lab with ID: ${id}`);
+            console.log(` Fetching lab with ID: ${id}`);
             const response = await apiClient.get(`/labs/${id}`);
 
             const lab = response.data.data || response.data;
-            console.log('✅ Lab fetched successfully:', lab);
+            console.log(' Lab fetched successfully:', lab);
 
             return lab;
         } catch (err) {
-            console.error(`❌ Error fetching lab ${id}:`, err);
+            console.error(` Error fetching lab ${id}:`, err);
             error.value = err.response?.data?.message || 'Error al cargar el laboratorio';
             throw err;
         } finally {
@@ -181,24 +181,24 @@ export function useLabs() {
             error.value = null;
             validationErrors.value = {};
 
-            console.log('📤 Creating new lab:', labData);
+            console.log(' Creating new lab:', labData);
             const response = await apiClient.post('/labs', labData);
 
             const newLab = response.data.data || response.data;
-            console.log('✅ Lab created successfully:', newLab);
+            console.log(' Lab created successfully:', newLab);
 
             // Agregar el nuevo laboratorio a la lista local
             labs.value.unshift(newLab);
 
             return newLab;
         } catch (err) {
-            console.error('❌ Error creating lab:', err);
+            console.error(' Error creating lab:', err);
 
             // Manejar errores de validación (422)
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log('📋 Validation errors:', validationErrors.value);
+                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al crear el laboratorio';
             }
@@ -241,11 +241,11 @@ export function useLabs() {
             error.value = null;
             validationErrors.value = {};
 
-            console.log(`📤 Updating lab ${id}:`, labData);
+            console.log(` Updating lab ${id}:`, labData);
             const response = await apiClient.put(`/labs/${id}`, labData);
 
             const updatedLab = response.data.data || response.data;
-            console.log('✅ Lab updated successfully:', updatedLab);
+            console.log(' Lab updated successfully:', updatedLab);
 
             // Actualizar el laboratorio en la lista local
             const index = labs.value.findIndex(lab => lab.id === id);
@@ -255,13 +255,13 @@ export function useLabs() {
 
             return updatedLab;
         } catch (err) {
-            console.error(`❌ Error updating lab ${id}:`, err);
+            console.error(` Error updating lab ${id}:`, err);
 
             // Manejar errores de validación (422)
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log('📋 Validation errors:', validationErrors.value);
+                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al actualizar el laboratorio';
             }
@@ -293,15 +293,15 @@ export function useLabs() {
             loading.value = true;
             error.value = null;
 
-            console.log(`🗑️ Deleting lab ${id}`);
+            console.log(`️ Deleting lab ${id}`);
             await apiClient.delete(`/labs/${id}`);
 
-            console.log('✅ Lab deleted successfully');
+            console.log(' Lab deleted successfully');
 
             // Eliminar el laboratorio de la lista local
             labs.value = labs.value.filter(lab => lab.id !== id);
         } catch (err) {
-            console.error(`❌ Error deleting lab ${id}:`, err);
+            console.error(` Error deleting lab ${id}:`, err);
             error.value = err.response?.data?.message || 'Error al eliminar el laboratorio';
             throw err;
         } finally {
@@ -325,7 +325,7 @@ export function useLabs() {
     const clearErrors = () => {
         error.value = null;
         validationErrors.value = {};
-        loading.value = false; // 🔧 FIX: También resetear loading
+        loading.value = false; //  FIX: También resetear loading
     };
 
     /**
