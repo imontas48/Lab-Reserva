@@ -484,7 +484,7 @@ import { useLabs } from '@/composables/useLabs';
 import { useToast } from '@/composables/useToast';
 import ReservationCalendar from '@/components/reservations/ReservationCalendar.vue';
 import CreateReservationModal from '@/components/reservations/CreateReservationModal.vue';
-import { VueDatePicker } from '@vuepic/vue-datepicker';
+import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 // ============================================================================

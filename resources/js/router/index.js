@@ -4,42 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * CONFIGURACIÓN DE VUE ROUTER
- * ═══════════════════════════            // ─────────────────────────────────────────────────────────────────
-            // PERFIL DE USUARIO
-            // ─────────────────────────────────────────────────────────────────
-            {
-                path: '/profile',
-                name: 'profile',
-                component: () => import('@/views/profile/ProfileView.vue'),
-                meta: {
-                    title: 'Mi Perfil',
-                    requiresAuth: true,
-                }
-            },
-
-            // ─────────────────────────────────────────────────────────────────
-            // TESTING & DEMOS
-            // ─────────────────────────────────────────────────────────────────
-            {
-                path: '/test/base-input',
-                name: 'test.base-input',
-                component: () => import('@/views/test/BaseInputTestView.vue'),
-                meta: {
-                    title: 'Test: BaseInput Component',
-                    requiresAuth: true,
-                }
-            },
-            {
-                path: '/test/base-select',
-                name: 'test.base-select',
-                component: () => import('@/views/test/BaseSelectTestView.vue'),
-                meta: {
-                    title: 'Test: BaseSelect Component',
-                    requiresAuth: true,
-                }
-            },
-        ]
-    },══════════════════════════════════
+ * ═══════════════════════════════════════════════════════════════════════════
  *
  * Sistema de enrutamiento de la aplicación con protección de rutas.
  *
