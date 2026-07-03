@@ -7,11 +7,11 @@
 - `/labs/:id/edit` → Modo edición
 
 **Fecha:** Octubre 2025  
-**Estado:** ✅ Completo y Funcional
+**Estado:**  Completo y Funcional
 
 ---
 
-## 📋 Tabla de Contenidos
+##  Tabla de Contenidos
 
 1. [Descripción General](#descripción-general)
 2. [Características Principales](#características-principales)
@@ -26,14 +26,14 @@
 
 ---
 
-## 🎯 Descripción General
+##  Descripción General
 
 **LabsCreateEditView** es un componente de formulario unificado que maneja tanto la **creación** como la **edición** de laboratorios, siguiendo el principio DRY (Don't Repeat Yourself). Este patrón permite:
 
-- ✅ **Reutilización de código**: Una sola vista para dos funcionalidades
-- ✅ **Mantenibilidad**: Cambios en un solo lugar afectan ambos modos
-- ✅ **Consistencia UX**: Misma interfaz para crear y editar
-- ✅ **Reducción de bugs**: Menos código duplicado = menos puntos de fallo
+-  **Reutilización de código**: Una sola vista para dos funcionalidades
+-  **Mantenibilidad**: Cambios en un solo lugar afectan ambos modos
+-  **Consistencia UX**: Misma interfaz para crear y editar
+-  **Reducción de bugs**: Menos código duplicado = menos puntos de fallo
 
 ### Propósito
 
@@ -46,7 +46,7 @@ Este componente sirve como **blueprint (plantilla)** para todos los formularios 
 
 ---
 
-## ✨ Características Principales
+##  Características Principales
 
 ### 1. Modo Dual (Create/Edit)
 
@@ -80,10 +80,10 @@ const getFieldError = (fieldName) => {
 ```
 
 **Características:**
-- ✅ Errores de validación del backend (422)
-- ✅ Mensajes específicos por campo
-- ✅ Integración con `BaseInput` component
-- ✅ Transiciones suaves (error-fade)
+-  Errores de validación del backend (422)
+-  Mensajes específicos por campo
+-  Integración con `BaseInput` component
+-  Transiciones suaves (error-fade)
 
 ---
 
@@ -181,7 +181,7 @@ Después de una operación exitosa:
 
 ---
 
-## 🏗️ Arquitectura del Componente
+## ️ Arquitectura del Componente
 
 ### Estructura de Archivos
 
@@ -210,7 +210,7 @@ resources/js/
 
 ---
 
-## 🔄 Flujo de Datos
+##  Flujo de Datos
 
 ### Flujo Completo: Modo Creación
 
@@ -316,7 +316,7 @@ resources/js/
 
 ---
 
-## ✅ Validación de Formularios
+##  Validación de Formularios
 
 ### Validación del Backend (Laravel)
 
@@ -375,13 +375,13 @@ const getFieldError = (fieldName) => {
 ```
 
 **Características:**
-- ✅ Solo muestra el **primer error** de cada campo
-- ✅ Extrae el mensaje correctamente (array → string)
-- ✅ Retorna string vacío si no hay error (BaseInput lo maneja)
+-  Solo muestra el **primer error** de cada campo
+-  Extrae el mensaje correctamente (array → string)
+-  Retorna string vacío si no hay error (BaseInput lo maneja)
 
 ---
 
-## 🎨 Estados Visuales
+##  Estados Visuales
 
 ### Estado 1: Formulario Vacío (Creación)
 
@@ -452,20 +452,20 @@ const getFieldError = (fieldName) => {
 ┌─────────────────────────────────────────────┐
 │ Crear Nuevo Laboratorio                     │
 ├─────────────────────────────────────────────┤
-│ ⚠️ Por favor, corrige los errores...        │ ← Error general
+│ ️ Por favor, corrige los errores...        │ ← Error general
 ├─────────────────────────────────────────────┤
 │                                             │
 │ Nombre del Laboratorio *                    │
 │ ┌─────────────────────────────────────────┐ │
 │ │                                         │ │ ← Border rojo
 │ └─────────────────────────────────────────┘ │
-│ ⚠️ El campo nombre es obligatorio.          │ ← Error específico
+│ ️ El campo nombre es obligatorio.          │ ← Error específico
 │                                             │
 │ Capacidad *                                 │
 │ ┌─────────────────────────────────────────┐ │
 │ │ -5                                      │ │ ← Border rojo
 │ └─────────────────────────────────────────┘ │
-│ ⚠️ La capacidad debe ser al menos 1.        │ ← Error específico
+│ ️ La capacidad debe ser al menos 1.        │ ← Error específico
 │                                             │
 │        [ Cancelar ]  [ Crear Laboratorio ]  │
 └─────────────────────────────────────────────┘
@@ -500,7 +500,7 @@ const getFieldError = (fieldName) => {
 │ Editar Laboratorio                          │
 ├─────────────────────────────────────────────┤
 │ ┌─────────────────────────────────────────┐ │
-│ │ ❌ Error al cargar los datos            │ │ ← Banner rojo
+│ │  Error al cargar los datos            │ │ ← Banner rojo
 │ │ No se pudieron cargar los datos del...  │ │
 │ │                                          │ │
 │ │ [ Reintentar ] [ Volver al Listado ]    │ │
@@ -510,7 +510,7 @@ const getFieldError = (fieldName) => {
 
 ---
 
-## 📚 Casos de Uso
+##  Casos de Uso
 
 ### Caso 1: Crear un Nuevo Laboratorio (Happy Path)
 
@@ -532,9 +532,9 @@ const getFieldError = (fieldName) => {
 7. Usuario es redirigido a `/labs?success=created&name=Laboratorio%20de%20IoT`
 
 **Resultado Esperado:**
-- ✅ Laboratorio creado en la base de datos
-- ✅ Redirección exitosa al listado
-- ✅ (IndexView) Mensaje de éxito mostrado
+-  Laboratorio creado en la base de datos
+-  Redirección exitosa al listado
+-  (IndexView) Mensaje de éxito mostrado
 
 ---
 
@@ -556,9 +556,9 @@ const getFieldError = (fieldName) => {
 9. Usuario es redirigido a `/labs?success=updated&name=...`
 
 **Resultado Esperado:**
-- ✅ Laboratorio actualizado en la base de datos
-- ✅ Redirección exitosa al listado
-- ✅ Mensaje de éxito mostrado
+-  Laboratorio actualizado en la base de datos
+-  Redirección exitosa al listado
+-  Mensaje de éxito mostrado
 
 ---
 
@@ -574,9 +574,9 @@ const getFieldError = (fieldName) => {
 7. Cada BaseInput muestra su error específico con border rojo
 
 **Resultado Esperado:**
-- ❌ No se crea el laboratorio
-- ✅ Errores visualizados claramente
-- ✅ Usuario puede corregir y reintentar
+-  No se crea el laboratorio
+-  Errores visualizados claramente
+-  Usuario puede corregir y reintentar
 
 ---
 
@@ -591,9 +591,9 @@ const getFieldError = (fieldName) => {
 6. Botones "Reintentar" y "Volver al Listado" aparecen
 
 **Resultado Esperado:**
-- ✅ Error manejado correctamente
-- ✅ Usuario puede reintentar o volver
-- ✅ No hay crash de la aplicación
+-  Error manejado correctamente
+-  Usuario puede reintentar o volver
+-  No hay crash de la aplicación
 
 ---
 
@@ -605,13 +605,13 @@ const getFieldError = (fieldName) => {
 3. Router navega a `/labs` (listado)
 
 **Resultado Esperado:**
-- ✅ Navegación inmediata
-- ✅ Cambios no guardados (descartados)
-- ✅ No se hace petición a la API
+-  Navegación inmediata
+-  Cambios no guardados (descartados)
+-  No se hace petición a la API
 
 ---
 
-## 🛠️ Guía de Implementación
+## ️ Guía de Implementación
 
 ### Para Replicar en Otros Recursos
 
@@ -677,7 +677,7 @@ Probar manualmente:
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ### Test Cases Recomendados
 
@@ -776,7 +776,7 @@ Probar manualmente:
 
 ---
 
-## 📊 Métricas
+##  Métricas
 
 ### Métricas del Código
 
@@ -809,18 +809,18 @@ Probar manualmente:
 
 | Funcionalidad | Estado |
 |---------------|--------|
-| **Modo Dual (Create/Edit)** | ✅ Implementado |
-| **Carga Inicial (Edit)** | ✅ Implementado |
-| **Skeleton Loader** | ✅ Implementado |
-| **Validación Backend** | ✅ Integrado |
-| **Manejo de Errores** | ✅ Completo |
-| **Estados de Carga** | ✅ 3 estados |
-| **Breadcrumb Navegación** | ✅ Implementado |
-| **Redirección Automática** | ✅ Con query params |
-| **Botón con Spinner** | ✅ Implementado |
-| **Textarea Custom** | ✅ Implementado |
-| **Dark Mode** | ✅ Compatible |
-| **Responsive Design** | ✅ Mobile-first |
+| **Modo Dual (Create/Edit)** |  Implementado |
+| **Carga Inicial (Edit)** |  Implementado |
+| **Skeleton Loader** |  Implementado |
+| **Validación Backend** |  Integrado |
+| **Manejo de Errores** |  Completo |
+| **Estados de Carga** |  3 estados |
+| **Breadcrumb Navegación** |  Implementado |
+| **Redirección Automática** |  Con query params |
+| **Botón con Spinner** |  Implementado |
+| **Textarea Custom** |  Implementado |
+| **Dark Mode** |  Compatible |
+| **Responsive Design** |  Mobile-first |
 
 ---
 
@@ -828,27 +828,27 @@ Probar manualmente:
 
 | Caso de Uso | Cubierto |
 |-------------|----------|
-| **Crear laboratorio válido** | ✅ |
-| **Crear con validación fallida** | ✅ |
-| **Crear sin conexión** | ✅ |
-| **Editar laboratorio existente** | ✅ |
-| **Editar ID no existente** | ✅ |
-| **Cancelar operación** | ✅ |
-| **Redirección después de éxito** | ✅ |
+| **Crear laboratorio válido** |  |
+| **Crear con validación fallida** |  |
+| **Crear sin conexión** |  |
+| **Editar laboratorio existente** |  |
+| **Editar ID no existente** |  |
+| **Cancelar operación** |  |
+| **Redirección después de éxito** |  |
 | **Total** | **7/7 (100%)** |
 
 ---
 
-## 🎓 Patrones y Mejores Prácticas
+##  Patrones y Mejores Prácticas
 
 ### Patrón 1: Composable Pattern
 
-✅ **DO:**
+ **DO:**
 ```javascript
 const { loading, error, createLab } = useLabs();
 ```
 
-❌ **DON'T:**
+ **DON'T:**
 ```javascript
 // Lógica directamente en el componente
 const createLab = async () => {
@@ -866,12 +866,12 @@ const createLab = async () => {
 
 ### Patrón 2: Computed para Lógica Reactiva
 
-✅ **DO:**
+ **DO:**
 ```javascript
 const isEditing = computed(() => !!route.params.id);
 ```
 
-❌ **DON'T:**
+ **DON'T:**
 ```javascript
 const isEditing = ref(false);
 onMounted(() => {
@@ -888,7 +888,7 @@ onMounted(() => {
 
 ### Patrón 3: Helper Functions para Lógica Compleja
 
-✅ **DO:**
+ **DO:**
 ```javascript
 const getFieldError = (fieldName) => {
     if (!validationErrors.value[fieldName]) return '';
@@ -905,7 +905,7 @@ const getFieldError = (fieldName) => {
 
 ### Patrón 4: v-if para Estados Mutuamente Excluyentes
 
-✅ **DO:**
+ **DO:**
 ```vue
 <div v-if="initialLoading">Loading...</div>
 <div v-else-if="loadError">Error...</div>
@@ -921,7 +921,7 @@ const getFieldError = (fieldName) => {
 
 ### Patrón 5: Transiciones para Feedback Visual
 
-✅ **DO:**
+ **DO:**
 ```vue
 <transition name="error-fade">
     <p v-if="error">{{ error }}</p>
@@ -935,7 +935,7 @@ const getFieldError = (fieldName) => {
 
 ---
 
-## 🚀 Próximos Pasos
+##  Próximos Pasos
 
 ### Mejoras Futuras
 
@@ -964,21 +964,21 @@ const getFieldError = (fieldName) => {
 
 ---
 
-## ✅ Conclusión
+##  Conclusión
 
 **LabsCreateEditView** es un formulario robusto, profesional y extensible que sirve como **blueprint** para todos los formularios de gestión de la aplicación.
 
 ### Logros
 
-✅ **Modo dual** (create/edit) sin duplicar código  
-✅ **Validación completa** con errores del backend  
-✅ **Manejo de errores** en todos los escenarios  
-✅ **Estados de carga** visuales y claros  
-✅ **Navegación automática** después del éxito  
-✅ **Accesibilidad** garantizada (BaseInput)  
-✅ **Dark mode** compatible  
-✅ **Responsive design** mobile-first  
-✅ **Documentación** completa y detallada  
+ **Modo dual** (create/edit) sin duplicar código  
+ **Validación completa** con errores del backend  
+ **Manejo de errores** en todos los escenarios  
+ **Estados de carga** visuales y claros  
+ **Navegación automática** después del éxito  
+ **Accesibilidad** garantizada (BaseInput)  
+ **Dark mode** compatible  
+ **Responsive design** mobile-first  
+ **Documentación** completa y detallada  
 
 ### Aprendizajes
 
@@ -992,7 +992,7 @@ const getFieldError = (fieldName) => {
 
 **Última actualización:** Octubre 2025  
 **Versión:** 1.0.0  
-**Estado:** ✅ Producción Ready
+**Estado:**  Producción Ready
 
 ---
 

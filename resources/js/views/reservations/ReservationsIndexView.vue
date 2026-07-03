@@ -321,7 +321,7 @@ const handleCancelReservation = async (reservation) => {
 // ============================================================================
 
 onMounted(async () => {
-  console.log('🚀 ReservationsIndexView montado');
+  console.log(' ReservationsIndexView montado');
   await loadReservations();
 });
 </script>

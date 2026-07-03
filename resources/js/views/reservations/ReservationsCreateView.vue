@@ -14,7 +14,7 @@
  * Maneja el cambio en el select de equipos (solo actualiza el preview)
  */
 const handleEquipmentSelection = () => {
-  console.log('📝 Equipo seleccionado:', selectedEquipmentPreview.value?.name || selectedEquipmentPreview.value?.identifier);
+  console.log(' Equipo seleccionado:', selectedEquipmentPreview.value?.name || selectedEquipmentPreview.value?.identifier);
 };=========================================================== -->
     <div v-if="!selectedLab" class="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -648,7 +648,7 @@ const formatQuickPreview = computed(() => {
  * Selecciona un laboratorio y avanza al paso 2
  */
 const selectLab = async (lab) => {
-  console.log('📌 Laboratorio seleccionado:', lab.name);
+  console.log(' Laboratorio seleccionado:', lab.name);
   selectedLab.value = lab;
 
   // Cargar equipos del sistema
@@ -659,7 +659,7 @@ const selectLab = async (lab) => {
  * Limpia la selección de laboratorio y vuelve al paso 1
  */
 const clearLabSelection = () => {
-  console.log('🔄 Limpiando selección de laboratorio...');
+  console.log(' Limpiando selección de laboratorio...');
   selectedLab.value = null;
   selectedEquipment.value = null;
   selectedEquipmentId.value = null;
@@ -693,7 +693,7 @@ const confirmEquipmentSelection = () => {
     return;
   }
 
-  console.log('✅ Confirmando selección de equipo:', equipment);
+  console.log(' Confirmando selección de equipo:', equipment);
   selectedEquipment.value = equipment;
 };
 
@@ -701,7 +701,7 @@ const confirmEquipmentSelection = () => {
  * Limpia la selección de equipo y vuelve al paso 2
  */
 const clearEquipmentSelection = () => {
-  console.log('🔄 Limpiando selección de equipo...');
+  console.log(' Limpiando selección de equipo...');
   selectedEquipment.value = null;
   selectedEquipmentId.value = null;
   reservationDetails.value = null;
@@ -716,7 +716,7 @@ const clearEquipmentSelection = () => {
  * Abre el modal de confirmación
  */
 const handleSlotSelected = (slot) => {
-  console.log('📅 Slot seleccionado:', slot);
+  console.log(' Slot seleccionado:', slot);
 
   reservationDetails.value = {
     equipmentId: selectedEquipment.value.id,
@@ -751,7 +751,7 @@ const handleQuickSelect = () => {
  * Muestra notificación y redirige
  */
 const handleReservationSuccess = (reservation) => {
-  console.log('✅ Reserva creada exitosamente:', reservation);
+  console.log(' Reserva creada exitosamente:', reservation);
 
   // Mostrar notificación de éxito
   toast.success('¡Reserva confirmada exitosamente!');
@@ -784,7 +784,7 @@ watch(selectedLab, (newLab) => {
 // ============================================================================
 
 onMounted(async () => {
-  console.log('🚀 Cargando laboratorios...');
+  console.log(' Cargando laboratorios...');
 
   // Solo cargar laboratorios al inicio
   // Los equipos se cargarán cuando se seleccione un laboratorio

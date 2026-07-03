@@ -96,17 +96,17 @@ apiClient.interceptors.request.use(
         if (needsCsrfToken && !isExcludedRoute && !csrfTokenReady) {
             // Si no hay una petición de CSRF en curso, iniciarla
             if (!csrfTokenPromise) {
-                console.log('🔐 Obteniendo token CSRF de Sanctum...');
+                console.log(' Obteniendo token CSRF de Sanctum...');
                 csrfTokenPromise = axios.get(
                     `${import.meta.env.VITE_APP_URL || 'http://lab-reserva.test'}/sanctum/csrf-cookie`,
                     { withCredentials: true }
                 ).then(() => {
                     csrfTokenReady = true;
                     csrfTokenPromise = null;
-                    console.log('✅ Token CSRF obtenido correctamente');
+                    console.log(' Token CSRF obtenido correctamente');
                 }).catch((error) => {
                     csrfTokenPromise = null;
-                    console.error('❌ Error al obtener token CSRF:', error);
+                    console.error(' Error al obtener token CSRF:', error);
                     throw error;
                 });
             }
@@ -151,11 +151,11 @@ apiClient.interceptors.response.use(
             switch (status) {
                 case 401:
                     // Usuario no autenticado
-                    console.error('❌ Error 401: No autenticado');
+                    console.error(' Error 401: No autenticado');
 
                     // Si no estamos ya en la página de login, redirigir
                     if (!window.location.pathname.includes('/login')) {
-                        console.log('🔄 Redirigiendo a login...');
+                        console.log(' Redirigiendo a login...');
 
                         // Resetear el estado de CSRF
                         csrfTokenReady = false;
@@ -172,7 +172,7 @@ apiClient.interceptors.response.use(
 
                 case 419:
                     // Token CSRF expirado (Page Expired)
-                    console.warn('⚠️ Token CSRF expirado, renovando...');
+                    console.warn('️ Token CSRF expirado, renovando...');
 
                     // Resetear el estado de CSRF para forzar renovación
                     csrfTokenReady = false;
@@ -184,7 +184,7 @@ apiClient.interceptors.response.use(
 
                     if (shouldRetry && !config._retry) {
                         config._retry = true;
-                        console.log('🔄 Reintentando petición con nuevo token CSRF...');
+                        console.log(' Reintentando petición con nuevo token CSRF...');
                         return apiClient.request(config);
                     }
 
@@ -198,18 +198,18 @@ apiClient.interceptors.response.use(
 
                 case 403:
                     // Usuario autenticado pero sin permisos
-                    console.error('❌ Error 403: Acción no autorizada');
+                    console.error(' Error 403: Acción no autorizada');
                     console.error('No tienes permisos para realizar esta acción');
                     break;
 
                 case 404:
                     // Recurso no encontrado
-                    console.error('❌ Error 404: Recurso no encontrado');
+                    console.error(' Error 404: Recurso no encontrado');
                     break;
 
                 case 422:
                     // Error de validación (Laravel devuelve errores en este código)
-                    console.error('❌ Error 422: Error de validación', response.data);
+                    console.error(' Error 422: Error de validación', response.data);
                     // Los errores de validación se manejan típicamente en los componentes
                     break;
 
@@ -218,20 +218,20 @@ apiClient.interceptors.response.use(
                 case 503:
                 case 504:
                     // Errores del servidor
-                    console.error(`❌ Error ${status}: Error del servidor`);
+                    console.error(` Error ${status}: Error del servidor`);
                     console.error('El servidor encontró un error. Por favor, intenta nuevamente más tarde.');
                     break;
 
                 default:
-                    console.error(`❌ Error ${status}: Error en la petición`, error.message);
+                    console.error(` Error ${status}: Error en la petición`, error.message);
             }
         } else if (error.request) {
             // La petición se hizo pero no hubo respuesta
-            console.error('❌ Error de red: Sin respuesta del servidor');
+            console.error(' Error de red: Sin respuesta del servidor');
             console.error('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
         } else {
             // Error al configurar la petición
-            console.error('❌ Error:', error.message);
+            console.error(' Error:', error.message);
         }
 
         // Siempre rechazar la promesa para que el componente pueda manejar el error

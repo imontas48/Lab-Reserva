@@ -1,6 +1,6 @@
-# ✅ Sistema de Estados Dinámicos para Equipos - COMPLETADO
+#  Sistema de Estados Dinámicos para Equipos - COMPLETADO
 
-## 📋 Resumen de Implementación
+##  Resumen de Implementación
 
 Se ha implementado exitosamente un **sistema de estados dinámicos** para equipos que calcula automáticamente el estado actual basándose en:
 - Campo `is_operational` del equipo
@@ -8,36 +8,36 @@ Se ha implementado exitosamente un **sistema de estados dinámicos** para equipo
 - Reservas futuras programadas
 - Disponibilidad sin conflictos
 
-## 🎯 Estados Implementados
+##  Estados Implementados
 
-### 1. ✅ Available (Disponible)
+### 1.  Available (Disponible)
 - **Color**: Verde (`bg-green-100 text-green-800`)
 - **Ícono**: Check
 - **Condición**: Equipo operacional SIN reservas activas o futuras
 - **Acciones permitidas**: Puede ser reservado
 
-### 2. 🔵 In Use (En uso hasta...)
+### 2.  In Use (En uso hasta...)
 - **Color**: Azul (`bg-blue-100 text-blue-800`)
 - **Ícono**: Clock
 - **Condición**: Tiene reserva activa ahora (`start_time <= NOW < end_time`)
 - **Detalles**: Muestra hora de fin (ej: "En uso hasta 14:30")
 - **Acciones permitidas**: NO puede ser reservado
 
-### 3. 🟡 Reserved (Reservado para...)
+### 3.  Reserved (Reservado para...)
 - **Color**: Amarillo (`bg-yellow-100 text-yellow-800`)
 - **Ícono**: Calendar
 - **Condición**: Tiene reserva futura (`start_time > NOW`)
 - **Detalles**: Muestra fecha/hora de inicio (ej: "Reservado para 15/01 16:00")
 - **Acciones permitidas**: NO puede ser reservado
 
-### 4. 🔴 Out of Service (Fuera de servicio)
+### 4.  Out of Service (Fuera de servicio)
 - **Color**: Rojo (`bg-red-100 text-red-800`)
 - **Ícono**: Wrench
 - **Condición**: `is_operational = false`
 - **Detalles**: "Equipo en mantenimiento"
 - **Acciones permitidas**: NO puede ser reservado
 
-## 📁 Archivos Modificados
+##  Archivos Modificados
 
 ### Backend
 
@@ -153,19 +153,19 @@ Documentación completa sobre:
 - Casos de uso
 - Próximos pasos
 
-## 🧪 Datos de Prueba Creados
+##  Datos de Prueba Creados
 
 Se ejecutó `php artisan db:seed --class=ReservationSeeder` que creó:
 
 ```
-📊 Estados calculados:
-🔵 LAB-PC-001: En uso hasta 22:47
-🟡 PC-DEMO-001: Reservado para 14/10 23:47
-🟢 PC-DEMO-002: Disponible
-🔴 PC-DEMO-003: Equipo en mantenimiento
+ Estados calculados:
+ LAB-PC-001: En uso hasta 22:47
+ PC-DEMO-001: Reservado para 14/10 23:47
+ PC-DEMO-002: Disponible
+ PC-DEMO-003: Equipo en mantenimiento
 ```
 
-## 🎨 UX Implementada
+##  UX Implementada
 
 ### Vista de Selección de Equipos (Paso 2)
 
@@ -188,7 +188,7 @@ Se ejecutó `php artisan db:seed --class=ReservationSeeder` que creó:
    - Badge pequeño con estado actual
    - Color y texto coherentes con el resto de la UI
 
-## 📊 Ejemplo de API Response
+##  Ejemplo de API Response
 
 ```json
 GET /api/v1/labs/1/equipment
@@ -253,7 +253,7 @@ GET /api/v1/labs/1/equipment
 }
 ```
 
-## ✨ Características Destacadas
+##  Características Destacadas
 
 ### 1. **Cálculo Dinámico en Tiempo Real**
 - NO se almacena en base de datos
@@ -279,7 +279,7 @@ GET /api/v1/labs/1/equipment
 - Íconos contextuales
 - Texto descriptivo claro
 
-## 🚀 Cómo Probar
+##  Cómo Probar
 
 ### 1. Iniciar Servidores
 ```bash
@@ -306,10 +306,10 @@ http://localhost:8000/reservations/create
 - Click en "Computo 1" (o el lab creado)
 
 **Paso 2: Observar Estados**
-- 🔵 Ver equipo "En uso hasta HH:mm" (deshabilitado)
-- 🟡 Ver equipo "Reservado para dd/mm HH:mm" (deshabilitado)
-- 🟢 Ver equipo "Disponible" (seleccionable)
-- 🔴 Ver equipo "Equipo en mantenimiento" (deshabilitado)
+-  Ver equipo "En uso hasta HH:mm" (deshabilitado)
+-  Ver equipo "Reservado para dd/mm HH:mm" (deshabilitado)
+-  Ver equipo "Disponible" (seleccionable)
+-  Ver equipo "Equipo en mantenimiento" (deshabilitado)
 
 **Paso 3: Seleccionar Equipo Disponible**
 - Click en select → elegir equipo verde
@@ -326,7 +326,7 @@ http://localhost:8000/reservations/create
 - Ver mensaje de advertencia
 - Botón "Continuar" NO aparece
 
-## 📝 Próximos Pasos Sugeridos
+##  Próximos Pasos Sugeridos
 
 - [ ] Endpoint `GET /equipment/{id}/check-availability?start=X&end=Y`
 - [ ] Vista "Mis Reservas" con listado y cancelación
@@ -335,14 +335,14 @@ http://localhost:8000/reservations/create
 - [ ] Filtros en listado de equipos por estado
 - [ ] Búsqueda de equipos disponibles en rango de tiempo específico
 
-## 🎉 Conclusión
+##  Conclusión
 
 El sistema de estados dinámicos está **100% funcional** y proporciona:
-- ✅ Feedback visual inmediato sobre disponibilidad
-- ✅ Prevención de reservas en equipos no disponibles
-- ✅ Información contextual precisa (hasta cuándo está en uso, para cuándo está reservado)
-- ✅ UX mejorada con colores, íconos y mensajes claros
-- ✅ Código mantenible y escalable
-- ✅ Optimización de queries para performance
+-  Feedback visual inmediato sobre disponibilidad
+-  Prevención de reservas en equipos no disponibles
+-  Información contextual precisa (hasta cuándo está en uso, para cuándo está reservado)
+-  UX mejorada con colores, íconos y mensajes claros
+-  Código mantenible y escalable
+-  Optimización de queries para performance
 
 El usuario ahora puede ver de un vistazo el estado de TODOS los equipos sin necesidad de consultar calendarios o hacer clicks innecesarios.

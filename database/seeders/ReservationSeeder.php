@@ -24,14 +24,14 @@ class ReservationSeeder extends Seeder
         $user = User::first();
 
         if (!$user) {
-            $this->command->error('❌ No hay usuarios en la base de datos. Ejecuta primero: php artisan db:seed --class=AdminUserSeeder');
+            $this->command->error(' No hay usuarios en la base de datos. Ejecuta primero: php artisan db:seed --class=AdminUserSeeder');
             return;
         }
 
         $lab = \App\Models\Labs::where('is_active', true)->first();
 
         if (!$lab) {
-            $this->command->error('❌ No hay laboratorios activos en la base de datos.');
+            $this->command->error(' No hay laboratorios activos en la base de datos.');
             return;
         }
 
@@ -40,7 +40,7 @@ class ReservationSeeder extends Seeder
 
         // Si no hay suficientes equipos, crear algunos de prueba
         if ($equipments->count() < 4) {
-            $this->command->info("⚙️  Creando equipos de prueba...");
+            $this->command->info("️  Creando equipos de prueba...");
 
             $equipmentsNeeded = 4 - $equipments->count();
 
@@ -78,7 +78,7 @@ class ReservationSeeder extends Seeder
             'status' => 'confirmed'
         ]);
 
-        $this->command->info("✅ Reserva ACTIVA creada para equipo: {$equipment1->identifier}");
+        $this->command->info(" Reserva ACTIVA creada para equipo: {$equipment1->identifier}");
         $this->command->info("   Estado esperado: IN_USE (En uso hasta " . Carbon::now()->addHours(2)->format('H:i') . ")");
 
         // ========================================================================
@@ -94,7 +94,7 @@ class ReservationSeeder extends Seeder
             'status' => 'confirmed'
         ]);
 
-        $this->command->info("✅ Reserva FUTURA creada para equipo: {$equipment2->identifier}");
+        $this->command->info(" Reserva FUTURA creada para equipo: {$equipment2->identifier}");
         $this->command->info("   Estado esperado: RESERVED (Reservado para " . Carbon::now()->addHours(3)->format('d/m H:i') . ")");
 
         // ========================================================================
@@ -102,7 +102,7 @@ class ReservationSeeder extends Seeder
         // ========================================================================
         if (isset($equipments[2])) {
             $equipment3 = $equipments[2];
-            $this->command->info("✅ Equipo SIN reservas: {$equipment3->identifier}");
+            $this->command->info(" Equipo SIN reservas: {$equipment3->identifier}");
             $this->command->info("   Estado esperado: AVAILABLE (Disponible)");
         }
 
@@ -113,24 +113,24 @@ class ReservationSeeder extends Seeder
             $equipment4 = $equipments[3];
             $equipment4->update(['is_operational' => false]);
 
-            $this->command->info("✅ Equipo marcado como NO operacional: {$equipment4->identifier}");
+            $this->command->info(" Equipo marcado como NO operacional: {$equipment4->identifier}");
             $this->command->info("   Estado esperado: OUT_OF_SERVICE (Equipo en mantenimiento)");
         }
 
-        $this->command->info("\n🎉 Seeding completado! Verifica los estados en:");
+        $this->command->info("\n Seeding completado! Verifica los estados en:");
         $this->command->info("   Frontend: http://localhost:8000/reservations/create");
         $this->command->info("   API: GET /api/v1/labs/{lab_id}/equipment");
 
         // Mostrar estados actuales
-        $this->command->info("\n📊 Estados calculados:");
+        $this->command->info("\n Estados calculados:");
         Equipment::with('reservations')->get()->each(function ($eq) {
             $status = $eq->getCurrentStatus();
             $icon = [
-                'available' => '🟢',
-                'in_use' => '🔵',
-                'reserved' => '🟡',
-                'out_of_service' => '🔴'
-            ][$status['status']] ?? '⚪';
+                'available' => '',
+                'in_use' => '',
+                'reserved' => '',
+                'out_of_service' => ''
+            ][$status['status']] ?? '';
 
             $this->command->line("   {$icon} {$eq->identifier}: {$status['details']}");
         });

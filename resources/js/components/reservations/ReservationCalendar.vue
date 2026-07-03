@@ -207,7 +207,7 @@ const calendarOptions = computed(() => ({
   allDaySlot: false, // No mostrar sección "todo el día"
 
   // ===== INTERACTIVIDAD =====
-  selectable: true, // ✅ CRÍTICO: Permite seleccionar rangos de tiempo
+  selectable: true, //  CRÍTICO: Permite seleccionar rangos de tiempo
   selectMirror: true, // Feedback visual mientras se selecciona
   selectOverlap: false, // NO permitir seleccionar sobre eventos existentes
   unselectAuto: true, // Deseleccionar automáticamente después de crear evento
@@ -272,7 +272,7 @@ const calendarOptions = computed(() => ({
  * @param {Object} selectInfo - Información de la selección de FullCalendar
  */
 const handleSelect = (selectInfo) => {
-  console.log('📅 Rango de tiempo seleccionado:', {
+  console.log(' Rango de tiempo seleccionado:', {
     start: selectInfo.startStr,
     end: selectInfo.endStr
   });
@@ -302,7 +302,7 @@ const handleDatesSet = (dateInfo) => {
     currentDateRange.value.start !== start ||
     currentDateRange.value.end !== end
   ) {
-    console.log('📅 Navegando a nuevo rango:', { start, end });
+    console.log(' Navegando a nuevo rango:', { start, end });
 
     currentDateRange.value = { start, end };
 
@@ -320,7 +320,7 @@ const handleDatesSet = (dateInfo) => {
 const handleEventClick = (clickInfo) => {
   const reservation = clickInfo.event.extendedProps;
 
-  console.log('📌 Reserva clickeada:', {
+  console.log(' Reserva clickeada:', {
     id: reservation.reservationId,
     purpose: reservation.purpose
   });
@@ -341,7 +341,7 @@ const renderEventContent = (eventInfo) => {
       <div class="fc-event-main-frame">
         <div class="fc-event-title-container">
           <div class="fc-event-title fc-sticky">
-            <i class="mr-1">🔒</i>
+            <i class="mr-1"></i>
             ${eventInfo.event.title}
           </div>
         </div>
@@ -367,7 +367,7 @@ const loadInitialReservations = () => {
 
   currentDateRange.value = { start, end };
 
-  console.log('🚀 Carga inicial de reservas:', { equipmentId: props.equipmentId, start, end });
+  console.log(' Carga inicial de reservas:', { equipmentId: props.equipmentId, start, end });
 
   fetchReservationsForEquipment(props.equipmentId, start, end);
 };
@@ -384,7 +384,7 @@ watch(
   () => props.equipmentId,
   (newId, oldId) => {
     if (newId && newId !== oldId) {
-      console.log(`🔄 Equipo cambió de ${oldId} a ${newId}. Recargando calendario...`);
+      console.log(` Equipo cambió de ${oldId} a ${newId}. Recargando calendario...`);
       loadInitialReservations();
     }
   }

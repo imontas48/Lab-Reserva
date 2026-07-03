@@ -392,7 +392,7 @@ const generalError = computed(() => {
  * Llama al composable para crear la reserva y maneja el resultado
  */
 const handleConfirm = async () => {
-  console.log('📝 Confirmando reserva...', props.reservationDetails);
+  console.log(' Confirmando reserva...', props.reservationDetails);
 
   // Construir el payload para la API
   const payload = {
@@ -406,7 +406,7 @@ const handleConfirm = async () => {
 
   // Si la creación fue exitosa
   if (reservation) {
-    console.log('✅ Reserva confirmada exitosamente:', reservation);
+    console.log(' Reserva confirmada exitosamente:', reservation);
 
     // Emitir evento de éxito para que el padre pueda reaccionar
     emit('reservation-success', reservation);
@@ -414,7 +414,7 @@ const handleConfirm = async () => {
     // Cerrar el modal
     closeModal();
   } else {
-    console.error('❌ Error al confirmar reserva. Errores de validación:', validationErrors.value);
+    console.error(' Error al confirmar reserva. Errores de validación:', validationErrors.value);
     // Los errores se mostrarán automáticamente en el template
   }
 };
@@ -439,7 +439,7 @@ watch(
   () => props.show,
   (newValue) => {
     if (newValue) {
-      console.log('🔓 Modal abierto. Limpiando errores previos...');
+      console.log(' Modal abierto. Limpiando errores previos...');
       validationErrors.value = {};
     }
   }

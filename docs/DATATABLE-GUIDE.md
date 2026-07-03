@@ -1,6 +1,6 @@
-# 📊 DataTable Component - Guía de Uso
+#  DataTable Component - Guía de Uso
 
-## 🎯 Descripción
+##  Descripción
 
 `DataTable.vue` es un componente de tabla de datos completamente reutilizable y altamente personalizable. Es la piedra angular para todas las vistas de listado en Lab-Reserva.
 
@@ -8,21 +8,21 @@
 
 ---
 
-## ✨ Características
+##  Características
 
-- ✅ **Agnóstico a los datos** - Funciona con cualquier tipo de datos
-- ✅ **Altamente personalizable** - Slots para cada celda y estado
-- ✅ **Cuatro estados manejados** - Loading, Error, Empty, Data
-- ✅ **Acciones configurables** - View, Edit, Delete por defecto
-- ✅ **Soporte para datos anidados** - Usa dot notation (ej. `user.name`)
-- ✅ **Formateo personalizable** - Función `format` por columna
-- ✅ **Responsive** - Scroll horizontal en pantallas pequeñas
-- ✅ **Accesible** - Semántica HTML correcta
-- ✅ **Estilizado profesional** - Tailwind CSS
+-  **Agnóstico a los datos** - Funciona con cualquier tipo de datos
+-  **Altamente personalizable** - Slots para cada celda y estado
+-  **Cuatro estados manejados** - Loading, Error, Empty, Data
+-  **Acciones configurables** - View, Edit, Delete por defecto
+-  **Soporte para datos anidados** - Usa dot notation (ej. `user.name`)
+-  **Formateo personalizable** - Función `format` por columna
+-  **Responsive** - Scroll horizontal en pantallas pequeñas
+-  **Accesible** - Semántica HTML correcta
+-  **Estilizado profesional** - Tailwind CSS
 
 ---
 
-## 📦 Props
+##  Props
 
 ### `columns` (Array, required)
 Define las columnas de la tabla.
@@ -63,7 +63,7 @@ Clase CSS adicional para las filas.
 
 ---
 
-## 🎪 Slots
+##  Slots
 
 ### Slots de Celda: `cell-[key]`
 
@@ -137,7 +137,7 @@ Personaliza el skeleton loader.
 
 ---
 
-## 📡 Events
+##  Events
 
 ### `@view-item`
 Se emite cuando se hace clic en "Ver".
@@ -182,7 +182,7 @@ const handleDelete = async (item) => {
 
 ---
 
-## 💡 Ejemplos de Uso
+##  Ejemplos de Uso
 
 ### Ejemplo 1: Uso Básico
 
@@ -472,7 +472,7 @@ const columns = ref([
 
 ---
 
-## 🎨 Personalización Visual
+##  Personalización Visual
 
 ### Clases de Header Personalizadas
 
@@ -510,7 +510,7 @@ columns: [
 
 ---
 
-## 🔍 Casos de Uso Comunes
+##  Casos de Uso Comunes
 
 ### 1. Búsqueda en la Tabla
 
@@ -610,7 +610,7 @@ const previousPage = () => {
 
 ---
 
-## ⚠️ Notas Importantes
+## ️ Notas Importantes
 
 1. **Dot Notation**: El componente soporta acceso a propiedades anidadas usando dot notation (ej. `user.name`, `lab.building.floor`).
 
@@ -624,7 +624,7 @@ const previousPage = () => {
 
 ---
 
-## 🚀 Próximas Mejoras (Opcional)
+##  Próximas Mejoras (Opcional)
 
 - [ ] Ordenamiento por columnas (click en header)
 - [ ] Selección múltiple con checkboxes
@@ -636,4 +636,4 @@ const previousPage = () => {
 
 ---
 
-**Documentado por El Arquitecto - Lab-Reserva Team** 🚀
+**Documentado por El Arquitecto - Lab-Reserva Team** 

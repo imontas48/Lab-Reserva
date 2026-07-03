@@ -1,21 +1,21 @@
-# 🚀 Frontend Vue 3 - Lab-Reserva
+#  Frontend Vue 3 - Lab-Reserva
 
-## 📋 Resumen de Implementación
+##  Resumen de Implementación
 
 Hemos completado exitosamente la **Fase 1** del desarrollo del frontend, estableciendo una arquitectura sólida y escalable.
 
-## ✅ Componentes Implementados
+##  Componentes Implementados
 
 ### 1. **Cliente HTTP Axios** (`resources/js/utils/api.js`)
 
 #### Características Implementadas:
-- ✅ Configuración pre-establecida con `baseURL` apuntando a la API
-- ✅ **`withCredentials: true`** - Esencial para Laravel Sanctum
-- ✅ **Interceptor de Peticiones (Request Interceptor)**:
+-  Configuración pre-establecida con `baseURL` apuntando a la API
+-  **`withCredentials: true`** - Esencial para Laravel Sanctum
+-  **Interceptor de Peticiones (Request Interceptor)**:
   - Obtiene automáticamente el token CSRF antes de operaciones de mutación (POST, PUT, PATCH, DELETE)
   - Evita llamadas redundantes mediante caché del token
   - Excluye rutas específicas (login, register) para evitar bucles
-- ✅ **Interceptor de Respuestas (Response Interceptor)**:
+-  **Interceptor de Respuestas (Response Interceptor)**:
   - Manejo centralizado de errores HTTP
   - **Error 401**: Redirige a login automáticamente
   - **Error 419**: Renueva token CSRF y reintenta la petición
@@ -31,7 +31,7 @@ Hemos completado exitosamente la **Fase 1** del desarrollo del frontend, estable
 5. Axios lee automáticamente la cookie
 6. Axios envía X-XSRF-TOKEN header en la petición original
 7. Laravel valida el token
-8. Petición completada ✅
+8. Petición completada 
 ```
 
 #### Importancia de `withCredentials`:
@@ -145,28 +145,28 @@ if (guest && isAuthenticated) {
 ### 5. **Vistas Implementadas**
 
 #### Vistas de Autenticación:
-- ✅ `LoginView.vue` - Formulario de login con validación
-- ✅ `RegisterView.vue` - Formulario de registro con validación
-- ✅ Manejo de errores en tiempo real
-- ✅ Estados de carga (loading)
-- ✅ Integración completa con auth store
+-  `LoginView.vue` - Formulario de login con validación
+-  `RegisterView.vue` - Formulario de registro con validación
+-  Manejo de errores en tiempo real
+-  Estados de carga (loading)
+-  Integración completa con auth store
 
 #### Vista Principal:
-- ✅ `DashboardView.vue` - Dashboard con estadísticas y acciones rápidas
+-  `DashboardView.vue` - Dashboard con estadísticas y acciones rápidas
 
 #### Vistas Stub (Pendientes de implementación):
-- ⏳ Labs (Index, Show, Create, Edit)
-- ⏳ Equipment (Index, Show, Create, Edit)
-- ⏳ Software (Index, Show, Create, Edit)
-- ⏳ Reservations (Index, Show, Create)
-- ⏳ Profile
+-  Labs (Index, Show, Create, Edit)
+-  Equipment (Index, Show, Create, Edit)
+-  Software (Index, Show, Create, Edit)
+-  Reservations (Index, Show, Create)
+-  Profile
 
 #### Vista de Error:
-- ✅ `NotFoundView.vue` - Página 404
+-  `NotFoundView.vue` - Página 404
 
 ---
 
-## 📁 Estructura de Archivos
+##  Estructura de Archivos
 
 ```
 resources/js/
@@ -211,7 +211,7 @@ resources/js/
 
 ---
 
-## 🔧 Configuración
+##  Configuración
 
 ### Variables de Entorno (`.env`):
 ```env
@@ -224,16 +224,16 @@ VITE_API_URL="${APP_URL}/api/v1"
 ```
 
 ### Dependencias Instaladas:
-- ✅ `vue@3.5.22` - Framework principal
-- ✅ `vue-router@4` - Enrutamiento
-- ✅ `pinia@3.0.3` - Gestión de estado
-- ✅ `axios@1.12.2` - Cliente HTTP
-- ✅ `@vitejs/plugin-vue@6.0.1` - Plugin de Vite para Vue
-- ✅ `tailwindcss@3.4.18` - Estilos
+-  `vue@3.5.22` - Framework principal
+-  `vue-router@4` - Enrutamiento
+-  `pinia@3.0.3` - Gestión de estado
+-  `axios@1.12.2` - Cliente HTTP
+-  `@vitejs/plugin-vue@6.0.1` - Plugin de Vite para Vue
+-  `tailwindcss@3.4.18` - Estilos
 
 ---
 
-## 🚀 Próximos Pasos
+##  Próximos Pasos
 
 ### Fase 2: Implementación de Vistas CRUD
 1. **Laboratorios**: Listar, crear, editar, eliminar
@@ -258,7 +258,7 @@ VITE_API_URL="${APP_URL}/api/v1"
 
 ---
 
-## 📝 Comandos Útiles
+##  Comandos Útiles
 
 ### Desarrollo:
 ```bash
@@ -278,7 +278,7 @@ npm run test          # Ejecutar tests (cuando se implementen)
 
 ---
 
-## 🎯 Puntos Clave de Arquitectura
+##  Puntos Clave de Arquitectura
 
 ### 1. **Separación de Responsabilidades**
 - **API Client**: Solo maneja comunicación HTTP
@@ -306,7 +306,7 @@ npm run test          # Ejecutar tests (cuando se implementen)
 
 ---
 
-## 🔐 Seguridad Laravel Sanctum
+##  Seguridad Laravel Sanctum
 
 ### Configuración Requerida en Backend:
 
@@ -335,7 +335,7 @@ npm run test          # Ejecutar tests (cuando se implementen)
 
 ---
 
-## ✨ Características Destacadas
+##  Características Destacadas
 
 1. **Auto-renovación de CSRF Token**: Si expira, se renueva automáticamente
 2. **Manejo Global de Errores**: Todos los errores HTTP manejados centralizadamente
@@ -346,7 +346,7 @@ npm run test          # Ejecutar tests (cuando se implementen)
 
 ---
 
-## 📚 Documentación de Referencia
+##  Documentación de Referencia
 
 - [Vue 3 Documentation](https://vuejs.org/)
 - [Vue Router Documentation](https://router.vuejs.org/)
@@ -357,7 +357,7 @@ npm run test          # Ejecutar tests (cuando se implementen)
 
 ---
 
-**Estado del Proyecto**: ✅ **Fase 1 Completada**
+**Estado del Proyecto**:  **Fase 1 Completada**
 
 **Próximo Milestone**: Implementación de vistas CRUD completas
 

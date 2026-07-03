@@ -473,7 +473,7 @@ const getEquipmentCountClasses = (count) => {
  * Aquí cargamos los datos iniciales de software desde la API.
  */
 onMounted(() => {
-    console.log('📦 SoftwareIndexView montado. Cargando software...');
+    console.log(' SoftwareIndexView montado. Cargando software...');
     fetchSoftware();
 });
 
@@ -491,7 +491,7 @@ onMounted(() => {
  * @param {Object} item - El objeto software seleccionado
  */
 const handleView = (item) => {
-    console.log('👁️ Ver detalles de software:', item.name);
+    console.log('️ Ver detalles de software:', item.name);
 
     router.push({
         name: 'software-show',
@@ -511,7 +511,7 @@ const handleView = (item) => {
  * @param {Object} item - El objeto software seleccionado
  */
 const handleEdit = (item) => {
-    console.log('✏️ Editar software:', item.name);
+    console.log('️ Editar software:', item.name);
 
     router.push({
         name: 'software-edit',
@@ -537,7 +537,7 @@ const handleEdit = (item) => {
  * @param {Object} item - El objeto software seleccionado
  */
 const handleDelete = (item) => {
-    console.log('🗑️ Eliminar software:', item.name);
+    console.log('️ Eliminar software:', item.name);
 
     // Por ahora, solo mostramos un alert de confirmación
     // En una implementación completa, esto debería abrir un modal de confirmación

@@ -9,25 +9,25 @@ El sistema calcula automáticamente el estado de cada equipo basándose en:
 
 ## Estados Posibles
 
-### 1. **Available** (Disponible) ✅
+### 1. **Available** (Disponible) 
 - Color: Verde
 - Ícono: check
 - Condición: Equipo operacional Y sin reservas activas/futuras
 - Ejemplo: `{"status":"available","details":"Disponible","color":"green","icon":"check"}`
 
-### 2. **In Use** (En uso hasta...) 🔵
+### 2. **In Use** (En uso hasta...) 
 - Color: Azul
 - Ícono: clock
 - Condición: Tiene reserva activa en este momento
 - Ejemplo: `{"status":"in_use","details":"En uso hasta 14:30","until":"2024-01-15T14:30:00","color":"blue","icon":"clock"}`
 
-### 3. **Reserved** (Reservado para...) 🟡
+### 3. **Reserved** (Reservado para...) 
 - Color: Amarillo
 - Ícono: calendar
 - Condición: Tiene reserva futura próxima
 - Ejemplo: `{"status":"reserved","details":"Reservado para 15/01 16:00","next_reservation":"2024-01-15T16:00:00","color":"yellow","icon":"calendar"}`
 
-### 4. **Out of Service** (Fuera de servicio) 🔴
+### 4. **Out of Service** (Fuera de servicio) 
 - Color: Rojo
 - Ícono: wrench
 - Condición: is_operational = false
@@ -105,10 +105,10 @@ $equipment3->update(['is_operational' => false]);
 1. **Ir a `/reservations/create`**
 2. **Seleccionar un laboratorio**
 3. **Observar select de equipos:**
-   - ✅ Equipos disponibles: "PC-001 - Disponible"
-   - 🔵 Equipos en uso: "PC-002 - En uso hasta 14:30"
-   - 🟡 Equipos reservados: "PC-003 - Reservado para 15/01 16:00"
-   - 🔴 Equipos fuera de servicio: "PC-004 - Equipo en mantenimiento" (deshabilitado)
+   -  Equipos disponibles: "PC-001 - Disponible"
+   -  Equipos en uso: "PC-002 - En uso hasta 14:30"
+   -  Equipos reservados: "PC-003 - Reservado para 15/01 16:00"
+   -  Equipos fuera de servicio: "PC-004 - Equipo en mantenimiento" (deshabilitado)
 
 4. **Seleccionar equipo disponible:**
    - Ver badge verde con "Disponible"

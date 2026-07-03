@@ -62,13 +62,13 @@ resources/js/
 - Las clases de modelo **deben** llevar nombre en **PascalCase singular** aunque la tabla sea plural (corregir `equipment` → `Equipment`, `labs` → `Lab`, `reservations` → `Reservation` en nuevos módulos). Respeta los nombres ya existentes para no romper código en producción, pero sigue PascalCase en cualquier modelo **nuevo**.
 
 ```php
-// ✅ CORRECTO — Scope en el modelo
+//  CORRECTO — Scope en el modelo
 public function scopeOperational(Builder $query): Builder
 {
     return $query->where('is_operational', true);
 }
 
-// ❌ INCORRECTO — Lógica de negocio en el modelo
+//  INCORRECTO — Lógica de negocio en el modelo
 public function createReservationFor(User $user, array $data): Reservation { ... }
 ```
 
@@ -80,7 +80,7 @@ public function createReservationFor(User $user, array $data): Reservation { ...
 - Un Service **nunca** retorna respuestas HTTP (`JsonResponse`, `Response`). Eso es responsabilidad del Controller.
 
 ```php
-// ✅ CORRECTO — Service devuelve modelo o lanza excepción
+//  CORRECTO — Service devuelve modelo o lanza excepción
 public function createReservation(array $data, User $user): Reservation
 {
     return DB::transaction(function () use ($data, $user) {
@@ -101,7 +101,7 @@ public function createReservation(array $data, User $user): Reservation
 - Todos los controllers de API van en `app/Http/Controllers/Api/` y extienden el `Controller` base.
 
 ```php
-// ✅ CORRECTO — Controller ultra delgado
+//  CORRECTO — Controller ultra delgado
 public function __construct(private readonly ReservationService $reservationService) {}
 
 public function store(StoreReservationRequest $request): ReservationResource
@@ -123,7 +123,7 @@ public function store(StoreReservationRequest $request): ReservationResource
 - Las validaciones de integridad de negocio simples (ej. verificar que una FK existe y está activa) pueden incluirse como closures en `rules()`, pero las verificaciones **complejas** (race conditions, locks) van en el Service.
 
 ```php
-// ✅ CORRECTO — authorize() delega en Policy
+//  CORRECTO — authorize() delega en Policy
 public function authorize(): bool
 {
     return $this->user()->can('create', Reservation::class);
@@ -186,7 +186,7 @@ public function authorize(): bool
 - Maneja errores: captura `422` para poblar `validationErrors` y otros códigos para poblar `error`.
 
 ```js
-// ✅ CORRECTO — Estructura de composable
+//  CORRECTO — Estructura de composable
 export function useReservations() {
   const reservations = ref([]);
   const isLoading = ref(false);
@@ -240,10 +240,10 @@ Antes de crear HTML crudo para un formulario, verifica y usa los componentes exi
 | `ThemeToggle` | `components/ui/ThemeToggle.vue` | Toggle de modo oscuro/claro. |
 
 ```vue
-<!-- ✅ CORRECTO — Usa componentes base -->
+<!--  CORRECTO — Usa componentes base -->
 <BaseInput v-model="form.name" label="Nombre" :error="errors.name" required />
 
-<!-- ❌ INCORRECTO — HTML crudo cuando existe un componente -->
+<!--  INCORRECTO — HTML crudo cuando existe un componente -->
 <input type="text" v-model="form.name" class="border rounded p-2" />
 ```
 
