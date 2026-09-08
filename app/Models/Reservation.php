@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Reservations extends Model
+class Reservation extends Model
 {
     use HasFactory;
 
@@ -43,7 +43,7 @@ class Reservations extends Model
      */
     public function equipment(): BelongsTo
     {
-        return $this->belongsTo(equipment::class);
+        return $this->belongsTo(Equipment::class);
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\equipment;
-use App\Models\labs;
+use App\Models\Equipment;
+use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -18,7 +18,7 @@ class EquipmentService
      */
     public function getAllEquipment(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
-        $query = equipment::with(['lab', 'software']);
+        $query = Equipment::with(['lab', 'software']);
 
         // Filtrar por laboratorio
         if (isset($filters['lab_id'])) {
@@ -61,7 +61,7 @@ class EquipmentService
      * @param array $filters
      * @return Collection
      */
-    public function getEquipmentByLab(labs $lab, array $filters = []): Collection
+    public function getEquipmentByLab(Lab $lab, array $filters = []): Collection
     {
         $query = $lab->equipment()->with('software');
 
@@ -100,7 +100,7 @@ class EquipmentService
      */
     public function getOperationalEquipment(): Collection
     {
-        return equipment::with(['lab', 'software'])
+        return Equipment::with(['lab', 'software'])
             ->operational()
             ->orderBy('identifier')
             ->get();
@@ -123,7 +123,7 @@ class EquipmentService
         unset($data['software']);
 
         // Crear el equipo
-        $equipment = equipment::create($data);
+        $equipment = Equipment::create($data);
 
         // Asociar el software si se proporcionó
         if (!empty($softwareIds)) {
@@ -143,7 +143,7 @@ class EquipmentService
      */
     public function getEquipmentById(int $id): equipment
     {
-        return equipment::with(['lab', 'software'])->findOrFail($id);
+        return Equipment::with(['lab', 'software'])->findOrFail($id);
     }
 
     /**
@@ -153,7 +153,7 @@ class EquipmentService
      * @param array $data
      * @return equipment
      */
-    public function updateEquipment(equipment $equipment, array $data): equipment
+    public function updateEquipment(Equipment $equipment, array $data): equipment
     {
         // Extraer la relación de software si existe
         $softwareIds = $data['software'] ?? null;
@@ -178,7 +178,7 @@ class EquipmentService
      * @return bool
      * @throws \Exception
      */
-    public function deleteEquipment(equipment $equipment): bool
+    public function deleteEquipment(Equipment $equipment): bool
     {
         // Verificar si el equipo tiene reservas activas
         $activeReservations = $equipment->reservations()
@@ -204,7 +204,7 @@ class EquipmentService
      * @param equipment $equipment
      * @return equipment
      */
-    public function toggleOperationalStatus(equipment $equipment): equipment
+    public function toggleOperationalStatus(Equipment $equipment): equipment
     {
         $equipment->update(['is_operational' => !$equipment->is_operational]);
 
@@ -218,7 +218,7 @@ class EquipmentService
      * @param array $softwareIds
      * @return equipment
      */
-    public function assignSoftware(equipment $equipment, array $softwareIds): equipment
+    public function assignSoftware(Equipment $equipment, array $softwareIds): equipment
     {
         $equipment->software()->sync($softwareIds);
 
@@ -232,7 +232,7 @@ class EquipmentService
      */
     public function getEquipmentTypes(): Collection
     {
-        return equipment::select('type')
+        return Equipment::select('type')
             ->distinct()
             ->orderBy('type')
             ->pluck('type');
@@ -246,7 +246,7 @@ class EquipmentService
      * @param string $endTime
      * @return bool
      */
-    public function isAvailable(equipment $equipment, string $startTime, string $endTime): bool
+    public function isAvailable(Equipment $equipment, string $startTime, string $endTime): bool
     {
         // Verificar si el equipo está operacional
         if (!$equipment->is_operational) {

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\labs;
+use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -17,7 +17,7 @@ class LabService
      */
     public function getAllLabs(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
-        $query = labs::query();
+        $query = Lab::query();
 
         // Aplicar filtro de búsqueda por nombre o ubicación
         if (isset($filters['search'])) {
@@ -49,7 +49,7 @@ class LabService
      */
     public function getActiveLabs(): Collection
     {
-        return labs::active()->orderBy('name')->get();
+        return Lab::active()->orderBy('name')->get();
     }
 
     /**
@@ -63,7 +63,7 @@ class LabService
         // Establecer valores por defecto si no se proporcionan
         $data['is_active'] = $data['is_active'] ?? true;
 
-        return labs::create($data);
+        return Lab::create($data);
     }
 
     /**
@@ -75,7 +75,7 @@ class LabService
      */
     public function getLabById(int $id): labs
     {
-        return labs::findOrFail($id);
+        return Lab::findOrFail($id);
     }
 
     /**
@@ -85,7 +85,7 @@ class LabService
      * @param array $data
      * @return labs
      */
-    public function updateLab(labs $lab, array $data): labs
+    public function updateLab(Lab $lab, array $data): labs
     {
         $lab->update($data);
 
@@ -99,7 +99,7 @@ class LabService
      * @return bool
      * @throws \Exception
      */
-    public function deleteLab(labs $lab): bool
+    public function deleteLab(Lab $lab): bool
     {
         // Verificar si el laboratorio tiene equipos asociados
         if ($lab->equipment()->exists()) {
@@ -118,7 +118,7 @@ class LabService
      * @param labs $lab
      * @return labs
      */
-    public function toggleActiveStatus(labs $lab): labs
+    public function toggleActiveStatus(Lab $lab): labs
     {
         $lab->update(['is_active' => !$lab->is_active]);
 
@@ -132,7 +132,7 @@ class LabService
      */
     public function getLabsWithEquipmentCount(): Collection
     {
-        return labs::withCount('equipment')->orderBy('name')->get();
+        return Lab::withCount('equipment')->orderBy('name')->get();
     }
 
     /**
@@ -142,6 +142,6 @@ class LabService
      */
     public function getLabsWithOperationalEquipmentCount(): Collection
     {
-        return labs::withCount('operationalEquipment')->orderBy('name')->get();
+        return Lab::withCount('operationalEquipment')->orderBy('name')->get();
     }
 }

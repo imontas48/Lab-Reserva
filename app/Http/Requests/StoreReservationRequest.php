@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\reservations;
+use App\Models\Reservation;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReservationRequest extends FormRequest
@@ -13,7 +13,7 @@ class StoreReservationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', reservations::class);
+        return $this->user()->can('create', Reservation::class);
     }
 
     /**
@@ -30,7 +30,7 @@ class StoreReservationRequest extends FormRequest
                 'exists:equipment,id',
                 // Validación personalizada: verificar que el equipo esté operacional
                 function ($attribute, $value, $fail) {
-                    $equipment = \App\Models\equipment::find($value);
+                    $equipment = \App\Models\Equipment::find($value);
                     if ($equipment && !$equipment->is_operational) {
                         $fail('El equipo seleccionado no está operacional y no puede ser reservado.');
                     }
@@ -46,7 +46,7 @@ class StoreReservationRequest extends FormRequest
                     }
 
                     // Buscar reservas confirmadas que se solapen
-                    $hasConflict = reservations::where('equipment_id', $value)
+                    $hasConflict = Reservation::where('equipment_id', $value)
                         ->where('status', 'confirmed')
                         ->where(function ($query) use ($startTime, $endTime) {
                             // Caso 1: La nueva reserva comienza durante una existente

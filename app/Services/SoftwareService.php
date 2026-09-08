@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\software;
+use App\Models\Software;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -17,7 +17,7 @@ class SoftwareService
      */
     public function getAllSoftware(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
-        $query = software::query();
+        $query = Software::query();
 
         // Aplicar filtro de búsqueda por nombre o versión
         if (isset($filters['search'])) {
@@ -45,7 +45,7 @@ class SoftwareService
      */
     public function createSoftware(array $data): software
     {
-        return software::create($data);
+        return Software::create($data);
     }
 
     /**
@@ -57,7 +57,7 @@ class SoftwareService
      */
     public function getSoftwareById(int $id): software
     {
-        return software::findOrFail($id);
+        return Software::findOrFail($id);
     }
 
     /**
@@ -67,7 +67,7 @@ class SoftwareService
      * @param array $data
      * @return software
      */
-    public function updateSoftware(software $software, array $data): software
+    public function updateSoftware(Software $software, array $data): software
     {
         $software->update($data);
 
@@ -82,7 +82,7 @@ class SoftwareService
      * @return bool
      * @throws \Exception
      */
-    public function deleteSoftware(software $software): bool
+    public function deleteSoftware(Software $software): bool
     {
         // Verificar si el software está asignado a algún equipo
         if ($software->equipment()->exists()) {
@@ -102,7 +102,7 @@ class SoftwareService
      */
     public function getSoftwareWithEquipmentCount(): Collection
     {
-        return software::withCount('equipment')->orderBy('name')->get();
+        return Software::withCount('equipment')->orderBy('name')->get();
     }
 
     /**
@@ -113,7 +113,7 @@ class SoftwareService
      */
     public function searchSoftware(string $search): Collection
     {
-        return software::search($search)->get();
+        return Software::search($search)->get();
     }
 
     /**
@@ -124,7 +124,7 @@ class SoftwareService
      */
     public function getSoftwareByEquipment(int $equipmentId): Collection
     {
-        return software::whereHas('equipment', function ($query) use ($equipmentId) {
+        return Software::whereHas('equipment', function ($query) use ($equipmentId) {
             $query->where('equipment_id', $equipmentId);
         })->orderBy('name')->get();
     }
@@ -137,7 +137,7 @@ class SoftwareService
      */
     public function getMostUsedSoftware(int $limit = 10): Collection
     {
-        return software::withCount('equipment')
+        return Software::withCount('equipment')
             ->orderByDesc('equipment_count')
             ->limit($limit)
             ->get();

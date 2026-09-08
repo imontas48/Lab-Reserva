@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Labs extends Model
+class Lab extends Model
 {
     use HasFactory;
 
@@ -33,7 +33,7 @@ class Labs extends Model
      */
     public function equipment(): HasMany
     {
-        return $this->hasMany(equipment::class, 'lab_id');
+        return $this->hasMany(Equipment::class, 'lab_id');
     }
 
     /**
@@ -41,7 +41,7 @@ class Labs extends Model
      */
     public function operationalEquipment(): HasMany
     {
-        return $this->hasMany(equipment::class, 'lab_id')->where('is_operational', true);
+        return $this->hasMany(Equipment::class, 'lab_id')->where('is_operational', true);
     }
 
     /**

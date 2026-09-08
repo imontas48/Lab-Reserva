@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
-use App\Models\equipment;
+use App\Models\Equipment;
 use App\Models\GroupRoleAssignment;
-use App\Models\labs;
+use App\Models\Lab;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\software;
-use App\Models\reservations;
+use App\Models\Software;
+use App\Models\Reservation;
 use App\Models\UserRole;
 use App\Policies\EquipmentPolicy;
 use App\Policies\LabPolicy;
@@ -35,11 +35,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Registrar las políticas de autorización
-        Gate::policy(labs::class, LabPolicy::class);
-        Gate::policy(equipment::class, EquipmentPolicy::class);
-        Gate::policy(software::class, SoftwarePolicy::class);
+        Gate::policy(Lab::class, LabPolicy::class);
+        Gate::policy(Equipment::class, EquipmentPolicy::class);
+        Gate::policy(Software::class, SoftwarePolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Permission::class, PermissionPolicy::class);
-        Gate::policy(reservations::class, ReservationPolicy::class);
+        Gate::policy(Reservation::class, ReservationPolicy::class);
     }
 }

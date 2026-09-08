@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\equipment;
-use App\Models\reservations;
+use App\Models\Equipment;
+use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -43,7 +43,7 @@ class ReservationService
             }
 
             // Verificar nuevamente que el equipo esté operacional
-            $equipment = equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
+            $equipment = Equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
 
             if (!$equipment->is_operational) {
                 throw new \Exception(
@@ -52,7 +52,7 @@ class ReservationService
             }
 
             // Crear la reserva
-            $reservation = reservations::create($validatedData);
+            $reservation = Reservation::create($validatedData);
 
             // Cargar las relaciones para la respuesta
             return $reservation->load(['user', 'equipment.lab']);
@@ -67,7 +67,7 @@ class ReservationService
      * @return reservations
      * @throws \Exception
      */
-    public function cancelReservation(reservations $reservation): reservations
+    public function cancelReservation(Reservation $reservation): reservations
     {
         // Verificar que la reserva esté confirmada
         if ($reservation->status !== 'confirmed') {
@@ -98,7 +98,7 @@ class ReservationService
      * @param array $data
      * @return reservations
      */
-    public function updateReservation(reservations $reservation, array $data): reservations
+    public function updateReservation(Reservation $reservation, array $data): reservations
     {
         $reservation->update($data);
 
@@ -111,7 +111,7 @@ class ReservationService
      * @param reservations $reservation
      * @return bool
      */
-    public function deleteReservation(reservations $reservation): bool
+    public function deleteReservation(Reservation $reservation): bool
     {
         return $reservation->delete();
     }
@@ -125,7 +125,7 @@ class ReservationService
      */
     public function getAllReservations(array $filters = [], ?int $perPage = null): LengthAwarePaginator
     {
-        $query = reservations::with(['user', 'equipment.lab']);
+        $query = Reservation::with(['user', 'equipment.lab']);
 
         // Filtrar por usuario
         if (isset($filters['user_id'])) {
@@ -191,7 +191,7 @@ class ReservationService
      */
     public function getReservationsForUser(User $user, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = reservations::where('user_id', $user->id)
+        $query = Reservation::where('user_id', $user->id)
             ->with(['equipment.lab']);
 
         // Filtrar por estado si se proporciona
@@ -225,7 +225,7 @@ class ReservationService
      */
     public function getReservationsByUserRole(string $role, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = reservations::with(['user', 'equipment.lab'])
+        $query = Reservation::with(['user', 'equipment.lab'])
             ->whereHas('user', function ($q) use ($role) {
                 $q->where('role', $role);
             });
@@ -273,7 +273,7 @@ class ReservationService
      * @param array $filters
      * @return Collection
      */
-    public function getReservationsForEquipment(equipment $equipment, array $filters = []): Collection
+    public function getReservationsForEquipment(Equipment $equipment, array $filters = []): Collection
     {
         $query = $equipment->reservations()->with('user');
 
@@ -299,7 +299,7 @@ class ReservationService
      */
     public function getActiveReservations(): Collection
     {
-        return reservations::with(['user', 'equipment.lab'])
+        return Reservation::with(['user', 'equipment.lab'])
             ->where('status', 'confirmed')
             ->where('start_time', '<=', now())
             ->where('end_time', '>=', now())
@@ -315,7 +315,7 @@ class ReservationService
      */
     public function getUpcomingReservations(int $limit = 10): Collection
     {
-        return reservations::with(['user', 'equipment.lab'])
+        return Reservation::with(['user', 'equipment.lab'])
             ->confirmed()
             ->where('start_time', '>', now())
             ->orderBy('start_time', 'asc')
@@ -331,7 +331,7 @@ class ReservationService
      */
     public function markExpiredReservationsAsCompleted(): int
     {
-        return reservations::where('status', 'confirmed')
+        return Reservation::where('status', 'confirmed')
             ->where('end_time', '<', now())
             ->update(['status' => 'completed']);
     }
@@ -344,10 +344,10 @@ class ReservationService
      */
     public function getUserStatistics(User $user): array
     {
-        $total = reservations::where('user_id', $user->id)->count();
-        $confirmed = reservations::where('user_id', $user->id)->confirmed()->count();
-        $cancelled = reservations::where('user_id', $user->id)->cancelled()->count();
-        $completed = reservations::where('user_id', $user->id)->completed()->count();
+        $total = Reservation::where('user_id', $user->id)->count();
+        $confirmed = Reservation::where('user_id', $user->id)->confirmed()->count();
+        $cancelled = Reservation::where('user_id', $user->id)->cancelled()->count();
+        $completed = Reservation::where('user_id', $user->id)->completed()->count();
 
         return [
             'total' => $total,
@@ -363,7 +363,7 @@ class ReservationService
      * @param equipment $equipment
      * @return array
      */
-    public function getEquipmentStatistics(equipment $equipment): array
+    public function getEquipmentStatistics(Equipment $equipment): array
     {
         $total = $equipment->reservations()->count();
         $confirmed = $equipment->reservations()->confirmed()->count();
@@ -392,7 +392,7 @@ class ReservationService
         string $endTime,
         ?int $excludeReservationId = null
     ): bool {
-        $query = reservations::where('equipment_id', $equipmentId)
+        $query = Reservation::where('equipment_id', $equipmentId)
             ->where('status', 'confirmed')
             ->where(function ($q) use ($startTime, $endTime) {
                 // Mismo algoritmo de detección de solapamiento que en la validación

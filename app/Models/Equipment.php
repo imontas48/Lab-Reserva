@@ -40,7 +40,7 @@ class Equipment extends Model
      */
     public function lab(): BelongsTo
     {
-        return $this->belongsTo(labs::class, 'lab_id');
+        return $this->belongsTo(Lab::class, 'lab_id');
     }
 
     /**
@@ -48,7 +48,7 @@ class Equipment extends Model
      */
     public function software(): BelongsToMany
     {
-        return $this->belongsToMany(software::class, 'equipment_software');
+        return $this->belongsToMany(Software::class, 'equipment_software');
     }
 
     /**
@@ -56,7 +56,7 @@ class Equipment extends Model
      */
     public function reservations(): HasMany
     {
-        return $this->hasMany(reservations::class);
+        return $this->hasMany(Reservation::class);
     }
 
     /**
@@ -64,7 +64,7 @@ class Equipment extends Model
      */
     public function activeReservations(): HasMany
     {
-        return $this->hasMany(reservations::class)->where('status', 'confirmed');
+        return $this->hasMany(Reservation::class)->where('status', 'confirmed');
     }
 
     /**

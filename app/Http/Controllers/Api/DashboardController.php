@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\equipment;
-use App\Models\labs;
-use App\Models\reservations;
-use App\Models\software;
+use App\Models\Equipment;
+use App\Models\Lab;
+use App\Models\Reservation;
+use App\Models\Software;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,14 +20,14 @@ class DashboardController extends Controller
         $user = $request->user();
 
         // Contar laboratorios disponibles (is_active = true)
-        $availableLabs = labs::where('is_active', true)->count();
+        $availableLabs = Lab::where('is_active', true)->count();
 
         // Contar equipos registrados
-        $totalEquipment = equipment::count();
+        $totalEquipment = Equipment::count();
 
         // Contar reservas activas del usuario actual
         // Activas = confirmadas y no canceladas, con fecha futura o actual
-        $activeReservations = reservations::where('user_id', $user->id)
+        $activeReservations = Reservation::where('user_id', $user->id)
             ->where('status', 'confirmed')
             ->where(function($query) {
                 $query->where('end_time', '>=', now())
@@ -36,11 +36,11 @@ class DashboardController extends Controller
             ->count();
 
         // Contar software disponible
-        $availableSoftware = software::count();
+        $availableSoftware = Software::count();
 
         // Obtener próximas reservas del usuario (máximo 5)
         // Incluye reservas activas (en curso) y futuras
-        $upcomingReservations = reservations::with(['equipment.lab'])
+        $upcomingReservations = Reservation::with(['equipment.lab'])
             ->where('user_id', $user->id)
             ->where('status', 'confirmed')
             ->where('end_time', '>=', now())

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSoftwareRequest;
 use App\Http\Requests\UpdateSoftwareRequest;
 use App\Http\Resources\SoftwareResource;
-use App\Models\software;
+use App\Models\Software;
 use App\Services\SoftwareService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class SoftwareController extends Controller
         private readonly SoftwareService $softwareService
     ) {
         // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(software::class, 'software');
+        // $this->authorizeResource(Software::class, 'software');
     }
 
     /**
@@ -57,7 +57,7 @@ class SoftwareController extends Controller
      * Display the specified software.
      * GET /api/v1/software/{software}
      */
-    public function show(software $software): SoftwareResource
+    public function show(Software $software): SoftwareResource
     {
         // Cargamos el contador de equipos
         $software->loadCount('equipment');
@@ -69,7 +69,7 @@ class SoftwareController extends Controller
      * Update the specified software in storage.
      * PUT/PATCH /api/v1/software/{software}
      */
-    public function update(UpdateSoftwareRequest $request, software $software): SoftwareResource
+    public function update(UpdateSoftwareRequest $request, Software $software): SoftwareResource
     {
         $updatedSoftware = $this->softwareService->updateSoftware(
             $software,
@@ -83,7 +83,7 @@ class SoftwareController extends Controller
      * Remove the specified software from storage.
      * DELETE /api/v1/software/{software}
      */
-    public function destroy(software $software): JsonResponse
+    public function destroy(Software $software): JsonResponse
     {
         $this->softwareService->deleteSoftware($software);
 

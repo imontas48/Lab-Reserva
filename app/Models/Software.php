@@ -28,7 +28,7 @@ class Software extends Model
      */
     public function equipment(): BelongsToMany
     {
-        return $this->belongsToMany(equipment::class, 'equipment_software');
+        return $this->belongsToMany(Equipment::class, 'equipment_software');
     }
 
     /**

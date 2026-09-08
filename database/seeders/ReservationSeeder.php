@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Equipment;
-use App\Models\Reservations;
+use App\Models\Reservation;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -28,7 +28,7 @@ class ReservationSeeder extends Seeder
             return;
         }
 
-        $lab = \App\Models\Labs::where('is_active', true)->first();
+        $lab = \App\Models\Lab::where('is_active', true)->first();
 
         if (!$lab) {
             $this->command->error(' No hay laboratorios activos en la base de datos.');
@@ -70,7 +70,7 @@ class ReservationSeeder extends Seeder
         // ========================================================================
         $equipment1 = $equipments[0];
 
-        Reservations::create([
+        Reservation::create([
             'user_id' => $user->id,
             'equipment_id' => $equipment1->id,
             'start_time' => Carbon::now()->subHour(),        // Empezó hace 1 hora
@@ -86,7 +86,7 @@ class ReservationSeeder extends Seeder
         // ========================================================================
         $equipment2 = $equipments[1];
 
-        Reservations::create([
+        Reservation::create([
             'user_id' => $user->id,
             'equipment_id' => $equipment2->id,
             'start_time' => Carbon::now()->addHours(3),      // Empieza en 3 horas

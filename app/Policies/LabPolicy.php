@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\labs;
+use App\Models\Lab;
 use Illuminate\Auth\Access\Response;
 
 class LabPolicy
@@ -21,7 +21,7 @@ class LabPolicy
      * Determine whether the user can view the model.
      * Cualquier usuario autenticado puede ver un laboratorio específico.
      */
-    public function view(User $user, labs $labs): bool
+    public function view(User $user, Lab $labs): bool
     {
         return true;
     }
@@ -39,7 +39,7 @@ class LabPolicy
      * Determine whether the user can update the model.
      * Solo los administradores pueden actualizar laboratorios.
      */
-    public function update(User $user, labs $labs): bool
+    public function update(User $user, Lab $labs): bool
     {
         return $user->isAdmin();
     }
@@ -48,7 +48,7 @@ class LabPolicy
      * Determine whether the user can delete the model.
      * Solo los administradores pueden eliminar laboratorios.
      */
-    public function delete(User $user, labs $labs): bool
+    public function delete(User $user, Lab $labs): bool
     {
         return $user->isAdmin();
     }
@@ -56,7 +56,7 @@ class LabPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, labs $labs): bool
+    public function restore(User $user, Lab $labs): bool
     {
         return false;
     }
@@ -64,7 +64,7 @@ class LabPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, labs $labs): bool
+    public function forceDelete(User $user, Lab $labs): bool
     {
         return false;
     }

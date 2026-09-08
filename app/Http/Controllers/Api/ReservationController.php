@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 use App\Http\Resources\ReservationResource;
-use App\Models\equipment;
-use App\Models\reservations;
+use App\Models\Equipment;
+use App\Models\Reservation;
 use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,7 +25,7 @@ class ReservationController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', reservations::class);
+        $this->authorize('viewAny', Reservation::class);
 
         $filters = [
             'search' => $request->input('search'),
@@ -75,7 +75,7 @@ class ReservationController extends Controller
      * Display reservations for a specific equipment.
      * GET /api/v1/equipment/{equipment}/reservations
      */
-    public function indexForEquipment(equipment $equipment, Request $request): AnonymousResourceCollection
+    public function indexForEquipment(Equipment $equipment, Request $request): AnonymousResourceCollection
     {
         $filters = [
             'status' => $request->input('status', 'confirmed'), // Por defecto solo confirmadas
@@ -111,7 +111,7 @@ class ReservationController extends Controller
      * Display the specified reservation.
      * GET /api/v1/reservations/{reservation}
      */
-    public function show(reservations $reservation): ReservationResource
+    public function show(Reservation $reservation): ReservationResource
     {
         $this->authorize('view', $reservation);
 
@@ -125,7 +125,7 @@ class ReservationController extends Controller
      * PUT/PATCH /api/v1/reservations/{reservation}
      * (Principalmente usado para cambios administrativos)
      */
-    public function update(UpdateReservationRequest $request, reservations $reservation): ReservationResource
+    public function update(UpdateReservationRequest $request, Reservation $reservation): ReservationResource
     {
         $this->authorize('update', $reservation);
 
@@ -141,7 +141,7 @@ class ReservationController extends Controller
      * Cancel a reservation.
      * PATCH /api/v1/reservations/{reservation}/cancel
      */
-    public function cancel(reservations $reservation): ReservationResource
+    public function cancel(Reservation $reservation): ReservationResource
     {
         $this->authorize('cancel', $reservation);
 
@@ -159,7 +159,7 @@ class ReservationController extends Controller
      */
     public function indexByRole(Request $request, string $role): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', reservations::class);
+        $this->authorize('viewAny', Reservation::class);
 
         // Validar que el rol solicitado sea válido
         if (!in_array($role, ['student', 'teacher'])) {
@@ -186,7 +186,7 @@ class ReservationController extends Controller
      * Remove the specified reservation from storage (admin only).
      * DELETE /api/v1/reservations/{reservation}
      */
-    public function destroy(reservations $reservation): JsonResponse
+    public function destroy(Reservation $reservation): JsonResponse
     {
         $this->authorize('delete', $reservation);
 

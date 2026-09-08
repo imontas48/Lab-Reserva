@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\equipment;
+use App\Models\Equipment;
 use Illuminate\Auth\Access\Response;
 
 class EquipmentPolicy
@@ -21,7 +21,7 @@ class EquipmentPolicy
      * Determine whether the user can view the model.
      * Cualquier usuario autenticado puede ver un equipo específico.
      */
-    public function view(User $user, equipment $equipment): bool
+    public function view(User $user, Equipment $equipment): bool
     {
         return true;
     }
@@ -39,7 +39,7 @@ class EquipmentPolicy
      * Determine whether the user can update the model.
      * Solo los administradores pueden actualizar equipos.
      */
-    public function update(User $user, equipment $equipment): bool
+    public function update(User $user, Equipment $equipment): bool
     {
         return $user->isAdmin();
     }
@@ -48,7 +48,7 @@ class EquipmentPolicy
      * Determine whether the user can delete the model.
      * Solo los administradores pueden eliminar equipos.
      */
-    public function delete(User $user, equipment $equipment): bool
+    public function delete(User $user, Equipment $equipment): bool
     {
         return $user->isAdmin();
     }
@@ -56,7 +56,7 @@ class EquipmentPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, equipment $equipment): bool
+    public function restore(User $user, Equipment $equipment): bool
     {
         return false;
     }
@@ -64,7 +64,7 @@ class EquipmentPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, equipment $equipment): bool
+    public function forceDelete(User $user, Equipment $equipment): bool
     {
         return false;
     }

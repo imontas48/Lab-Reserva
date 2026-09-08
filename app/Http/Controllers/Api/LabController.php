@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLabRequest;
 use App\Http\Requests\UpdateLabRequest;
 use App\Http\Resources\LabResource;
-use App\Models\labs;
+use App\Models\Lab;
 use App\Services\LabService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -17,7 +17,7 @@ class LabController extends Controller
         private readonly LabService $labService
     ) {
         // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(labs::class, 'lab');
+        // $this->authorizeResource(Lab::class, 'lab');
     }
 
     /**
@@ -41,7 +41,7 @@ class LabController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(labs $lab): LabResource
+    public function show(Lab $lab): LabResource
     {
         return new LabResource($lab);
     }
@@ -49,7 +49,7 @@ class LabController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLabRequest $request, labs $lab): LabResource
+    public function update(UpdateLabRequest $request, Lab $lab): LabResource
     {
         $updatedLab = $this->labService->updateLab($lab, $request->validated());
 
@@ -59,7 +59,7 @@ class LabController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(labs $lab): JsonResponse
+    public function destroy(Lab $lab): JsonResponse
     {
         $this->labService->deleteLab($lab);
 

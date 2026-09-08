@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEquipmentRequest;
 use App\Http\Requests\UpdateEquipmentRequest;
 use App\Http\Resources\EquipmentResource;
-use App\Models\equipment;
-use App\Models\labs;
+use App\Models\Equipment;
+use App\Models\Lab;
 use App\Services\EquipmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class EquipmentController extends Controller
         private readonly EquipmentService $equipmentService
     ) {
         // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(equipment::class, 'equipment');
+        // $this->authorizeResource(Equipment::class, 'equipment');
     }
 
     /**
@@ -48,7 +48,7 @@ class EquipmentController extends Controller
      * Display equipment for a specific lab (nested resource).
      * GET /api/v1/labs/{lab}/equipment
      */
-    public function indexByLab(labs $lab, Request $request): AnonymousResourceCollection
+    public function indexByLab(Lab $lab, Request $request): AnonymousResourceCollection
     {
         // No necesitamos autorización adicional aquí,
         // ya que heredamos el permiso de viewAny del resource
@@ -90,7 +90,7 @@ class EquipmentController extends Controller
      * Display the specified equipment.
      * GET /api/v1/equipment/{equipment}
      */
-    public function show(equipment $equipment): EquipmentResource
+    public function show(Equipment $equipment): EquipmentResource
     {
         // Cargamos las relaciones necesarias
         $equipment->load(['lab', 'software']);
@@ -102,7 +102,7 @@ class EquipmentController extends Controller
      * Update the specified equipment in storage.
      * PUT/PATCH /api/v1/equipment/{equipment}
      */
-    public function update(UpdateEquipmentRequest $request, equipment $equipment): EquipmentResource
+    public function update(UpdateEquipmentRequest $request, Equipment $equipment): EquipmentResource
     {
         $updatedEquipment = $this->equipmentService->updateEquipment(
             $equipment,
@@ -116,7 +116,7 @@ class EquipmentController extends Controller
      * Remove the specified equipment from storage.
      * DELETE /api/v1/equipment/{equipment}
      */
-    public function destroy(equipment $equipment): JsonResponse
+    public function destroy(Equipment $equipment): JsonResponse
     {
         $this->equipmentService->deleteEquipment($equipment);
 

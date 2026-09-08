@@ -54,7 +54,7 @@ class User extends Authenticatable
      */
     public function reservations(): HasMany
     {
-        return $this->hasMany(reservations::class);
+        return $this->hasMany(Reservation::class);
     }
 
     /**
@@ -62,7 +62,7 @@ class User extends Authenticatable
      */
     public function activeReservations(): HasMany
     {
-        return $this->hasMany(reservations::class)->where('status', 'confirmed');
+        return $this->hasMany(Reservation::class)->where('status', 'confirmed');
     }
 
     /**
