@@ -7,6 +7,26 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @layer base {
+    /*
+     * Esquema de color del documento.
+     *
+     * No se declaraba en ninguna parte. Sin él, el navegador no sabe en qué
+     * modo pintar los controles nativos y usa la preferencia del SISTEMA, no la
+     * de la aplicación: con el equipo en oscuro, los <input> se dibujaban con el
+     * fondo oscuro del agente de usuario mientras la app seguía en claro
+     * aplicando `text-gray-900`. Texto casi negro sobre fondo oscuro.
+     *
+     * El store de tema alterna la clase `dark` en <html>, así que el esquema la
+     * sigue y los controles nativos van siempre a juego con la interfaz.
+     */
+    :root {
+        color-scheme: light;
+    }
+
+    .dark {
+        color-scheme: dark;
+    }
+
     /* Transición suave al cambiar de tema */
     html {
         @apply transition-colors duration-200;
@@ -20,6 +40,48 @@
     #app {
         @apply bg-gray-50 min-h-screen;
         @apply dark:bg-gray-900;
+    }
+
+    /*
+     * Autorrelleno del navegador.
+     *
+     * Chrome pinta los campos autorrellenados con un fondo propio y un color de
+     * texto propio, y ninguno de los dos se puede cambiar con `background-color`
+     * ni con `color`: la única vía es una sombra interior que tape el fondo y
+     * -webkit-text-fill-color para el texto.
+     *
+     * Esto se hizo visible al añadir `name` y `autocomplete` a BaseInput: antes
+     * esos atributos caían en el div contenedor y nunca llegaban al <input>, así
+     * que el navegador apenas tenía señales para autorrellenar. Ahora sí las
+     * tiene —que es lo correcto para los gestores de contraseñas— y hay que
+     * vestir ese estado.
+     *
+     * El retardo largo de la transición es el truco habitual para que el fondo
+     * del agente de usuario no llegue a verse mientras se aplica la sombra.
+     */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        -webkit-text-fill-color: theme('colors.gray.900');
+        -webkit-box-shadow: 0 0 0 1000px theme('colors.white') inset;
+        box-shadow: 0 0 0 1000px theme('colors.white') inset;
+        caret-color: theme('colors.gray.900');
+        transition: background-color 100000s ease-in-out 0s;
+    }
+
+    .dark input:-webkit-autofill,
+    .dark input:-webkit-autofill:hover,
+    .dark input:-webkit-autofill:focus,
+    .dark input:-webkit-autofill:active,
+    .dark textarea:-webkit-autofill,
+    .dark select:-webkit-autofill {
+        -webkit-text-fill-color: theme('colors.white');
+        -webkit-box-shadow: 0 0 0 1000px theme('colors.gray.900') inset;
+        box-shadow: 0 0 0 1000px theme('colors.gray.900') inset;
+        caret-color: theme('colors.white');
     }
 }
 
