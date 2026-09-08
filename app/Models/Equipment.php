@@ -113,12 +113,12 @@ class Equipment extends Model
     public function getCurrentStatus(): array
     {
         // Si el equipo está fuera de servicio físicamente
-        if (!$this->is_operational) {
+        if (! $this->is_operational) {
             return [
                 'status' => 'out_of_service',
                 'details' => 'Equipo en mantenimiento',
                 'color' => 'red',
-                'icon' => 'wrench'
+                'icon' => 'wrench',
             ];
         }
 
@@ -134,10 +134,10 @@ class Equipment extends Model
         if ($activeReservation) {
             return [
                 'status' => 'in_use',
-                'details' => 'En uso hasta ' . $activeReservation->end_time->format('H:i'),
+                'details' => 'En uso hasta '.$activeReservation->end_time->format('H:i'),
                 'until' => $activeReservation->end_time,
                 'color' => 'blue',
-                'icon' => 'clock'
+                'icon' => 'clock',
             ];
         }
 
@@ -151,10 +151,10 @@ class Equipment extends Model
         if ($nextReservation) {
             return [
                 'status' => 'reserved',
-                'details' => 'Reservado para ' . $nextReservation->start_time->format('d/m H:i'),
+                'details' => 'Reservado para '.$nextReservation->start_time->format('d/m H:i'),
                 'next_reservation' => $nextReservation->start_time,
                 'color' => 'yellow',
-                'icon' => 'calendar'
+                'icon' => 'calendar',
             ];
         }
 
@@ -163,21 +163,20 @@ class Equipment extends Model
             'status' => 'available',
             'details' => 'Disponible',
             'color' => 'green',
-            'icon' => 'check'
+            'icon' => 'check',
         ];
     }
 
     /**
      * Verifica si el equipo está disponible en un rango de tiempo específico.
      *
-     * @param string $startTime Fecha/hora de inicio
-     * @param string $endTime Fecha/hora de fin
-     * @return bool
+     * @param  string  $startTime  Fecha/hora de inicio
+     * @param  string  $endTime  Fecha/hora de fin
      */
     public function isAvailableInRange($startTime, $endTime): bool
     {
         // Si está fuera de servicio, no está disponible
-        if (!$this->is_operational) {
+        if (! $this->is_operational) {
             return false;
         }
 
@@ -190,12 +189,12 @@ class Equipment extends Model
                     ->orWhereBetween('end_time', [$startTime, $endTime])
                     ->orWhere(function ($q) use ($startTime, $endTime) {
                         $q->where('start_time', '<=', $startTime)
-                          ->where('end_time', '>=', $endTime);
+                            ->where('end_time', '>=', $endTime);
                     });
             })
             ->exists();
 
-        return !$conflicts;
+        return ! $conflicts;
     }
 
     /**
@@ -208,8 +207,8 @@ class Equipment extends Model
         return $query->where('is_operational', true)
             ->whereDoesntHave('reservations', function ($q) use ($now) {
                 $q->where('status', 'confirmed')
-                  ->where('start_time', '<=', $now)
-                  ->where('end_time', '>', $now);
+                    ->where('start_time', '<=', $now)
+                    ->where('end_time', '>', $now);
             });
     }
 }

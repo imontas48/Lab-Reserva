@@ -66,8 +66,8 @@ class EquipmentController extends Controller
         // Eager load reservations para cálculo de estado
         $equipment->load(['reservations' => function ($query) {
             $query->where('start_time', '>=', now()->subHours(2))
-                  ->where('status', '!=', 'cancelled')
-                  ->orderBy('start_time', 'asc');
+                ->where('status', '!=', 'cancelled')
+                ->orderBy('start_time', 'asc');
         }]);
 
         return EquipmentResource::collection($equipment);
@@ -121,7 +121,7 @@ class EquipmentController extends Controller
         $this->equipmentService->deleteEquipment($equipment);
 
         return response()->json([
-            'message' => 'Equipo eliminado exitosamente'
+            'message' => 'Equipo eliminado exitosamente',
         ]);
     }
 }

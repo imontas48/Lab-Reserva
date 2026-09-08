@@ -5,16 +5,13 @@ namespace App\Services;
 use App\Models\Equipment;
 use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class EquipmentService
 {
     /**
      * Get all equipment with optional filtering and pagination.
-     *
-     * @param array $filters
-     * @param int|null $perPage
-     * @return Collection|LengthAwarePaginator
      */
     public function getAllEquipment(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -40,8 +37,8 @@ class EquipmentService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('identifier', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('specifications', 'like', "%{$search}%");
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('specifications', 'like', "%{$search}%");
             });
         }
 
@@ -57,9 +54,7 @@ class EquipmentService
     /**
      * Get equipment for a specific lab.
      *
-     * @param labs $lab
-     * @param array $filters
-     * @return Collection
+     * @param  labs  $lab
      */
     public function getEquipmentByLab(Lab $lab, array $filters = []): Collection
     {
@@ -80,8 +75,8 @@ class EquipmentService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('identifier', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('specifications', 'like', "%{$search}%");
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('specifications', 'like', "%{$search}%");
             });
         }
 
@@ -95,8 +90,6 @@ class EquipmentService
 
     /**
      * Get only operational equipment.
-     *
-     * @return Collection
      */
     public function getOperationalEquipment(): Collection
     {
@@ -108,11 +101,8 @@ class EquipmentService
 
     /**
      * Create a new equipment.
-     *
-     * @param array $data
-     * @return equipment
      */
-    public function createEquipment(array $data): equipment
+    public function createEquipment(array $data): Equipment
     {
         // Establecer valores por defecto
         $data['type'] = $data['type'] ?? 'PC';
@@ -126,7 +116,7 @@ class EquipmentService
         $equipment = Equipment::create($data);
 
         // Asociar el software si se proporcionó
-        if (!empty($softwareIds)) {
+        if (! empty($softwareIds)) {
             $equipment->software()->sync($softwareIds);
         }
 
@@ -137,23 +127,17 @@ class EquipmentService
     /**
      * Get equipment by ID.
      *
-     * @param int $id
-     * @return equipment
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
-    public function getEquipmentById(int $id): equipment
+    public function getEquipmentById(int $id): Equipment
     {
         return Equipment::with(['lab', 'software'])->findOrFail($id);
     }
 
     /**
      * Update an existing equipment.
-     *
-     * @param equipment $equipment
-     * @param array $data
-     * @return equipment
      */
-    public function updateEquipment(Equipment $equipment, array $data): equipment
+    public function updateEquipment(Equipment $equipment, array $data): Equipment
     {
         // Extraer la relación de software si existe
         $softwareIds = $data['software'] ?? null;
@@ -174,8 +158,6 @@ class EquipmentService
     /**
      * Delete an equipment.
      *
-     * @param equipment $equipment
-     * @return bool
      * @throws \Exception
      */
     public function deleteEquipment(Equipment $equipment): bool
@@ -188,7 +170,7 @@ class EquipmentService
 
         if ($activeReservations) {
             throw new \Exception(
-                'No se puede eliminar el equipo porque tiene reservas activas. ' .
+                'No se puede eliminar el equipo porque tiene reservas activas. '.
                 'Cancele las reservas primero.'
             );
         }
@@ -200,25 +182,18 @@ class EquipmentService
 
     /**
      * Toggle operational status of equipment.
-     *
-     * @param equipment $equipment
-     * @return equipment
      */
-    public function toggleOperationalStatus(Equipment $equipment): equipment
+    public function toggleOperationalStatus(Equipment $equipment): Equipment
     {
-        $equipment->update(['is_operational' => !$equipment->is_operational]);
+        $equipment->update(['is_operational' => ! $equipment->is_operational]);
 
         return $equipment->fresh(['lab', 'software']);
     }
 
     /**
      * Assign software to equipment.
-     *
-     * @param equipment $equipment
-     * @param array $softwareIds
-     * @return equipment
      */
-    public function assignSoftware(Equipment $equipment, array $softwareIds): equipment
+    public function assignSoftware(Equipment $equipment, array $softwareIds): Equipment
     {
         $equipment->software()->sync($softwareIds);
 
@@ -227,8 +202,6 @@ class EquipmentService
 
     /**
      * Get equipment types (unique).
-     *
-     * @return Collection
      */
     public function getEquipmentTypes(): Collection
     {
@@ -240,16 +213,11 @@ class EquipmentService
 
     /**
      * Get equipment availability for a date range.
-     *
-     * @param equipment $equipment
-     * @param string $startTime
-     * @param string $endTime
-     * @return bool
      */
     public function isAvailable(Equipment $equipment, string $startTime, string $endTime): bool
     {
         // Verificar si el equipo está operacional
-        if (!$equipment->is_operational) {
+        if (! $equipment->is_operational) {
             return false;
         }
 
@@ -258,14 +226,14 @@ class EquipmentService
             ->where('status', 'confirmed')
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->whereBetween('start_time', [$startTime, $endTime])
-                      ->orWhereBetween('end_time', [$startTime, $endTime])
-                      ->orWhere(function ($q) use ($startTime, $endTime) {
-                          $q->where('start_time', '<=', $startTime)
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '<=', $startTime)
                             ->where('end_time', '>=', $endTime);
-                      });
+                    });
             })
             ->exists();
 
-        return !$hasConflict;
+        return ! $hasConflict;
     }
 }

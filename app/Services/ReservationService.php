@@ -15,9 +15,6 @@ class ReservationService
      * Create a new reservation.
      * Usa transacciones para evitar race conditions.
      *
-     * @param array $validatedData
-     * @param User $user
-     * @return reservations
      * @throws \Exception
      */
     public function createReservation(array $validatedData, User $user): reservations
@@ -37,7 +34,7 @@ class ReservationService
 
             if ($hasConflict) {
                 throw new \Exception(
-                    'El equipo ya no está disponible en el rango de tiempo seleccionado. ' .
+                    'El equipo ya no está disponible en el rango de tiempo seleccionado. '.
                     'Por favor, seleccione otro horario.'
                 );
             }
@@ -45,7 +42,7 @@ class ReservationService
             // Verificar nuevamente que el equipo esté operacional
             $equipment = Equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
 
-            if (!$equipment->is_operational) {
+            if (! $equipment->is_operational) {
                 throw new \Exception(
                     'El equipo seleccionado no está operacional en este momento.'
                 );
@@ -63,8 +60,8 @@ class ReservationService
      * Cancel a reservation.
      * Solo cancela si está en estado 'confirmed' y no ha comenzado.
      *
-     * @param reservations $reservation
-     * @return reservations
+     * @param  reservations  $reservation
+     *
      * @throws \Exception
      */
     public function cancelReservation(Reservation $reservation): reservations
@@ -72,8 +69,8 @@ class ReservationService
         // Verificar que la reserva esté confirmada
         if ($reservation->status !== 'confirmed') {
             throw new \Exception(
-                'Solo se pueden cancelar reservas confirmadas. ' .
-                'Esta reserva ya está en estado: ' . $reservation->status
+                'Solo se pueden cancelar reservas confirmadas. '.
+                'Esta reserva ya está en estado: '.$reservation->status
             );
         }
 
@@ -94,9 +91,7 @@ class ReservationService
     /**
      * Update a reservation (admin only - mainly for status changes).
      *
-     * @param reservations $reservation
-     * @param array $data
-     * @return reservations
+     * @param  reservations  $reservation
      */
     public function updateReservation(Reservation $reservation, array $data): reservations
     {
@@ -108,8 +103,7 @@ class ReservationService
     /**
      * Delete a reservation (admin only).
      *
-     * @param reservations $reservation
-     * @return bool
+     * @param  reservations  $reservation
      */
     public function deleteReservation(Reservation $reservation): bool
     {
@@ -118,10 +112,6 @@ class ReservationService
 
     /**
      * Get all reservations with advanced filtering (admin only).
-     *
-     * @param array $filters
-     * @param int|null $perPage
-     * @return LengthAwarePaginator
      */
     public function getAllReservations(array $filters = [], ?int $perPage = null): LengthAwarePaginator
     {
@@ -164,11 +154,11 @@ class ReservationService
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('name', 'like', "%{$search}%")
-                              ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })
-                ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
-                    $equipmentQuery->where('identifier', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
+                        $equipmentQuery->where('identifier', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -183,11 +173,6 @@ class ReservationService
 
     /**
      * Get reservations for a specific user.
-     *
-     * @param User $user
-     * @param array $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
     public function getReservationsForUser(User $user, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
@@ -218,10 +203,7 @@ class ReservationService
      * Permite al administrador ver todas las reservas hechas por
      * un tipo de usuario específico (student o teacher).
      *
-     * @param string $role - 'student' | 'teacher'
-     * @param array $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @param  string  $role  - 'student' | 'teacher'
      */
     public function getReservationsByUserRole(string $role, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
@@ -250,11 +232,11 @@ class ReservationService
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('name', 'like', "%{$search}%")
-                              ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })
-                ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
-                    $equipmentQuery->where('identifier', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
+                        $equipmentQuery->where('identifier', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -268,10 +250,6 @@ class ReservationService
     /**
      * Get reservations for a specific equipment.
      * Útil para calendarios y visualización de disponibilidad.
-     *
-     * @param equipment $equipment
-     * @param array $filters
-     * @return Collection
      */
     public function getReservationsForEquipment(Equipment $equipment, array $filters = []): Collection
     {
@@ -294,8 +272,6 @@ class ReservationService
 
     /**
      * Get active reservations (currently in progress).
-     *
-     * @return Collection
      */
     public function getActiveReservations(): Collection
     {
@@ -309,9 +285,6 @@ class ReservationService
 
     /**
      * Get upcoming reservations (confirmed and in the future).
-     *
-     * @param int $limit
-     * @return Collection
      */
     public function getUpcomingReservations(int $limit = 10): Collection
     {
@@ -338,9 +311,6 @@ class ReservationService
 
     /**
      * Get reservation statistics for a user.
-     *
-     * @param User $user
-     * @return array
      */
     public function getUserStatistics(User $user): array
     {
@@ -359,9 +329,6 @@ class ReservationService
 
     /**
      * Get reservation statistics for an equipment.
-     *
-     * @param equipment $equipment
-     * @return array
      */
     public function getEquipmentStatistics(Equipment $equipment): array
     {
@@ -380,10 +347,7 @@ class ReservationService
      * Check if equipment is available for a given time range.
      * Método privado para verificación de disponibilidad.
      *
-     * @param int $equipmentId
-     * @param string $startTime
-     * @param string $endTime
-     * @param int|null $excludeReservationId Para actualización de reservas
+     * @param  int|null  $excludeReservationId  Para actualización de reservas
      * @return bool True si hay conflicto, False si está disponible
      */
     private function checkEquipmentAvailability(
@@ -397,15 +361,15 @@ class ReservationService
             ->where(function ($q) use ($startTime, $endTime) {
                 // Mismo algoritmo de detección de solapamiento que en la validación
                 $q->whereBetween('start_time', [$startTime, $endTime])
-                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                  ->orWhere(function ($query) use ($startTime, $endTime) {
-                      $query->where('start_time', '>=', $startTime)
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '>=', $startTime)
                             ->where('end_time', '<=', $endTime);
-                  })
-                  ->orWhere(function ($query) use ($startTime, $endTime) {
-                      $query->where('start_time', '<=', $startTime)
+                    })
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<=', $startTime)
                             ->where('end_time', '>=', $endTime);
-                  });
+                    });
             });
 
         // Excluir una reserva específica (útil para actualizaciones)
@@ -420,13 +384,11 @@ class ReservationService
      * Get available time slots for an equipment on a specific date.
      * Útil para el frontend mostrar slots disponibles.
      *
-     * @param equipment $equipment
-     * @param string $date Formato: Y-m-d
-     * @param int $slotDuration En minutos (default: 60)
-     * @return array
+     * @param  string  $date  Formato: Y-m-d
+     * @param  int  $slotDuration  En minutos (default: 60)
      */
     public function getAvailableTimeSlots(
-        equipment $equipment,
+        Equipment $equipment,
         string $date,
         int $slotDuration = 60
     ): array {
@@ -443,7 +405,7 @@ class ReservationService
             $slotEnd->modify("+$slotDuration minutes");
 
             // Verificar si el slot está disponible
-            $isAvailable = !$this->checkEquipmentAvailability(
+            $isAvailable = ! $this->checkEquipmentAvailability(
                 $equipment->id,
                 $currentTime->format('Y-m-d H:i:s'),
                 $slotEnd->format('Y-m-d H:i:s')

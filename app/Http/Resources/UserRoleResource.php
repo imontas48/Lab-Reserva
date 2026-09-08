@@ -10,9 +10,9 @@ class UserRoleResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'         => $this->id,
-            'user_id'    => $this->user_id,
-            'role_id'    => $this->role_id,
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'role_id' => $this->role_id,
 
             // Rol completo (solo si la relación fue cargada)
             'role' => new RoleResource($this->whenLoaded('role')),
@@ -25,9 +25,9 @@ class UserRoleResource extends JsonResource
             ),
 
             // Expiración
-            'expires_at'      => $this->expires_at?->toISOString(),
-            'is_expired'      => $this->expires_at !== null && $this->expires_at->isPast(),
-            'expires_at_human'=> $this->expires_at?->diffForHumans(),
+            'expires_at' => $this->expires_at?->toISOString(),
+            'is_expired' => $this->expires_at !== null && $this->expires_at->isPast(),
+            'expires_at_human' => $this->expires_at?->diffForHumans(),
 
             'created_at' => $this->created_at?->toISOString(),
         ];

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePermissionOverrideRequest extends FormRequest
 {
@@ -21,13 +22,13 @@ class StorePermissionOverrideRequest extends FormRequest
                 'integer',
                 'exists:permissions,id',
                 // Un usuario solo puede tener una sobreescritura por permiso
-                \Illuminate\Validation\Rule::unique('permission_overrides')
+                Rule::unique('permission_overrides')
                     ->where('user_id', $targetUserId),
             ],
             'type' => [
                 'required',
                 'string',
-                \Illuminate\Validation\Rule::in(['grant', 'revoke']),
+                Rule::in(['grant', 'revoke']),
             ],
             'reason' => [
                 'nullable',
@@ -46,11 +47,11 @@ class StorePermissionOverrideRequest extends FormRequest
     {
         return [
             'permission_id.required' => 'El permiso es obligatorio.',
-            'permission_id.exists'   => 'El permiso seleccionado no existe.',
-            'permission_id.unique'   => 'Este usuario ya tiene una sobreescritura para ese permiso.',
-            'type.required'          => 'El tipo (grant/revoke) es obligatorio.',
-            'type.in'                => 'El tipo debe ser "grant" o "revoke".',
-            'expires_at.after'       => 'La fecha de expiración debe ser en el futuro.',
+            'permission_id.exists' => 'El permiso seleccionado no existe.',
+            'permission_id.unique' => 'Este usuario ya tiene una sobreescritura para ese permiso.',
+            'type.required' => 'El tipo (grant/revoke) es obligatorio.',
+            'type.in' => 'El tipo debe ser "grant" o "revoke".',
+            'expires_at.after' => 'La fecha de expiración debe ser en el futuro.',
         ];
     }
 }

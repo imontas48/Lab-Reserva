@@ -4,16 +4,13 @@ namespace App\Services;
 
 use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LabService
 {
     /**
      * Get all labs with optional filtering and pagination.
-     *
-     * @param array $filters
-     * @param int|null $perPage
-     * @return Collection|LengthAwarePaginator
      */
     public function getAllLabs(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -24,7 +21,7 @@ class LabService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
@@ -44,8 +41,6 @@ class LabService
 
     /**
      * Get only active labs.
-     *
-     * @return Collection
      */
     public function getActiveLabs(): Collection
     {
@@ -54,9 +49,6 @@ class LabService
 
     /**
      * Create a new lab.
-     *
-     * @param array $data
-     * @return labs
      */
     public function createLab(array $data): labs
     {
@@ -69,9 +61,7 @@ class LabService
     /**
      * Get a lab by ID.
      *
-     * @param int $id
-     * @return labs
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function getLabById(int $id): labs
     {
@@ -81,9 +71,7 @@ class LabService
     /**
      * Update an existing lab.
      *
-     * @param labs $lab
-     * @param array $data
-     * @return labs
+     * @param  labs  $lab
      */
     public function updateLab(Lab $lab, array $data): labs
     {
@@ -95,8 +83,8 @@ class LabService
     /**
      * Delete a lab.
      *
-     * @param labs $lab
-     * @return bool
+     * @param  labs  $lab
+     *
      * @throws \Exception
      */
     public function deleteLab(Lab $lab): bool
@@ -104,7 +92,7 @@ class LabService
         // Verificar si el laboratorio tiene equipos asociados
         if ($lab->equipment()->exists()) {
             throw new \Exception(
-                'No se puede eliminar el laboratorio porque tiene equipos asociados. ' .
+                'No se puede eliminar el laboratorio porque tiene equipos asociados. '.
                 'Primero elimine o reasigne los equipos.'
             );
         }
@@ -115,20 +103,17 @@ class LabService
     /**
      * Toggle active status of a lab.
      *
-     * @param labs $lab
-     * @return labs
+     * @param  labs  $lab
      */
     public function toggleActiveStatus(Lab $lab): labs
     {
-        $lab->update(['is_active' => !$lab->is_active]);
+        $lab->update(['is_active' => ! $lab->is_active]);
 
         return $lab->fresh();
     }
 
     /**
      * Get labs with their equipment count.
-     *
-     * @return Collection
      */
     public function getLabsWithEquipmentCount(): Collection
     {
@@ -137,8 +122,6 @@ class LabService
 
     /**
      * Get labs with their operational equipment count.
-     *
-     * @return Collection
      */
     public function getLabsWithOperationalEquipmentCount(): Collection
     {

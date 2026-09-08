@@ -154,24 +154,23 @@ class ReservationController extends Controller
      * Display reservations filtered by user role (admin only).
      * GET /api/v1/reservations/by-role/{role}
      *
-     * @param Request $request
-     * @param string $role - 'student' | 'teacher'
+     * @param  string  $role  - 'student' | 'teacher'
      */
     public function indexByRole(Request $request, string $role): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Reservation::class);
 
         // Validar que el rol solicitado sea válido
-        if (!in_array($role, ['student', 'teacher'])) {
+        if (! in_array($role, ['student', 'teacher'])) {
             abort(422, 'Rol no válido. Debe ser "student" o "teacher".');
         }
 
         $filters = [
-            'search'     => $request->input('search'),
-            'status'     => $request->input('status'),
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
             'start_date' => $request->input('start_date'),
-            'end_date'   => $request->input('end_date'),
-            'sort_by'    => $request->input('sort_by', 'start_time'),
+            'end_date' => $request->input('end_date'),
+            'sort_by' => $request->input('sort_by', 'start_time'),
             'sort_order' => $request->input('sort_order', 'desc'),
         ];
 
@@ -193,7 +192,7 @@ class ReservationController extends Controller
         $this->reservationService->deleteReservation($reservation);
 
         return response()->json([
-            'message' => 'Reserva eliminada exitosamente'
+            'message' => 'Reserva eliminada exitosamente',
         ]);
     }
 }

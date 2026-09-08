@@ -36,10 +36,10 @@ class StoreUserRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'role_id.required'    => 'El rol es obligatorio.',
-            'role_id.exists'      => 'El rol seleccionado no existe.',
-            'role_id.unique'      => 'Este usuario ya tiene ese rol asignado.',
-            'expires_at.after'    => 'La fecha de expiración debe ser en el futuro.',
+            'role_id.required' => 'El rol es obligatorio.',
+            'role_id.exists' => 'El rol seleccionado no existe.',
+            'role_id.unique' => 'Este usuario ya tiene ese rol asignado.',
+            'expires_at.after' => 'La fecha de expiración debe ser en el futuro.',
         ];
     }
 }

@@ -8,7 +8,6 @@ use App\Models\Lab;
 use App\Models\Reservation;
 use App\Models\Software;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -29,9 +28,9 @@ class DashboardController extends Controller
         // Activas = confirmadas y no canceladas, con fecha futura o actual
         $activeReservations = Reservation::where('user_id', $user->id)
             ->where('status', 'confirmed')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('end_time', '>=', now())
-                      ->orWhereNull('end_time');
+                    ->orWhereNull('end_time');
             })
             ->count();
 

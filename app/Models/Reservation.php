@@ -77,11 +77,11 @@ class Reservation extends Model
     {
         return $query->where(function ($query) use ($startDate, $endDate) {
             $query->whereBetween('start_time', [$startDate, $endDate])
-                  ->orWhereBetween('end_time', [$startDate, $endDate])
-                  ->orWhere(function ($query) use ($startDate, $endDate) {
-                      $query->where('start_time', '<=', $startDate)
-                            ->where('end_time', '>=', $endDate);
-                  });
+                ->orWhereBetween('end_time', [$startDate, $endDate])
+                ->orWhere(function ($query) use ($startDate, $endDate) {
+                    $query->where('start_time', '<=', $startDate)
+                        ->where('end_time', '>=', $endDate);
+                });
         });
     }
 
@@ -107,6 +107,7 @@ class Reservation extends Model
     public function getIsActiveAttribute(): bool
     {
         $now = Carbon::now();
+
         return $this->status === 'confirmed'
             && $this->start_time <= $now
             && $this->end_time >= $now;

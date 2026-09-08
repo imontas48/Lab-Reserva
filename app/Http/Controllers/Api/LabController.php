@@ -28,7 +28,9 @@ class LabController extends Controller
         $labs = $this->labService->getAllLabs();
 
         return LabResource::collection($labs);
-    }    /**
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreLabRequest $request): LabResource
@@ -64,7 +66,7 @@ class LabController extends Controller
         $this->labService->deleteLab($lab);
 
         return response()->json([
-            'message' => 'Laboratorio eliminado exitosamente'
+            'message' => 'Laboratorio eliminado exitosamente',
         ]);
     }
 }

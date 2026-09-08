@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -9,7 +10,7 @@ class StoreRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', \App\Models\Role::class);
+        return $this->user()->can('create', Role::class);
     }
 
     public function rules(): array
@@ -56,12 +57,12 @@ class StoreRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'    => 'El slug del rol es obligatorio.',
-            'name.unique'      => 'Ya existe un rol con ese slug.',
-            'name.regex'       => 'El slug solo puede contener letras minúsculas, números y guiones bajos.',
-            'name.max'         => 'El slug no puede superar los 64 caracteres.',
+            'name.required' => 'El slug del rol es obligatorio.',
+            'name.unique' => 'Ya existe un rol con ese slug.',
+            'name.regex' => 'El slug solo puede contener letras minúsculas, números y guiones bajos.',
+            'name.max' => 'El slug no puede superar los 64 caracteres.',
             'display_name.required' => 'El nombre del rol es obligatorio.',
-            'color.in'         => 'El color debe ser: blue, green, red, yellow, purple, orange o gray.',
+            'color.in' => 'El color debe ser: blue, green, red, yellow, purple, orange o gray.',
             'permission_ids.*.exists' => 'Uno o más permisos seleccionados no existen.',
         ];
     }

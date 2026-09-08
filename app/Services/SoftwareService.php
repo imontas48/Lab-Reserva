@@ -4,16 +4,13 @@ namespace App\Services;
 
 use App\Models\Software;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class SoftwareService
 {
     /**
      * Get all software with optional filtering and pagination.
-     *
-     * @param array $filters
-     * @param int|null $perPage
-     * @return Collection|LengthAwarePaginator
      */
     public function getAllSoftware(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -24,7 +21,7 @@ class SoftwareService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('version', 'like', "%{$search}%");
+                    ->orWhere('version', 'like', "%{$search}%");
             });
         }
 
@@ -39,11 +36,8 @@ class SoftwareService
 
     /**
      * Create a new software.
-     *
-     * @param array $data
-     * @return software
      */
-    public function createSoftware(array $data): software
+    public function createSoftware(array $data): Software
     {
         return Software::create($data);
     }
@@ -51,23 +45,17 @@ class SoftwareService
     /**
      * Get a software by ID.
      *
-     * @param int $id
-     * @return software
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
-    public function getSoftwareById(int $id): software
+    public function getSoftwareById(int $id): Software
     {
         return Software::findOrFail($id);
     }
 
     /**
      * Update an existing software.
-     *
-     * @param software $software
-     * @param array $data
-     * @return software
      */
-    public function updateSoftware(Software $software, array $data): software
+    public function updateSoftware(Software $software, array $data): Software
     {
         $software->update($data);
 
@@ -78,8 +66,6 @@ class SoftwareService
      * Delete a software.
      * Verifica que no esté asignado a ningún equipo antes de eliminar.
      *
-     * @param software $software
-     * @return bool
      * @throws \Exception
      */
     public function deleteSoftware(Software $software): bool
@@ -87,7 +73,7 @@ class SoftwareService
         // Verificar si el software está asignado a algún equipo
         if ($software->equipment()->exists()) {
             throw new \Exception(
-                'No se puede eliminar el software porque está asignado a uno o más equipos. ' .
+                'No se puede eliminar el software porque está asignado a uno o más equipos. '.
                 'Primero desasigne el software de todos los equipos.'
             );
         }
@@ -97,8 +83,6 @@ class SoftwareService
 
     /**
      * Get software with their equipment count.
-     *
-     * @return Collection
      */
     public function getSoftwareWithEquipmentCount(): Collection
     {
@@ -107,9 +91,6 @@ class SoftwareService
 
     /**
      * Search software by name.
-     *
-     * @param string $search
-     * @return Collection
      */
     public function searchSoftware(string $search): Collection
     {
@@ -118,9 +99,6 @@ class SoftwareService
 
     /**
      * Get software assigned to a specific equipment.
-     *
-     * @param int $equipmentId
-     * @return Collection
      */
     public function getSoftwareByEquipment(int $equipmentId): Collection
     {
@@ -131,9 +109,6 @@ class SoftwareService
 
     /**
      * Get the most used software (by equipment count).
-     *
-     * @param int $limit
-     * @return Collection
      */
     public function getMostUsedSoftware(int $limit = 10): Collection
     {

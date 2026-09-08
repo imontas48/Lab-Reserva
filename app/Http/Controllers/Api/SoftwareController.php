@@ -88,7 +88,7 @@ class SoftwareController extends Controller
         $this->softwareService->deleteSoftware($software);
 
         return response()->json([
-            'message' => 'Software eliminado exitosamente'
+            'message' => 'Software eliminado exitosamente',
         ]);
     }
 }

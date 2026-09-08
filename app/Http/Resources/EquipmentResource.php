@@ -37,7 +37,7 @@ class EquipmentResource extends JsonResource
             // IDs de software (útil para formularios de edición)
             'software_ids' => $this->when(
                 $this->relationLoaded('software'),
-                fn() => $this->software->pluck('id')
+                fn () => $this->software->pluck('id')
             ),
 
             // Contadores de reservas (solo si están cargados)
@@ -47,7 +47,7 @@ class EquipmentResource extends JsonResource
             // Identificador completo (laboratorio + identificador)
             'full_identifier' => $this->when(
                 $this->relationLoaded('lab'),
-                fn() => "{$this->lab->name} - {$this->identifier}"
+                fn () => "{$this->lab->name} - {$this->identifier}"
             ),
 
             // Timestamps formateados

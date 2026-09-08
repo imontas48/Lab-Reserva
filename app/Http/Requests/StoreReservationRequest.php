@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Equipment;
 use App\Models\Reservation;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReservationRequest extends FormRequest
@@ -19,7 +21,7 @@ class StoreReservationRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -30,8 +32,8 @@ class StoreReservationRequest extends FormRequest
                 'exists:equipment,id',
                 // Validación personalizada: verificar que el equipo esté operacional
                 function ($attribute, $value, $fail) {
-                    $equipment = \App\Models\Equipment::find($value);
-                    if ($equipment && !$equipment->is_operational) {
+                    $equipment = Equipment::find($value);
+                    if ($equipment && ! $equipment->is_operational) {
                         $fail('El equipo seleccionado no está operacional y no puede ser reservado.');
                     }
                 },
@@ -41,7 +43,7 @@ class StoreReservationRequest extends FormRequest
                     $endTime = $this->input('end_time');
 
                     // Solo validar si tenemos ambas fechas
-                    if (!$startTime || !$endTime) {
+                    if (! $startTime || ! $endTime) {
                         return;
                     }
 
@@ -52,17 +54,17 @@ class StoreReservationRequest extends FormRequest
                             // Caso 1: La nueva reserva comienza durante una existente
                             $query->whereBetween('start_time', [$startTime, $endTime])
                                   // Caso 2: La nueva reserva termina durante una existente
-                                  ->orWhereBetween('end_time', [$startTime, $endTime])
+                                ->orWhereBetween('end_time', [$startTime, $endTime])
                                   // Caso 3: La nueva reserva engloba completamente una existente
-                                  ->orWhere(function ($q) use ($startTime, $endTime) {
-                                      $q->where('start_time', '>=', $startTime)
+                                ->orWhere(function ($q) use ($startTime, $endTime) {
+                                    $q->where('start_time', '>=', $startTime)
                                         ->where('end_time', '<=', $endTime);
-                                  })
+                                })
                                   // Caso 4: Una reserva existente engloba completamente la nueva
-                                  ->orWhere(function ($q) use ($startTime, $endTime) {
-                                      $q->where('start_time', '<=', $startTime)
+                                ->orWhere(function ($q) use ($startTime, $endTime) {
+                                    $q->where('start_time', '<=', $startTime)
                                         ->where('end_time', '>=', $endTime);
-                                  });
+                                });
                         })
                         ->exists();
 

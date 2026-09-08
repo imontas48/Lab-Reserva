@@ -35,8 +35,8 @@ class UserRoleService
         }
 
         return UserRole::create([
-            'user_id'    => $user->id,
-            'role_id'    => $role->id,
+            'user_id' => $user->id,
+            'role_id' => $role->id,
             'granted_by' => $admin->id,
             'expires_at' => $data['expires_at'] ?? null,
         ]);
@@ -94,11 +94,11 @@ class UserRoleService
         }
 
         return GroupRoleAssignment::create([
-            'role_id'     => $data['role_id'],
-            'group_type'  => $data['group_type'],
+            'role_id' => $data['role_id'],
+            'group_type' => $data['group_type'],
             'group_value' => $data['group_value'],
-            'granted_by'  => $admin->id,
-            'is_active'   => $data['is_active'] ?? true,
+            'granted_by' => $admin->id,
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class UpdateEquipmentRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -42,6 +43,7 @@ class UpdateEquipmentRequest extends FormRequest
                 // Ignoramos el equipo actual y validamos contra el lab_id (actual o nuevo)
                 Rule::unique('equipment')->where(function ($query) {
                     $labId = $this->input('lab_id') ?? $this->route('equipment')->lab_id;
+
                     return $query->where('lab_id', $labId);
                 })->ignore($equipmentId),
             ],

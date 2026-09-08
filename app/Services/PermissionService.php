@@ -7,7 +7,6 @@ use App\Models\Permission;
 use App\Models\PermissionOverride;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 
 class PermissionService
 {
@@ -26,8 +25,8 @@ class PermissionService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('subject', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -40,8 +39,8 @@ class PermissionService
     public function createPermission(array $data): Permission
     {
         return Permission::create([
-            'subject'     => $data['subject'],
-            'action'      => $data['action'],
+            'subject' => $data['subject'],
+            'action' => $data['action'],
             'description' => $data['description'],
         ]);
     }
@@ -78,7 +77,7 @@ class PermissionService
      *   2. Permisos de roles asignados individualmente (user_roles vigentes)
      *   3. Se aplican sobreescrituras activas (REVOKE primero, luego GRANT)
      *
-     * @return Collection<Permission>  Colección de permisos con campo 'source' adicional.
+     * @return Collection<Permission> Colección de permisos con campo 'source' adicional.
      */
     public function resolveEffectivePermissions(User $user): Collection
     {
@@ -141,12 +140,12 @@ class PermissionService
     public function createOverride(User $user, array $data, User $admin): PermissionOverride
     {
         return PermissionOverride::create([
-            'user_id'       => $user->id,
+            'user_id' => $user->id,
             'permission_id' => $data['permission_id'],
-            'type'          => $data['type'],
-            'reason'        => $data['reason'] ?? null,
-            'granted_by'    => $admin->id,
-            'expires_at'    => $data['expires_at'] ?? null,
+            'type' => $data['type'],
+            'reason' => $data['reason'] ?? null,
+            'granted_by' => $admin->id,
+            'expires_at' => $data['expires_at'] ?? null,
         ]);
     }
 
@@ -156,8 +155,8 @@ class PermissionService
     public function updateOverride(PermissionOverride $override, array $data): PermissionOverride
     {
         $override->update(array_filter([
-            'type'       => $data['type'] ?? null,
-            'reason'     => $data['reason'] ?? null,
+            'type' => $data['type'] ?? null,
+            'reason' => $data['reason'] ?? null,
             'expires_at' => array_key_exists('expires_at', $data) ? $data['expires_at'] : null,
         ], fn ($v) => $v !== null));
 

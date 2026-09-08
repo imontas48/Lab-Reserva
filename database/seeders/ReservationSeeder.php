@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Equipment;
+use App\Models\Lab;
 use App\Models\Reservation;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ReservationSeeder extends Seeder
 {
@@ -23,15 +24,17 @@ class ReservationSeeder extends Seeder
     {
         $user = User::first();
 
-        if (!$user) {
+        if (! $user) {
             $this->command->error(' No hay usuarios en la base de datos. Ejecuta primero: php artisan db:seed --class=AdminUserSeeder');
+
             return;
         }
 
-        $lab = \App\Models\Lab::where('is_active', true)->first();
+        $lab = Lab::where('is_active', true)->first();
 
-        if (!$lab) {
+        if (! $lab) {
             $this->command->error(' No hay laboratorios activos en la base de datos.');
+
             return;
         }
 
@@ -40,17 +43,17 @@ class ReservationSeeder extends Seeder
 
         // Si no hay suficientes equipos, crear algunos de prueba
         if ($equipments->count() < 4) {
-            $this->command->info("️  Creando equipos de prueba...");
+            $this->command->info('️  Creando equipos de prueba...');
 
             $equipmentsNeeded = 4 - $equipments->count();
 
             for ($i = 1; $i <= $equipmentsNeeded; $i++) {
                 $newEquipment = Equipment::create([
                     'lab_id' => $lab->id,
-                    'identifier' => 'PC-DEMO-' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                    'identifier' => 'PC-DEMO-'.str_pad($i, 3, '0', STR_PAD_LEFT),
                     'type' => 'Computadora',
                     'specifications' => 'CPU: Intel Core i5, RAM: 8GB, Almacenamiento: 256GB SSD',
-                    'is_operational' => true
+                    'is_operational' => true,
                 ]);
 
                 $equipments->push($newEquipment);
@@ -71,11 +74,11 @@ class ReservationSeeder extends Seeder
             'equipment_id' => $equipment1->id,
             'start_time' => Carbon::now()->subHour(),        // Empezó hace 1 hora
             'end_time' => Carbon::now()->addHours(2),        // Termina en 2 horas
-            'status' => 'confirmed'
+            'status' => 'confirmed',
         ]);
 
         $this->command->info(" Reserva ACTIVA creada para equipo: {$equipment1->identifier}");
-        $this->command->info("   Estado esperado: IN_USE (En uso hasta " . Carbon::now()->addHours(2)->format('H:i') . ")");
+        $this->command->info('   Estado esperado: IN_USE (En uso hasta '.Carbon::now()->addHours(2)->format('H:i').')');
 
         // ========================================================================
         // 2. RESERVA FUTURA - Estado: "RESERVED"
@@ -87,11 +90,11 @@ class ReservationSeeder extends Seeder
             'equipment_id' => $equipment2->id,
             'start_time' => Carbon::now()->addHours(3),      // Empieza en 3 horas
             'end_time' => Carbon::now()->addHours(5),        // Termina en 5 horas
-            'status' => 'confirmed'
+            'status' => 'confirmed',
         ]);
 
         $this->command->info(" Reserva FUTURA creada para equipo: {$equipment2->identifier}");
-        $this->command->info("   Estado esperado: RESERVED (Reservado para " . Carbon::now()->addHours(3)->format('d/m H:i') . ")");
+        $this->command->info('   Estado esperado: RESERVED (Reservado para '.Carbon::now()->addHours(3)->format('d/m H:i').')');
 
         // ========================================================================
         // 3. EQUIPO DISPONIBLE - Estado: "AVAILABLE"
@@ -99,7 +102,7 @@ class ReservationSeeder extends Seeder
         if (isset($equipments[2])) {
             $equipment3 = $equipments[2];
             $this->command->info(" Equipo SIN reservas: {$equipment3->identifier}");
-            $this->command->info("   Estado esperado: AVAILABLE (Disponible)");
+            $this->command->info('   Estado esperado: AVAILABLE (Disponible)');
         }
 
         // ========================================================================
@@ -110,12 +113,12 @@ class ReservationSeeder extends Seeder
             $equipment4->update(['is_operational' => false]);
 
             $this->command->info(" Equipo marcado como NO operacional: {$equipment4->identifier}");
-            $this->command->info("   Estado esperado: OUT_OF_SERVICE (Equipo en mantenimiento)");
+            $this->command->info('   Estado esperado: OUT_OF_SERVICE (Equipo en mantenimiento)');
         }
 
         $this->command->info("\n Seeding completado! Verifica los estados en:");
-        $this->command->info("   Frontend: http://localhost:8000/reservations/create");
-        $this->command->info("   API: GET /api/v1/labs/{lab_id}/equipment");
+        $this->command->info('   Frontend: http://localhost:8000/reservations/create');
+        $this->command->info('   API: GET /api/v1/labs/{lab_id}/equipment');
 
         // Mostrar estados actuales
         $this->command->info("\n Estados calculados:");
@@ -125,7 +128,7 @@ class ReservationSeeder extends Seeder
                 'available' => '',
                 'in_use' => '',
                 'reserved' => '',
-                'out_of_service' => ''
+                'out_of_service' => '',
             ][$status['status']] ?? '';
 
             $this->command->line("   {$icon} {$eq->identifier}: {$status['details']}");

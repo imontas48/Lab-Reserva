@@ -3,13 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Equipment;
-use App\Models\GroupRoleAssignment;
 use App\Models\Lab;
 use App\Models\Permission;
+use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\Software;
-use App\Models\Reservation;
-use App\Models\UserRole;
 use App\Policies\EquipmentPolicy;
 use App\Policies\LabPolicy;
 use App\Policies\PermissionPolicy;

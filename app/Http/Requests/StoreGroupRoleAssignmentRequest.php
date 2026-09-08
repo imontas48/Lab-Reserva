@@ -45,12 +45,12 @@ class StoreGroupRoleAssignmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'role_id.required'    => 'El rol es obligatorio.',
-            'role_id.exists'      => 'El rol seleccionado no existe.',
-            'role_id.unique'      => 'Ya existe una regla que asigna ese rol a ese grupo.',
+            'role_id.required' => 'El rol es obligatorio.',
+            'role_id.exists' => 'El rol seleccionado no existe.',
+            'role_id.unique' => 'Ya existe una regla que asigna ese rol a ese grupo.',
             'group_type.required' => 'El tipo de grupo es obligatorio.',
-            'group_type.in'       => 'El tipo de grupo no es válido.',
-            'group_value.required'=> 'El valor del grupo es obligatorio.',
+            'group_type.in' => 'El tipo de grupo no es válido.',
+            'group_value.required' => 'El valor del grupo es obligatorio.',
         ];
     }
 }

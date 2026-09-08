@@ -10,16 +10,16 @@ class RoleResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'name'         => $this->name,
+            'id' => $this->id,
+            'name' => $this->name,
             'display_name' => $this->display_name,
-            'description'  => $this->description,
-            'color'        => $this->color,
-            'is_system'    => $this->is_system,
-            'is_active'    => $this->is_active,
+            'description' => $this->description,
+            'color' => $this->color,
+            'is_system' => $this->is_system,
+            'is_active' => $this->is_active,
 
             // Permisos del rol (solo si la relación fue cargada)
-            'permissions'       => PermissionResource::collection($this->whenLoaded('permissions')),
+            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
             'permissions_count' => $this->whenCounted('permissions'),
 
             // Conteo de usuarios con este rol
