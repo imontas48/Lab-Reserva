@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -180,18 +181,12 @@ class Equipment extends Model
             return false;
         }
 
-        // Verificar si hay conflictos con reservas existentes
+        // Verificar si hay conflictos con reservas existentes.
+        // Esta copia solo tenia tres casos frente a los cuatro de las otras,
+        // asi que era mas permisiva y podia declarar disponible un equipo que
+        // el servicio rechazaba despues.
         $conflicts = $this->reservations()
-            ->where('status', 'confirmed')
-            ->where(function ($query) use ($startTime, $endTime) {
-                // Detectar solapamiento de rangos de tiempo
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($q) use ($startTime, $endTime) {
-                        $q->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                    });
-            })
+            ->blocking($startTime, $endTime)
             ->exists();
 
         return ! $conflicts;

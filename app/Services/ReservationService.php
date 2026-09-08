@@ -23,10 +23,30 @@ class ReservationService
         return DB::transaction(function () use ($validatedData, $user) {
             // Asignar el usuario autenticado
             $validatedData['user_id'] = $user->id;
-            $validatedData['status'] = 'confirmed';
+            $validatedData['status'] = Reservation::STATUS_CONFIRMED;
 
-            // Doble comprobación de disponibilidad dentro de la transacción
-            // Esto protege contra race conditions
+            // El bloqueo va PRIMERO. Antes se comprobaba la disponibilidad con
+            // un SELECT sin bloqueo y solo despues se bloqueaba la fila de
+            // equipment, de modo que el lock no protegia nada: dos peticiones
+            // simultaneas leian ambas "sin conflicto" y ambas insertaban.
+            //
+            // Bloquear la fila del equipo serializa todos los intentos de
+            // reserva sobre ese equipo, que es la seccion critica real. MySQL
+            // no admite restricciones de exclusion sobre intervalos (eso es
+            // EXCLUDE de PostgreSQL), asi que este lock es la garantia: no hay
+            // red de seguridad posible en el esquema.
+            $equipment = Equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
+
+            if (! $equipment->is_operational) {
+                throw new BusinessRuleException(
+                    'El equipo seleccionado no está operacional en este momento.'
+                );
+            }
+
+            // Ya dentro del lock. La comprobacion tambien es una lectura con
+            // bloqueo: bajo REPEATABLE READ una lectura normal veria el
+            // snapshot del inicio de la transaccion y no las filas que la otra
+            // transaccion acaba de confirmar.
             $hasConflict = $this->checkEquipmentAvailability(
                 $validatedData['equipment_id'],
                 $validatedData['start_time'],
@@ -37,15 +57,6 @@ class ReservationService
                 throw new BusinessRuleException(
                     'El equipo ya no está disponible en el rango de tiempo seleccionado. '.
                     'Por favor, seleccione otro horario.'
-                );
-            }
-
-            // Verificar nuevamente que el equipo esté operacional
-            $equipment = Equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
-
-            if (! $equipment->is_operational) {
-                throw new BusinessRuleException(
-                    'El equipo seleccionado no está operacional en este momento.'
                 );
             }
 
@@ -67,7 +78,7 @@ class ReservationService
     public function cancelReservation(Reservation $reservation): Reservation
     {
         // Verificar que la reserva esté confirmada
-        if ($reservation->status !== 'confirmed') {
+        if (! $reservation->canTransitionTo(Reservation::STATUS_CANCELLED)) {
             throw new BusinessRuleException(
                 'Solo se pueden cancelar reservas confirmadas. '.
                 'Esta reserva ya está en estado: '.$reservation->status
@@ -93,6 +104,26 @@ class ReservationService
      */
     public function updateReservation(Reservation $reservation, array $data): Reservation
     {
+        // Antes esto era un update() directo. Como UpdateReservationRequest
+        // acepta cualquiera de los tres estados y ReservationPolicy::update
+        // autoriza al dueño, un usuario podia cancelar su reserva, esperar a
+        // que otro ocupase la franja y volver a confirmarla: dos reservas
+        // solapadas sin pasar por ninguna comprobacion de disponibilidad.
+        // Tambien podia marcarse reservas como 'completed' a voluntad y
+        // falsear las estadisticas.
+        if (isset($data['status']) && $data['status'] !== $reservation->status) {
+            if (! $reservation->canTransitionTo($data['status'])) {
+                $allowed = $reservation->allowedTransitions();
+
+                throw new BusinessRuleException(
+                    "No se puede pasar de '{$reservation->status}' a '{$data['status']}'. ".
+                    ($allowed === []
+                        ? "El estado '{$reservation->status}' es final."
+                        : 'Transiciones permitidas: '.implode(', ', $allowed).'.')
+                );
+            }
+        }
+
         $reservation->update($data);
 
         return $reservation->fresh(['user', 'equipment.lab']);
@@ -352,28 +383,20 @@ class ReservationService
         string $endTime,
         ?int $excludeReservationId = null
     ): bool {
-        $query = Reservation::where('equipment_id', $equipmentId)
-            ->where('status', 'confirmed')
-            ->where(function ($q) use ($startTime, $endTime) {
-                // Mismo algoritmo de detección de solapamiento que en la validación
-                $q->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($query) use ($startTime, $endTime) {
-                        $query->where('start_time', '>=', $startTime)
-                            ->where('end_time', '<=', $endTime);
-                    })
-                    ->orWhere(function ($query) use ($startTime, $endTime) {
-                        $query->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                    });
-            });
+        $query = Reservation::query()
+            ->forEquipment($equipmentId)
+            ->blocking($startTime, $endTime);
 
         // Excluir una reserva específica (útil para actualizaciones)
         if ($excludeReservationId) {
             $query->where('id', '!=', $excludeReservationId);
         }
 
-        return $query->exists();
+        // Lectura con bloqueo: ver createReservation. Dentro de la transaccion
+        // es lo que garantiza leer las filas que otra transaccion acaba de
+        // confirmar, en vez del snapshot de REPEATABLE READ. En autocommit el
+        // bloqueo se toma y se libera dentro de la propia sentencia.
+        return $query->lockForUpdate()->exists();
     }
 
     /**

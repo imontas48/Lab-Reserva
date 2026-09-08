@@ -222,15 +222,7 @@ class EquipmentService
 
         // Verificar si hay reservas confirmadas que se solapen
         $hasConflict = $equipment->reservations()
-            ->where('status', 'confirmed')
-            ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($q) use ($startTime, $endTime) {
-                        $q->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                    });
-            })
+            ->blocking($startTime, $endTime)
             ->exists();
 
         return ! $hasConflict;
