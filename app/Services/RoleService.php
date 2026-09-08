@@ -75,12 +75,13 @@ class RoleService
      */
     public function updateRole(Role $role, array $data): Role
     {
-        $role->update(array_filter([
-            'display_name' => $data['display_name'] ?? null,
-            'description' => array_key_exists('description', $data) ? $data['description'] : null,
-            'color' => $data['color'] ?? null,
-            'is_active' => $data['is_active'] ?? null,
-        ], fn ($v) => $v !== null));
+        // Antes esto era un array_filter que descartaba los null, de modo que
+        // enviar description: null respondia 200 pero no vaciaba el campo. Lo
+        // correcto es distinguir "clave ausente" de "clave con valor null":
+        // solo se escriben las claves que el cliente envio de verdad.
+        $role->update(
+            array_intersect_key($data, array_flip(['display_name', 'description', 'color', 'is_active']))
+        );
 
         return $role->fresh();
     }
@@ -119,6 +120,10 @@ class RoleService
         }
 
         $role->permissions()->sync($permissionIds);
+
+        // sync() sobre la tabla pivote no dispara eventos de modelo, asi que la
+        // invalidacion centralizada no la cubre.
+        PermissionService::flushCache();
 
         return $role->load('permissions');
     }

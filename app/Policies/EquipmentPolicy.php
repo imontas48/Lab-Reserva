@@ -13,7 +13,7 @@ class EquipmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('equipment', 'viewAny');
     }
 
     /**
@@ -22,7 +22,7 @@ class EquipmentPolicy
      */
     public function view(User $user, Equipment $equipment): bool
     {
-        return true;
+        return $user->hasPermission('equipment', 'view');
     }
 
     /**
@@ -31,7 +31,7 @@ class EquipmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('equipment', 'create');
     }
 
     /**
@@ -40,7 +40,7 @@ class EquipmentPolicy
      */
     public function update(User $user, Equipment $equipment): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('equipment', 'update');
     }
 
     /**
@@ -49,7 +49,7 @@ class EquipmentPolicy
      */
     public function delete(User $user, Equipment $equipment): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('equipment', 'delete');
     }
 
     /**

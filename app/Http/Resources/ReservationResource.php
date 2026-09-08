@@ -33,7 +33,14 @@ class ReservationResource extends JsonResource
             // extraer el padrón completo de la institución.
             'user' => $this->whenLoaded('user', function () use ($request) {
                 $viewer = $request->user();
-                $canSeeIdentity = $viewer && ($viewer->isAdmin() || $viewer->id === $this->user_id);
+                // Mismo criterio que ReservationPolicy::view: quien puede ver
+                // las reservas de cualquiera ve también su identidad. Se
+                // consulta el permiso y no isAdmin() para que un usuario
+                // elevado por rol individual reciba el mismo trato.
+                $canSeeIdentity = $viewer && (
+                    $viewer->hasPermission('reservations', 'viewAny')
+                    || $viewer->id === $this->user_id
+                );
 
                 return $canSeeIdentity
                     ? [

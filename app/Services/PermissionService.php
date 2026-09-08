@@ -7,9 +7,16 @@ use App\Models\Permission;
 use App\Models\PermissionOverride;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class PermissionService
 {
+    /**
+     * Contador global cuyo valor forma parte de la clave de cache de cada
+     * usuario. Incrementarlo invalida todas las entradas a la vez.
+     */
+    private const VERSION_KEY = 'rbac:version';
+
     /**
      * Lista el catálogo completo de permisos, opcionalmente agrupados por subject.
      */
@@ -38,11 +45,13 @@ class PermissionService
      */
     public function createPermission(array $data): Permission
     {
-        return Permission::create([
+        $permission = Permission::create([
             'subject' => $data['subject'],
             'action' => $data['action'],
             'description' => $data['description'],
         ]);
+
+        return $permission;
     }
 
     /**
@@ -88,19 +97,28 @@ class PermissionService
 
         // ── Paso 2: IDs de roles individuales vigentes ────────────────────────
         $individualRoleIds = $user->userRoles()
-            ->active()
+            ->notExpired()
             ->pluck('role_id');
 
         $allRoleIds = $groupRoleIds->merge($individualRoleIds)->unique();
 
         // ── Paso 3: Permisos base de todos los roles ──────────────────────────
-        $basePermissions = Permission::whereHas('roles', fn ($q) => $q->whereIn('roles.id', $allRoleIds))
+        //
+        // El filtro por roles.is_active es imprescindible y faltaba: sin él,
+        // desactivar un rol no revocaba nada. Todos los usuarios que ya lo
+        // tenían conservaban sus permisos, de modo que el interruptor que la
+        // migración describe como "permite desactivar un rol sin eliminarlo"
+        // no hacía absolutamente nada.
+        $basePermissions = Permission::whereHas('roles', fn ($q) => $q
+            ->whereIn('roles.id', $allRoleIds)
+            ->where('roles.is_active', true)
+        )
             ->get()
             ->keyBy('id');
 
         // ── Paso 4: Sobreescrituras activas del usuario ───────────────────────
         $overrides = $user->permissionOverrides()
-            ->active()
+            ->notExpired()
             ->with('permission')
             ->get();
 
@@ -117,6 +135,61 @@ class PermissionService
             });
 
         return $basePermissions->values();
+    }
+
+    // =========================================================================
+    // RESOLUCIÓN CACHEADA PARA EL CONTROL DE ACCESO
+    // =========================================================================
+
+    /**
+     * Clave "subject.action" de cada permiso efectivo del usuario.
+     *
+     * Es lo que consultan las policies. Se cachea porque resolveEffectivePermissions
+     * cuesta cinco consultas y antes solo se invocaba una vez bajo demanda desde
+     * una pantalla de administración; al conectarlo al control de acceso pasa a
+     * ejecutarse en cada authorize(), varias veces por petición.
+     *
+     * La clave incluye la versión global del RBAC, así que cualquier cambio en
+     * roles, permisos, asignaciones o sobreescrituras invalida la caché de todos
+     * los usuarios de golpe. Es más grosero que invalidar por usuario, pero
+     * imposible de dejar obsoleto: en control de acceso una caché sucia es un
+     * fallo de seguridad, y las escrituras del RBAC son raras.
+     *
+     * @return array<int, string>
+     */
+    public function effectivePermissionKeys(User $user): array
+    {
+        return Cache::remember(
+            $this->cacheKeyFor($user),
+            now()->addMinutes(30),
+            fn () => $this->resolveEffectivePermissions($user)
+                ->map(fn (Permission $p) => "{$p->subject}.{$p->action}")
+                ->all()
+        );
+    }
+
+    public function userHasPermission(User $user, string $subject, string $action): bool
+    {
+        return in_array("{$subject}.{$action}", $this->effectivePermissionKeys($user), true);
+    }
+
+    /**
+     * Invalida la caché de permisos de todos los usuarios.
+     *
+     * Se llama desde los servicios que escriben en el RBAC.
+     */
+    public static function flushCache(): void
+    {
+        // increment() no crea la clave si no existe en todos los drivers,
+        // asi que se escribe el valor de forma explicita.
+        Cache::forever(self::VERSION_KEY, ((int) Cache::get(self::VERSION_KEY, 0)) + 1);
+    }
+
+    private function cacheKeyFor(User $user): string
+    {
+        $version = Cache::get(self::VERSION_KEY, 0);
+
+        return "rbac:v{$version}:user:{$user->id}:permissions";
     }
 
     // =========================================================================
@@ -139,14 +212,23 @@ class PermissionService
      */
     public function createOverride(User $user, array $data, User $admin): PermissionOverride
     {
-        return PermissionOverride::create([
-            'user_id' => $user->id,
-            'permission_id' => $data['permission_id'],
-            'type' => $data['type'],
-            'reason' => $data['reason'] ?? null,
-            'granted_by' => $admin->id,
-            'expires_at' => $data['expires_at'] ?? null,
-        ]);
+        // updateOrCreate y no create: la tabla tiene UNIQUE(user_id,
+        // permission_id), de modo que una sobreescritura caducada bloqueaba
+        // para siempre la creación de otra sobre el mismo permiso. La fila
+        // caducada se sustituye por la nueva, que es justo lo que el
+        // administrador quiere al volver a conceder o revocar algo.
+        return PermissionOverride::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'permission_id' => $data['permission_id'],
+            ],
+            [
+                'type' => $data['type'],
+                'reason' => $data['reason'] ?? null,
+                'granted_by' => $admin->id,
+                'expires_at' => $data['expires_at'] ?? null,
+            ]
+        );
     }
 
     /**
@@ -154,11 +236,14 @@ class PermissionService
      */
     public function updateOverride(PermissionOverride $override, array $data): PermissionOverride
     {
-        $override->update(array_filter([
-            'type' => $data['type'] ?? null,
-            'reason' => $data['reason'] ?? null,
-            'expires_at' => array_key_exists('expires_at', $data) ? $data['expires_at'] : null,
-        ], fn ($v) => $v !== null));
+        // El array_filter descartaba los null DESPUES de haberlos calculado, de
+        // modo que el array_key_exists de expires_at no servia de nada: enviar
+        // expires_at: null respondia 200 y no cambiaba el valor. Una
+        // sobreescritura temporal no podia convertirse en permanente, ni podia
+        // vaciarse el motivo.
+        $override->update(
+            array_intersect_key($data, array_flip(['type', 'reason', 'expires_at']))
+        );
 
         return $override->fresh();
     }

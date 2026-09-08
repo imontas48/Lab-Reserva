@@ -47,7 +47,12 @@ class UserRoleService
      */
     public function updateAssignment(UserRole $userRole, array $data): UserRole
     {
-        $userRole->update(['expires_at' => $data['expires_at'] ?? null]);
+        // '?? null' borraba la fecha de expiracion en cualquier PATCH que no
+        // la incluyese, convirtiendo en permanente una asignacion temporal sin
+        // que nadie se enterase. Solo se escribe si el cliente la envio.
+        if (array_key_exists('expires_at', $data)) {
+            $userRole->update(['expires_at' => $data['expires_at']]);
+        }
 
         return $userRole->fresh();
     }

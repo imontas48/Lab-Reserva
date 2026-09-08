@@ -13,7 +13,7 @@ class LabPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('labs', 'viewAny');
     }
 
     /**
@@ -22,7 +22,7 @@ class LabPolicy
      */
     public function view(User $user, Lab $labs): bool
     {
-        return true;
+        return $user->hasPermission('labs', 'view');
     }
 
     /**
@@ -31,7 +31,7 @@ class LabPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('labs', 'create');
     }
 
     /**
@@ -40,7 +40,7 @@ class LabPolicy
      */
     public function update(User $user, Lab $labs): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('labs', 'update');
     }
 
     /**
@@ -49,7 +49,7 @@ class LabPolicy
      */
     public function delete(User $user, Lab $labs): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('labs', 'delete');
     }
 
     /**

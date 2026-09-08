@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\PermissionService;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -102,6 +103,19 @@ class User extends Authenticatable
     /**
      * Check if the user is an admin.
      */
+    /**
+     * ¿Tiene el usuario este permiso efectivo?
+     *
+     * Resuelve roles por grupo, roles individuales vigentes y sobreescrituras,
+     * con caché. Es lo que consultan las policies desde que el RBAC gobierna de
+     * verdad el control de acceso: antes las 41 decisiones se tomaban con
+     * isAdmin() y las cinco tablas del RBAC no influían en nada.
+     */
+    public function hasPermission(string $subject, string $action): bool
+    {
+        return app(PermissionService::class)->userHasPermission($this, $subject, $action);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

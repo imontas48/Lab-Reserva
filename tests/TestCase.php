@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Models\User;
+use Database\Seeders\RbacSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Laravel\Sanctum\Sanctum;
@@ -16,6 +17,18 @@ abstract class TestCase extends BaseTestCase
      * y acabe dependiendo del estado que dejo la anterior.
      */
     use RefreshDatabase;
+
+    /**
+     * Cada prueba parte del catálogo de permisos sembrado.
+     *
+     * Desde que el RBAC gobierna el control de acceso, un esquema sin sembrar
+     * deja a todo el mundo sin permiso para nada y la suite entera daría 403.
+     * Se siembra solo RbacSeeder, no DatabaseSeeder: crear además el usuario
+     * administrador de arranque contaminaría las pruebas que cuentan usuarios.
+     */
+    protected bool $seed = true;
+
+    protected string $seeder = RbacSeeder::class;
 
     /**
      * Autentica a un usuario recien creado con el rol indicado y lo devuelve.

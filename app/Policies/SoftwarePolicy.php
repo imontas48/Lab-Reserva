@@ -13,7 +13,7 @@ class SoftwarePolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('software', 'viewAny');
     }
 
     /**
@@ -22,7 +22,7 @@ class SoftwarePolicy
      */
     public function view(User $user, Software $software): bool
     {
-        return true;
+        return $user->hasPermission('software', 'view');
     }
 
     /**
@@ -31,7 +31,7 @@ class SoftwarePolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('software', 'create');
     }
 
     /**
@@ -40,7 +40,7 @@ class SoftwarePolicy
      */
     public function update(User $user, Software $software): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('software', 'update');
     }
 
     /**
@@ -49,7 +49,7 @@ class SoftwarePolicy
      */
     public function delete(User $user, Software $software): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('software', 'delete');
     }
 
     /**

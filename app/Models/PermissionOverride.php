@@ -73,7 +73,7 @@ class PermissionOverride extends Model
     /**
      * Solo sobreescrituras vigentes (no expiradas).
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeNotExpired(Builder $query): Builder
     {
         return $query->where(function (Builder $q) {
             $q->whereNull('expires_at')
