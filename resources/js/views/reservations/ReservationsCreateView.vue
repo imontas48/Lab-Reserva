@@ -476,7 +476,10 @@ const handleEquipmentSelection = () => {
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useThemeStore } from '@/stores/theme';
+import { toApiDateTime, toLocalDateString } from '@/utils/datetime';
 import { useRouter } from 'vue-router';
 import { useEquipment } from '@/composables/useEquipment';
 import { useLabs } from '@/composables/useLabs';
@@ -546,13 +549,19 @@ const quickStartTime = ref(null);
 const quickEndTime = ref(null);
 /** Fecha mínima permitida en el datepicker (hoy) */
 const today = new Date();
-/** Detecta el tema oscuro activo para pasárselo al datepicker */
-const isDark = ref(document.documentElement.classList.contains('dark'));
-const themeObserver = new MutationObserver(() => {
-  isDark.value = document.documentElement.classList.contains('dark');
-});
-onMounted(() => {
-  themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
+/**
+ * Tema oscuro para el datepicker.
+ *
+ * Antes esto era un MutationObserver sobre <html> que NUNCA se desconectaba:
+ * cada visita a la vista dejaba uno vivo reteniendo el componente entero. Y
+ * ademas duplicaba una informacion que el store de tema ya expone.
+ */
+const { isDark } = storeToRefs(useThemeStore());
+
+let redirectTimer = null;
+
+onUnmounted(() => {
+  clearTimeout(redirectTimer);
 });
 
 // ============================================================================
@@ -602,7 +611,7 @@ const quickSelectError = computed(() => {
   if (!quickDate.value || !quickStartTime.value || !quickEndTime.value) return null;
 
   const dateStr = quickDate.value instanceof Date
-    ? quickDate.value.toISOString().split('T')[0]
+    ? toLocalDateString(quickDate.value)
     : quickDate.value;
   const startStr = timeToString(quickStartTime.value);
   const endStr   = timeToString(quickEndTime.value);
@@ -627,7 +636,7 @@ const formatQuickPreview = computed(() => {
   if (!quickDate.value || !quickStartTime.value || !quickEndTime.value) return '';
 
   const dateStr = quickDate.value instanceof Date
-    ? quickDate.value.toISOString().split('T')[0]
+    ? toLocalDateString(quickDate.value)
     : quickDate.value;
   const startStr = timeToString(quickStartTime.value);
   const endStr   = timeToString(quickEndTime.value);
@@ -728,13 +737,15 @@ const handleQuickSelect = () => {
   if (quickSelectError.value) return;
 
   const dateStr = quickDate.value instanceof Date
-    ? quickDate.value.toISOString().split('T')[0]
+    ? toLocalDateString(quickDate.value)
     : quickDate.value;
   const startStr = timeToString(quickStartTime.value);
   const endStr   = timeToString(quickEndTime.value);
 
-  const start = new Date(`${dateStr}T${startStr}`).toISOString();
-  const end   = new Date(`${dateStr}T${endStr}`).toISOString();
+  // toApiDateTime deja explicito que lo que viaja es un instante con offset,
+  // el mismo formato que emite el calendario tras el arreglo.
+  const start = toApiDateTime(new Date(`${dateStr}T${startStr}`));
+  const end   = toApiDateTime(new Date(`${dateStr}T${endStr}`));
 
   handleSlotSelected({ start, end });
 };
@@ -751,8 +762,10 @@ const handleReservationSuccess = (reservation) => {
   // Cerrar modal
   showModal.value = false;
 
-  // Redirigir a "Mis Reservas"
-  setTimeout(() => {
+  // Redirigir a "Mis Reservas". Se guarda la referencia: sin cancelarlo, si
+  // el usuario navegaba a otra pantalla en ese segundo y medio, el temporizador
+  // lo sacaba de donde estuviera.
+  redirectTimer = setTimeout(() => {
     router.push('/reservations');
   }, 1500);
 };

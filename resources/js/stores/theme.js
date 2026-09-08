@@ -103,19 +103,30 @@ export const useThemeStore = defineStore('theme', () => {
     /**
      * Detecta la preferencia del sistema
      */
-    const detectSystemPreference = () => {
-        if (typeof window !== 'undefined' && window.matchMedia) {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            systemPrefersDark.value = mediaQuery.matches;
+    // El listener se registraba dentro de detectSystemPreference, que se llama
+    // desde initializeTheme: cada invocacion anadia otro listener sobre el mismo
+    // matchMedia, sin quitarlo nunca. Se registra una sola vez.
+    let systemListenerAttached = false;
 
-            // Escuchar cambios en la preferencia del sistema
-            mediaQuery.addEventListener('change', (e) => {
-                systemPrefersDark.value = e.matches;
-                if (theme.value === 'system') {
-                    applyTheme();
-                }
-            });
+    const detectSystemPreference = () => {
+        if (typeof window === 'undefined' || !window.matchMedia) {
+            return;
         }
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        systemPrefersDark.value = mediaQuery.matches;
+
+        if (systemListenerAttached) {
+            return;
+        }
+
+        // El watch sobre systemPrefersDark ya reaplica el tema, asi que aqui
+        // solo se actualiza el valor.
+        mediaQuery.addEventListener('change', (e) => {
+            systemPrefersDark.value = e.matches;
+        });
+
+        systemListenerAttached = true;
     };
 
     /**

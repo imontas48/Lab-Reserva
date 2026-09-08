@@ -34,10 +34,12 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        redirect: (to) => {
-            const authStore = useAuthStore();
-            return authStore.isAuthenticated ? '/dashboard' : '/login';
-        }
+        // Sin redirect(): las redirecciones declaradas se resuelven en
+        // router.resolve(), ANTES de que beforeEach restaure la sesion, asi
+        // que en un arranque en frio isAuthenticated era siempre false y la
+        // navegacion iba a /login para rebotar acto seguido a /dashboard.
+        // El guard decide, que es quien sabe si hay sesion.
+        redirect: { name: 'dashboard' },
     },
 
     /**
@@ -234,21 +236,23 @@ const routes = [
             {
                 path: '/reservations/students',
                 name: 'reservations.students',
-                component: () => import('@/views/reservations/ReservationsStudentsView.vue'),
+                component: () => import('@/views/reservations/ReservationsByRoleView.vue'),
                 meta: {
                     title: 'Reservas de Estudiantes',
                     requiresAuth: true,
                     requiresAdmin: true,
+                    reservationRole: 'student',
                 }
             },
             {
                 path: '/reservations/teachers',
                 name: 'reservations.teachers',
-                component: () => import('@/views/reservations/ReservationsTeachersView.vue'),
+                component: () => import('@/views/reservations/ReservationsByRoleView.vue'),
                 meta: {
                     title: 'Reservas de Maestros',
                     requiresAuth: true,
                     requiresAdmin: true,
+                    reservationRole: 'teacher',
                 }
             },
             {
@@ -394,7 +398,7 @@ router.beforeEach(async (to, from, next) => {
     // ─────────────────────────────────────────────────────────────────────────
     if (from.name === undefined && !authStore.user) {
         try {
-            await authStore.checkAuth();
+            await authStore.restoreSession();
         } catch (error) {
         }
     }

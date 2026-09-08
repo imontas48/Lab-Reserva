@@ -351,6 +351,8 @@ import DataTable from '@/components/ui/DataTable.vue';
 
 // Composables
 import { useSoftware } from '@/composables/useSoftware';
+import { confirmDestructive } from '@/utils/confirm';
+import { useToast } from '@/composables/useToast';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // INSTANCIACIÓN DE SERVICIOS
@@ -372,7 +374,8 @@ const authStore = useAuthStore();
  * Composable de Software
  * Extrae todo el estado reactivo y los métodos para gestionar software
  */
-const { software, loading, error, fetchSoftware } = useSoftware();
+const { software, loading, error, fetchSoftware, deleteSoftware } = useSoftware();
+const toast = useToast();
 
 // ═════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN DE COLUMNAS DEL DATATABLE
@@ -530,20 +533,24 @@ const handleEdit = (item) => {
  *
  * @param {Object} item - El objeto software seleccionado
  */
-const handleDelete = (item) => {
+const handleDelete = async (item) => {
+    // Era un stub: confirm() nativo y un alert('pendiente de implementar'),
+    // aunque deleteSoftware ya estaba implementado en el composable.
+    const confirmed = await confirmDestructive({
+        html: `Se eliminará el software <strong>"${item.name}"</strong>.<br>`
+            + 'Dejará de figurar en los equipos que lo tengan instalado.',
+    });
 
-    // Por ahora, solo mostramos un alert de confirmación
-    // En una implementación completa, esto debería abrir un modal de confirmación
-    const confirmed = confirm(
-        `¿Estás seguro de que deseas eliminar el software "${item.name}"?\n\n` +
-        `Esta acción no se puede deshacer y el software se eliminará de todos los equipos que lo tengan instalado.`
-    );
+    if (!confirmed) {
+        return;
+    }
 
-    if (confirmed) {
-        // TODO: Implementar la llamada al composable
-        // await deleteSoftware(item.id);
-        // Mostrar notificación de éxito
-        alert('Funcionalidad de eliminación pendiente de implementar');
+    try {
+        await deleteSoftware(item.id);
+        toast.success(`Software "${item.name}" eliminado`);
+    } catch {
+        // El composable lanza siempre y deja el motivo en error.value.
+        toast.error(error.value ?? 'No se pudo eliminar el software.');
     }
 };
 </script>

@@ -92,6 +92,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { toApiDateTime, toLocalDateString } from '@/utils/datetime';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -275,8 +276,10 @@ const handleSelect = (selectInfo) => {
 
   // Emitir evento con las fechas seleccionadas (formato ISO 8601)
   emit('slot-selected', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
+    // startStr es hora local SIN offset; el formulario rapido mandaba UTC
+    // con sufijo Z al mismo campo. Se normalizan los dos al mismo formato.
+    start: toApiDateTime(selectInfo.start),
+    end: toApiDateTime(selectInfo.end)
   });
 
   // Limpiar la selección visual (el usuario ya eligió su rango)
@@ -353,8 +356,8 @@ const loadInitialReservations = () => {
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 6); // Sábado
 
-  const start = startOfWeek.toISOString().split('T')[0];
-  const end = endOfWeek.toISOString().split('T')[0];
+  const start = toLocalDateString(startOfWeek);
+  const end = toLocalDateString(endOfWeek);
 
   currentDateRange.value = { start, end };
 
