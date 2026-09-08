@@ -54,13 +54,6 @@ class EquipmentController extends Controller
 
         $equipment = $this->equipmentService->getEquipmentByLab($lab, $filters);
 
-        // Eager load reservations para cálculo de estado
-        $equipment->load(['reservations' => function ($query) {
-            $query->where('start_time', '>=', now()->subHours(2))
-                ->where('status', '!=', 'cancelled')
-                ->orderBy('start_time', 'asc');
-        }]);
-
         return EquipmentResource::collection($equipment);
     }
 
@@ -88,7 +81,7 @@ class EquipmentController extends Controller
         $this->authorize('view', $equipment);
 
         // Cargamos las relaciones necesarias
-        $equipment->load(['lab', 'software']);
+        $equipment->load(['lab', 'software', 'currentReservation', 'nextReservation']);
 
         return new EquipmentResource($equipment);
     }

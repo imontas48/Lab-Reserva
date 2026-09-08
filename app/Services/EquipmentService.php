@@ -6,7 +6,6 @@ use App\Exceptions\BusinessRuleException;
 use App\Models\Equipment;
 use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class EquipmentService
@@ -16,7 +15,7 @@ class EquipmentService
      */
     public function getAllEquipment(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
-        $query = Equipment::with(['lab', 'software']);
+        $query = Equipment::with(['lab', 'software', 'currentReservation', 'nextReservation']);
 
         // Filtrar por laboratorio
         if (isset($filters['lab_id'])) {
@@ -57,7 +56,7 @@ class EquipmentService
      */
     public function getEquipmentByLab(Lab $lab, array $filters = []): Collection
     {
-        $query = $lab->equipment()->with('software');
+        $query = $lab->equipment()->with(['software', 'currentReservation', 'nextReservation']);
 
         // Filtrar por tipo
         if (isset($filters['type'])) {
@@ -88,17 +87,6 @@ class EquipmentService
     }
 
     /**
-     * Get only operational equipment.
-     */
-    public function getOperationalEquipment(): Collection
-    {
-        return Equipment::with(['lab', 'software'])
-            ->operational()
-            ->orderBy('identifier')
-            ->get();
-    }
-
-    /**
      * Create a new equipment.
      */
     public function createEquipment(array $data): Equipment
@@ -120,17 +108,7 @@ class EquipmentService
         }
 
         // Recargar con relaciones
-        return $equipment->load(['lab', 'software']);
-    }
-
-    /**
-     * Get equipment by ID.
-     *
-     * @throws ModelNotFoundException
-     */
-    public function getEquipmentById(int $id): Equipment
-    {
-        return Equipment::with(['lab', 'software'])->findOrFail($id);
+        return $equipment->load(['lab', 'software', 'currentReservation', 'nextReservation']);
     }
 
     /**
@@ -177,54 +155,5 @@ class EquipmentService
         // Las relaciones many-to-many se eliminan automáticamente (equipment_software)
         // Las reservas se eliminan en cascada según la migración
         return $equipment->delete();
-    }
-
-    /**
-     * Toggle operational status of equipment.
-     */
-    public function toggleOperationalStatus(Equipment $equipment): Equipment
-    {
-        $equipment->update(['is_operational' => ! $equipment->is_operational]);
-
-        return $equipment->fresh(['lab', 'software']);
-    }
-
-    /**
-     * Assign software to equipment.
-     */
-    public function assignSoftware(Equipment $equipment, array $softwareIds): Equipment
-    {
-        $equipment->software()->sync($softwareIds);
-
-        return $equipment->fresh(['lab', 'software']);
-    }
-
-    /**
-     * Get equipment types (unique).
-     */
-    public function getEquipmentTypes(): Collection
-    {
-        return Equipment::select('type')
-            ->distinct()
-            ->orderBy('type')
-            ->pluck('type');
-    }
-
-    /**
-     * Get equipment availability for a date range.
-     */
-    public function isAvailable(Equipment $equipment, string $startTime, string $endTime): bool
-    {
-        // Verificar si el equipo está operacional
-        if (! $equipment->is_operational) {
-            return false;
-        }
-
-        // Verificar si hay reservas confirmadas que se solapen
-        $hasConflict = $equipment->reservations()
-            ->blocking($startTime, $endTime)
-            ->exists();
-
-        return ! $hasConflict;
     }
 }

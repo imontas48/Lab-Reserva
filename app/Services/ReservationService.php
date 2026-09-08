@@ -64,7 +64,7 @@ class ReservationService
             $reservation = Reservation::create($validatedData);
 
             // Cargar las relaciones para la respuesta
-            return $reservation->load(['user', 'equipment.lab']);
+            return $reservation->load(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
         });
     }
 
@@ -96,7 +96,7 @@ class ReservationService
         $reservation->update(['status' => 'cancelled']);
 
         // Recargar con relaciones
-        return $reservation->fresh(['user', 'equipment.lab']);
+        return $reservation->fresh(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
     }
 
     /**
@@ -126,7 +126,7 @@ class ReservationService
 
         $reservation->update($data);
 
-        return $reservation->fresh(['user', 'equipment.lab']);
+        return $reservation->fresh(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
     }
 
     /**
@@ -142,7 +142,7 @@ class ReservationService
      */
     public function getAllReservations(array $filters = [], ?int $perPage = null): LengthAwarePaginator
     {
-        $query = Reservation::with(['user', 'equipment.lab']);
+        $query = Reservation::with(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
 
         // Filtrar por usuario
         if (isset($filters['user_id'])) {
@@ -204,7 +204,7 @@ class ReservationService
     public function getReservationsForUser(User $user, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Reservation::where('user_id', $user->id)
-            ->with(['equipment.lab']);
+            ->with(['equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
 
         // Filtrar por estado si se proporciona
         if (isset($filters['status'])) {
@@ -234,7 +234,7 @@ class ReservationService
      */
     public function getReservationsByUserRole(string $role, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Reservation::with(['user', 'equipment.lab'])
+        $query = Reservation::with(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation'])
             ->whereHas('user', function ($q) use ($role) {
                 $q->where('role', $role);
             });
@@ -298,32 +298,6 @@ class ReservationService
     }
 
     /**
-     * Get active reservations (currently in progress).
-     */
-    public function getActiveReservations(): Collection
-    {
-        return Reservation::with(['user', 'equipment.lab'])
-            ->where('status', 'confirmed')
-            ->where('start_time', '<=', now())
-            ->where('end_time', '>=', now())
-            ->orderBy('end_time', 'asc')
-            ->get();
-    }
-
-    /**
-     * Get upcoming reservations (confirmed and in the future).
-     */
-    public function getUpcomingReservations(int $limit = 10): Collection
-    {
-        return Reservation::with(['user', 'equipment.lab'])
-            ->confirmed()
-            ->where('start_time', '>', now())
-            ->orderBy('start_time', 'asc')
-            ->limit($limit)
-            ->get();
-    }
-
-    /**
      * Mark expired reservations as completed.
      * Este método puede ser llamado por un comando scheduled.
      *
@@ -334,40 +308,6 @@ class ReservationService
         return Reservation::where('status', 'confirmed')
             ->where('end_time', '<', now())
             ->update(['status' => 'completed']);
-    }
-
-    /**
-     * Get reservation statistics for a user.
-     */
-    public function getUserStatistics(User $user): array
-    {
-        $total = Reservation::where('user_id', $user->id)->count();
-        $confirmed = Reservation::where('user_id', $user->id)->confirmed()->count();
-        $cancelled = Reservation::where('user_id', $user->id)->cancelled()->count();
-        $completed = Reservation::where('user_id', $user->id)->completed()->count();
-
-        return [
-            'total' => $total,
-            'confirmed' => $confirmed,
-            'cancelled' => $cancelled,
-            'completed' => $completed,
-        ];
-    }
-
-    /**
-     * Get reservation statistics for an equipment.
-     */
-    public function getEquipmentStatistics(Equipment $equipment): array
-    {
-        $total = $equipment->reservations()->count();
-        $confirmed = $equipment->reservations()->confirmed()->count();
-        $completed = $equipment->reservations()->completed()->count();
-
-        return [
-            'total' => $total,
-            'confirmed' => $confirmed,
-            'completed' => $completed,
-        ];
     }
 
     /**
@@ -397,48 +337,5 @@ class ReservationService
         // confirmar, en vez del snapshot de REPEATABLE READ. En autocommit el
         // bloqueo se toma y se libera dentro de la propia sentencia.
         return $query->lockForUpdate()->exists();
-    }
-
-    /**
-     * Get available time slots for an equipment on a specific date.
-     * Útil para el frontend mostrar slots disponibles.
-     *
-     * @param  string  $date  Formato: Y-m-d
-     * @param  int  $slotDuration  En minutos (default: 60)
-     */
-    public function getAvailableTimeSlots(
-        Equipment $equipment,
-        string $date,
-        int $slotDuration = 60
-    ): array {
-        // Horario de operación (ejemplo: 8 AM a 8 PM)
-        $startHour = 8;
-        $endHour = 20;
-
-        $availableSlots = [];
-        $currentTime = new \DateTime("$date $startHour:00:00");
-        $endTime = new \DateTime("$date $endHour:00:00");
-
-        while ($currentTime < $endTime) {
-            $slotEnd = clone $currentTime;
-            $slotEnd->modify("+$slotDuration minutes");
-
-            // Verificar si el slot está disponible
-            $isAvailable = ! $this->checkEquipmentAvailability(
-                $equipment->id,
-                $currentTime->format('Y-m-d H:i:s'),
-                $slotEnd->format('Y-m-d H:i:s')
-            );
-
-            $availableSlots[] = [
-                'start' => $currentTime->format('H:i'),
-                'end' => $slotEnd->format('H:i'),
-                'available' => $isAvailable,
-            ];
-
-            $currentTime = $slotEnd;
-        }
-
-        return $availableSlots;
     }
 }

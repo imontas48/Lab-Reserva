@@ -4,7 +4,6 @@ namespace Tests\Feature\Reservations;
 
 use App\Models\Equipment;
 use App\Models\Reservation;
-use App\Services\EquipmentService;
 use Illuminate\Support\Carbon;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -128,21 +127,28 @@ class OverlapTest extends TestCase
         ])->assertCreated();
     }
 
-    public function test_las_tres_implementaciones_coinciden(): void
+    public function test_existe_una_unica_definicion_de_solapamiento(): void
     {
-        // Equipment::isAvailableInRange solo tenia tres casos frente a los
-        // cuatro de las otras copias, asi que declaraba disponible un equipo
-        // que el servicio rechazaba a continuacion.
+        // Habia cuatro copias de esta regla y una de ellas, la de
+        // Equipment::isAvailableInRange, tenia solo tres casos frente a los
+        // cuatro de las otras: declaraba disponible un equipo que el servicio
+        // rechazaba a continuacion. Las dos copias que no tenian ningun
+        // consumidor se eliminaron; el scope es ahora la unica definicion, y
+        // esta prueba lo ejercita directamente.
         $this->actingAsStudent();
         $this->reserve('10:00', '12:00')->assertCreated();
 
-        $inicio = $this->at('10:30');
-        $fin = $this->at('11:00');
+        $solapa = Reservation::query()
+            ->forEquipment($this->equipment->id)
+            ->blocking($this->at('10:30'), $this->at('11:00'))
+            ->exists();
 
-        $this->assertFalse($this->equipment->fresh()->isAvailableInRange($inicio, $fin));
-        $this->assertFalse(
-            app(EquipmentService::class)
-                ->isAvailable($this->equipment->fresh(), $inicio, $fin)
-        );
+        $contigua = Reservation::query()
+            ->forEquipment($this->equipment->id)
+            ->blocking($this->at('12:00'), $this->at('13:00'))
+            ->exists();
+
+        $this->assertTrue($solapa, 'Un intervalo contenido debe considerarse solapado.');
+        $this->assertFalse($contigua, 'Una franja consecutiva no debe considerarse solapada.');
     }
 }

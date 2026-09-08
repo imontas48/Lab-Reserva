@@ -170,14 +170,6 @@ class Reservation extends Model
     }
 
     /**
-     * Scope to get reservations for a specific user.
-     */
-    public function scopeForUser($query, $userId)
-    {
-        return $query->where('user_id', $userId);
-    }
-
-    /**
      * ¿Es válido pasar de este estado al indicado?
      */
     public function canTransitionTo(string $status): bool
@@ -208,35 +200,10 @@ class Reservation extends Model
     }
 
     /**
-     * Check if the reservation has expired.
-     */
-    public function getIsExpiredAttribute(): bool
-    {
-        return $this->end_time < Carbon::now();
-    }
-
-    /**
      * Get the duration of the reservation in minutes.
      */
     public function getDurationInMinutesAttribute(): int
     {
         return $this->start_time->diffInMinutes($this->end_time);
-    }
-
-    /**
-     * Get a human readable duration.
-     */
-    public function getHumanDurationAttribute(): string
-    {
-        $hours = floor($this->duration_in_minutes / 60);
-        $minutes = $this->duration_in_minutes % 60;
-
-        if ($hours > 0 && $minutes > 0) {
-            return "{$hours}h {$minutes}m";
-        } elseif ($hours > 0) {
-            return "{$hours}h";
-        } else {
-            return "{$minutes}m";
-        }
     }
 }

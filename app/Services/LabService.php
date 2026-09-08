@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Exceptions\BusinessRuleException;
 use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LabService
@@ -41,14 +40,6 @@ class LabService
     }
 
     /**
-     * Get only active labs.
-     */
-    public function getActiveLabs(): Collection
-    {
-        return Lab::active()->orderBy('name')->get();
-    }
-
-    /**
      * Create a new lab.
      */
     public function createLab(array $data): Lab
@@ -57,16 +48,6 @@ class LabService
         $data['is_active'] = $data['is_active'] ?? true;
 
         return Lab::create($data);
-    }
-
-    /**
-     * Get a lab by ID.
-     *
-     * @throws ModelNotFoundException
-     */
-    public function getLabById(int $id): Lab
-    {
-        return Lab::findOrFail($id);
     }
 
     /**
@@ -96,31 +77,5 @@ class LabService
         }
 
         return $lab->delete();
-    }
-
-    /**
-     * Toggle active status of a lab.
-     */
-    public function toggleActiveStatus(Lab $lab): Lab
-    {
-        $lab->update(['is_active' => ! $lab->is_active]);
-
-        return $lab->fresh();
-    }
-
-    /**
-     * Get labs with their equipment count.
-     */
-    public function getLabsWithEquipmentCount(): Collection
-    {
-        return Lab::withCount('equipment')->orderBy('name')->get();
-    }
-
-    /**
-     * Get labs with their operational equipment count.
-     */
-    public function getLabsWithOperationalEquipmentCount(): Collection
-    {
-        return Lab::withCount('operationalEquipment')->orderBy('name')->get();
     }
 }

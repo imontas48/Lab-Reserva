@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Exceptions\BusinessRuleException;
 use App\Models\Software;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class SoftwareService
@@ -44,16 +43,6 @@ class SoftwareService
     }
 
     /**
-     * Get a software by ID.
-     *
-     * @throws ModelNotFoundException
-     */
-    public function getSoftwareById(int $id): Software
-    {
-        return Software::findOrFail($id);
-    }
-
-    /**
      * Update an existing software.
      */
     public function updateSoftware(Software $software, array $data): Software
@@ -80,42 +69,5 @@ class SoftwareService
         }
 
         return $software->delete();
-    }
-
-    /**
-     * Get software with their equipment count.
-     */
-    public function getSoftwareWithEquipmentCount(): Collection
-    {
-        return Software::withCount('equipment')->orderBy('name')->get();
-    }
-
-    /**
-     * Search software by name.
-     */
-    public function searchSoftware(string $search): Collection
-    {
-        return Software::search($search)->get();
-    }
-
-    /**
-     * Get software assigned to a specific equipment.
-     */
-    public function getSoftwareByEquipment(int $equipmentId): Collection
-    {
-        return Software::whereHas('equipment', function ($query) use ($equipmentId) {
-            $query->where('equipment_id', $equipmentId);
-        })->orderBy('name')->get();
-    }
-
-    /**
-     * Get the most used software (by equipment count).
-     */
-    public function getMostUsedSoftware(int $limit = 10): Collection
-    {
-        return Software::withCount('equipment')
-            ->orderByDesc('equipment_count')
-            ->limit($limit)
-            ->get();
     }
 }

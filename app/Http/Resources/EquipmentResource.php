@@ -14,6 +14,10 @@ class EquipmentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Una sola invocacion: el Resource llamaba a getCurrentStatus() dos
+        // veces por recurso, duplicando su coste.
+        $status = $this->getCurrentStatus();
+
         return [
             'id' => $this->id,
             'lab_id' => $this->lab_id,
@@ -23,10 +27,10 @@ class EquipmentResource extends JsonResource
             'is_operational' => (bool) $this->is_operational,
 
             // Estado actual calculado dinámicamente
-            'status' => $this->getCurrentStatus(),
+            'status' => $status,
 
             // Compatibilidad legacy (deprecated - usar 'status' en su lugar)
-            'is_available' => $this->getCurrentStatus()['status'] === 'available',
+            'is_available' => $status['status'] === 'available',
 
             // Relación con el laboratorio (solo si está cargada)
             'lab' => new LabResource($this->whenLoaded('lab')),
