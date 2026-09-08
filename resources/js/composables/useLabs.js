@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import apiClient from '@/utils/api';
 
 /**
- * ════════════════════════════════════════════════════            console.log(` Fetching lab with ID: ${id}...`);
+ * ════════════════════════════════════════════════════            
             const response = await apiClient.get(`/v1/labs/${id}`);
 
             const lab = response.data.data || response.data;═══════════════════
@@ -87,23 +87,17 @@ export function useLabs() {
      *
      * @example
      * await fetchLabs();
-     * console.log(labs.value); // [{ id: 1, name: 'Lab A', ... }, ...]
+     *  // [{ id: 1, name: 'Lab A', ... }, ...]
      */
     const fetchLabs = async () => {
         try {
             loading.value = true;
             error.value = null;
 
-            console.log(' Fetching labs from API...');
-            console.log(' Base URL:', apiClient.defaults.baseURL);
-            console.log(' Full URL:', `${apiClient.defaults.baseURL}/labs`);
             const response = await apiClient.get('/labs');
 
-            console.log(' Response data type:', typeof response.data);
-            console.log(' Response data:', response.data);
 
             labs.value = response.data.data || response.data;
-            console.log(' Labs fetched successfully:', Array.isArray(labs.value) ? labs.value.length : 'NOT AN ARRAY!');
         } catch (err) {
             console.error(' Error fetching labs:', err);
             error.value = err.response?.data?.message || 'Error al cargar los laboratorios';
@@ -123,18 +117,16 @@ export function useLabs() {
      *
      * @example
      * const lab = await fetchLabById(1);
-     * console.log(lab); // { id: 1, name: 'Lab A', location: 'Building A', ... }
+     *  // { id: 1, name: 'Lab A', location: 'Building A', ... }
      */
     const fetchLabById = async (id) => {
         try {
             loading.value = true;
             error.value = null;
 
-            console.log(` Fetching lab with ID: ${id}`);
             const response = await apiClient.get(`/labs/${id}`);
 
             const lab = response.data.data || response.data;
-            console.log(' Lab fetched successfully:', lab);
 
             return lab;
         } catch (err) {
@@ -170,7 +162,7 @@ export function useLabs() {
      *     location: 'Edificio C, Piso 2',
      *     description: 'Laboratorio equipado para prácticas de redes'
      *   });
-     *   console.log('Lab creado:', newLab);
+     *   
      * } catch (error) {
      *   console.error('Error de validación:', validationErrors.value);
      * }
@@ -181,11 +173,9 @@ export function useLabs() {
             error.value = null;
             validationErrors.value = {};
 
-            console.log(' Creating new lab:', labData);
             const response = await apiClient.post('/labs', labData);
 
             const newLab = response.data.data || response.data;
-            console.log(' Lab created successfully:', newLab);
 
             // Agregar el nuevo laboratorio a la lista local
             labs.value.unshift(newLab);
@@ -198,7 +188,6 @@ export function useLabs() {
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al crear el laboratorio';
             }
@@ -230,7 +219,7 @@ export function useLabs() {
      *     name: 'Laboratorio de Redes Avanzadas',
      *     location: 'Edificio C, Piso 3'
      *   });
-     *   console.log('Lab actualizado:', updatedLab);
+     *   
      * } catch (error) {
      *   console.error('Error de validación:', validationErrors.value);
      * }
@@ -241,11 +230,9 @@ export function useLabs() {
             error.value = null;
             validationErrors.value = {};
 
-            console.log(` Updating lab ${id}:`, labData);
             const response = await apiClient.put(`/labs/${id}`, labData);
 
             const updatedLab = response.data.data || response.data;
-            console.log(' Lab updated successfully:', updatedLab);
 
             // Actualizar el laboratorio en la lista local
             const index = labs.value.findIndex(lab => lab.id === id);
@@ -261,7 +248,6 @@ export function useLabs() {
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al actualizar el laboratorio';
             }
@@ -286,17 +272,15 @@ export function useLabs() {
      *
      * @example
      * await deleteLab(1);
-     * console.log('Lab eliminado');
+     * 
      */
     const deleteLab = async (id) => {
         try {
             loading.value = true;
             error.value = null;
 
-            console.log(`️ Deleting lab ${id}`);
             await apiClient.delete(`/labs/${id}`);
 
-            console.log(' Lab deleted successfully');
 
             // Eliminar el laboratorio de la lista local
             labs.value = labs.value.filter(lab => lab.id !== id);

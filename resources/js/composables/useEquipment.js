@@ -154,7 +154,6 @@ export function useEquipment() {
         error.value = null;
 
         try {
-            console.log(' Obteniendo lista de equipment...');
 
             // Realizar petición GET a la API
             // La instancia apiClient ya tiene configurados:
@@ -168,11 +167,9 @@ export function useEquipment() {
             // Si no existe, usa response.data directamente
             equipment.value = response.data.data || response.data;
 
-            console.log(` Equipment cargado: ${equipment.value.length} registros`);
 
             // Log de muestra para verificar estructura de datos relacionales
             if (equipment.value.length > 0) {
-                console.log(' Muestra de estructura de datos:', equipment.value[0]);
             }
         } catch (err) {
             // Capturar y procesar el error
@@ -222,12 +219,10 @@ export function useEquipment() {
         error.value = null;
 
         try {
-            console.log(` Obteniendo equipment con ID: ${id}...`);
 
             const response = await apiClient.get(`/equipment/${id}`);
             const equipmentItem = response.data.data || response.data;
 
-            console.log(' Equipment obtenido:', equipmentItem);
 
             return equipmentItem;
         } catch (err) {
@@ -261,7 +256,6 @@ export function useEquipment() {
         validationErrors.value = {};
 
         try {
-            console.log(' Creando nuevo equipment...', equipmentData);
 
             const response = await apiClient.post('/equipment', equipmentData);
             const newEquipment = response.data.data || response.data;
@@ -269,7 +263,6 @@ export function useEquipment() {
             // Agregar el nuevo equipment al inicio de la lista local
             equipment.value.unshift(newEquipment);
 
-            console.log(' Equipment creado exitosamente:', newEquipment);
 
             return newEquipment;
         } catch (err) {
@@ -279,7 +272,6 @@ export function useEquipment() {
                 // Error de validación - capturar errores específicos por campo
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Datos de equipment inválidos. Verifica los campos.';
-                console.log(' Errores de validación:', validationErrors.value);
             } else {
                 error.value = 'Error al crear el equipment. Por favor, intenta nuevamente.';
             }
@@ -307,7 +299,6 @@ export function useEquipment() {
         validationErrors.value = {};
 
         try {
-            console.log(` Actualizando equipment con ID: ${id}...`, equipmentData);
 
             const response = await apiClient.put(`/equipment/${id}`, equipmentData);
             const updatedEquipment = response.data.data || response.data;
@@ -318,7 +309,6 @@ export function useEquipment() {
                 equipment.value[index] = updatedEquipment;
             }
 
-            console.log(' Equipment actualizado exitosamente:', updatedEquipment);
 
             return updatedEquipment;
         } catch (err) {
@@ -328,7 +318,6 @@ export function useEquipment() {
                 // Error de validación - capturar errores específicos por campo
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Datos de equipment inválidos. Verifica los campos.';
-                console.log(' Errores de validación:', validationErrors.value);
             } else if (err.response?.status === 404) {
                 error.value = 'Equipment no encontrado.';
             } else {
@@ -356,14 +345,12 @@ export function useEquipment() {
         error.value = null;
 
         try {
-            console.log(` Eliminando equipment con ID: ${id}...`);
 
             await apiClient.delete(`/equipment/${id}`);
 
             // Remover el equipment de la lista local
             equipment.value = equipment.value.filter(e => e.id !== id);
 
-            console.log(' Equipment eliminado exitosamente');
 
             return true;
         } catch (err) {

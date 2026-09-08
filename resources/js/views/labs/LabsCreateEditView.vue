@@ -368,7 +368,6 @@ const loadLabData = async () => {
         initialLoading.value = true;
         loadError.value = null;
 
-        console.log(' Cargando datos del laboratorio para edición...');
         const lab = await fetchLabById(route.params.id);
 
         // Poblar el formulario con los datos obtenidos
@@ -379,7 +378,6 @@ const loadLabData = async () => {
             description: lab.description || ''
         };
 
-        console.log(' Datos cargados en el formulario:', form.value);
     } catch (err) {
         console.error(' Error al cargar datos del laboratorio:', err);
         loadError.value = err.response?.data?.message || 'No se pudieron cargar los datos del laboratorio';
@@ -397,30 +395,23 @@ const handleSubmit = async () => {
         // Limpiar errores previos
         clearErrors();
 
-        console.log(' Enviando formulario...', {
-            mode: isEditing.value ? 'edit' : 'create',
-            data: form.value
-        });
 
         let result;
 
         if (isEditing.value) {
             // Modo edición: actualizar laboratorio existente
-            console.log(` Actualizando laboratorio ${route.params.id}...`);
             result = await updateLab(route.params.id, form.value);
 
             // Notificación de éxito
             toast.success(`Laboratorio "${result.name}" actualizado exitosamente`);
         } else {
             // Modo creación: crear nuevo laboratorio
-            console.log(' Creando nuevo laboratorio...');
             result = await createLab(form.value);
 
             // Notificación de éxito
             toast.success(`Laboratorio "${result.name}" creado exitosamente`);
         }
 
-        console.log(' Operación exitosa:', result);
 
         // Redirigir al listado de laboratorios
         router.push({ name: 'labs.index' });
@@ -450,10 +441,6 @@ const handleSubmit = async () => {
  * - Si estamos en modo creación, el formulario ya está limpio
  */
 onMounted(() => {
-    console.log(' LabsCreateEditView montado', {
-        mode: isEditing.value ? 'edit' : 'create',
-        labId: route.params.id || 'N/A'
-    });
 
     //  FIX: Limpiar estado del composable al montar
     // El composable es compartido entre vistas, así que limpiamos

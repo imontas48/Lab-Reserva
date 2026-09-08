@@ -96,14 +96,12 @@ apiClient.interceptors.request.use(
         if (needsCsrfToken && !isExcludedRoute && !csrfTokenReady) {
             // Si no hay una petición de CSRF en curso, iniciarla
             if (!csrfTokenPromise) {
-                console.log(' Obteniendo token CSRF de Sanctum...');
                 csrfTokenPromise = axios.get(
                     `${import.meta.env.VITE_APP_URL || 'http://lab-reserva.test'}/sanctum/csrf-cookie`,
                     { withCredentials: true }
                 ).then(() => {
                     csrfTokenReady = true;
                     csrfTokenPromise = null;
-                    console.log(' Token CSRF obtenido correctamente');
                 }).catch((error) => {
                     csrfTokenPromise = null;
                     console.error(' Error al obtener token CSRF:', error);
@@ -155,7 +153,6 @@ apiClient.interceptors.response.use(
 
                     // Si no estamos ya en la página de login, redirigir
                     if (!window.location.pathname.includes('/login')) {
-                        console.log(' Redirigiendo a login...');
 
                         // Resetear el estado de CSRF
                         csrfTokenReady = false;
@@ -184,7 +181,6 @@ apiClient.interceptors.response.use(
 
                     if (shouldRetry && !config._retry) {
                         config._retry = true;
-                        console.log(' Reintentando petición con nuevo token CSRF...');
                         return apiClient.request(config);
                     }
 

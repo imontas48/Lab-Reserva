@@ -54,7 +54,7 @@ class DashboardController extends Controller
                         ? $reservation->equipment->lab->name
                         : 'N/A',
                     'equipment_name' => $reservation->equipment
-                        ? $reservation->equipment->name
+                        ? $reservation->equipment->identifier
                         : 'N/A',
                     'start_datetime' => $reservation->start_time,
                     'end_datetime' => $reservation->end_time,

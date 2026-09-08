@@ -392,7 +392,6 @@ const generalError = computed(() => {
  * Llama al composable para crear la reserva y maneja el resultado
  */
 const handleConfirm = async () => {
-  console.log(' Confirmando reserva...', props.reservationDetails);
 
   // Construir el payload para la API
   const payload = {
@@ -406,7 +405,6 @@ const handleConfirm = async () => {
 
   // Si la creación fue exitosa
   if (reservation) {
-    console.log(' Reserva confirmada exitosamente:', reservation);
 
     // Emitir evento de éxito para que el padre pueda reaccionar
     emit('reservation-success', reservation);
@@ -439,7 +437,6 @@ watch(
   () => props.show,
   (newValue) => {
     if (newValue) {
-      console.log(' Modal abierto. Limpiando errores previos...');
       validationErrors.value = {};
     }
   }

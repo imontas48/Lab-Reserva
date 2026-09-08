@@ -115,7 +115,6 @@ export function useSoftware() {
         error.value = null;
 
         try {
-            console.log(' Obteniendo lista de software...');
 
             // Realizar petición GET a la API
             // La instancia apiClient ya tiene configurados:
@@ -129,7 +128,6 @@ export function useSoftware() {
             // Si no existe, usa response.data directamente
             software.value = response.data.data || response.data;
 
-            console.log(` Software cargado: ${software.value.length} registros`);
         } catch (err) {
             // Capturar y procesar el error
             console.error(' Error al cargar software:', err);
@@ -178,12 +176,10 @@ export function useSoftware() {
         error.value = null;
 
         try {
-            console.log(` Obteniendo software con ID: ${id}...`);
 
             const response = await apiClient.get(`/software/${id}`);
             const softwareItem = response.data.data || response.data;
 
-            console.log(' Software obtenido:', softwareItem);
 
             return softwareItem;
         } catch (err) {
@@ -217,7 +213,6 @@ export function useSoftware() {
         validationErrors.value = {};
 
         try {
-            console.log('� Creando nuevo software:', softwareData);
 
             const response = await apiClient.post('/software', softwareData);
             const newSoftware = response.data.data || response.data;
@@ -225,7 +220,6 @@ export function useSoftware() {
             // Agregar el nuevo software a la lista local
             software.value.unshift(newSoftware);
 
-            console.log(' Software creado exitosamente:', newSoftware);
 
             return newSoftware;
         } catch (err) {
@@ -235,7 +229,6 @@ export function useSoftware() {
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al crear el software';
             }
@@ -263,7 +256,6 @@ export function useSoftware() {
         validationErrors.value = {};
 
         try {
-            console.log(`� Actualizando software ${id}:`, softwareData);
 
             const response = await apiClient.put(`/software/${id}`, softwareData);
             const updatedSoftware = response.data.data || response.data;
@@ -274,7 +266,6 @@ export function useSoftware() {
                 software.value[index] = updatedSoftware;
             }
 
-            console.log(' Software actualizado exitosamente:', updatedSoftware);
 
             return updatedSoftware;
         } catch (err) {
@@ -284,7 +275,6 @@ export function useSoftware() {
             if (err.response?.status === 422) {
                 validationErrors.value = err.response.data.errors || {};
                 error.value = 'Por favor, corrige los errores en el formulario';
-                console.log(' Validation errors:', validationErrors.value);
             } else {
                 error.value = err.response?.data?.message || 'Error al actualizar el software';
             }
@@ -310,14 +300,12 @@ export function useSoftware() {
         error.value = null;
 
         try {
-            console.log(` Eliminando software con ID: ${id}...`);
 
             await apiClient.delete(`/software/${id}`);
 
             // Remover el software de la lista local
             software.value = software.value.filter(s => s.id !== id);
 
-            console.log(' Software eliminado exitosamente');
 
             return true;
         } catch (err) {

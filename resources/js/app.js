@@ -78,4 +78,3 @@ themeStore.initializeTheme();
  */
 app.mount('#app');
 
-console.log(' Lab-Reserva Frontend iniciado correctamente');

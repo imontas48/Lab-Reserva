@@ -101,9 +101,6 @@
             :items="equipment"
             :loading="loading"
             :error="error"
-            @view-item="handleView"
-            @edit-item="handleEdit"
-            @delete-item="handleDelete"
         >
 
 
@@ -425,7 +422,6 @@ const formatEquipmentType = (type) => {
  * Aquí cargamos los datos iniciales de equipment desde la API.
  */
 onMounted(() => {
-    console.log('️ EquipmentIndexView montado. Cargando equipos...');
     fetchEquipment();
 });
 
@@ -443,10 +439,9 @@ onMounted(() => {
  * @param {Object} item - El objeto equipment seleccionado
  */
 const handleView = (item) => {
-    console.log('️ Ver detalles de equipment:', item.identifier);
 
     router.push({
-        name: 'equipment-show',
+        name: 'equipment.show',
         params: { id: item.id }
     });
 };
@@ -463,7 +458,6 @@ const handleView = (item) => {
  * @param {Object} item - El objeto equipment seleccionado
  */
 const handleEdit = (item) => {
-    console.log('️ Editar equipment:', item.identifier);
 
     router.push({
         name: 'equipment.edit',
@@ -489,7 +483,6 @@ const handleEdit = (item) => {
  * @param {Object} item - El objeto equipment seleccionado
  */
 const handleDelete = async (item) => {
-    console.log('️ Eliminar equipment:', item.identifier);
 
     // Mostrar diálogo de confirmación con SweetAlert2
     const result = await Swal.fire({
@@ -512,7 +505,6 @@ const handleDelete = async (item) => {
 
     try {
         await deleteEquipment(item.id);
-        console.log(' Equipo eliminado');
 
         // Mostrar notificación de éxito
         toast.success(`Equipo "${item.identifier}" eliminado exitosamente`);

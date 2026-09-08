@@ -272,10 +272,6 @@ const calendarOptions = computed(() => ({
  * @param {Object} selectInfo - Información de la selección de FullCalendar
  */
 const handleSelect = (selectInfo) => {
-  console.log(' Rango de tiempo seleccionado:', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
 
   // Emitir evento con las fechas seleccionadas (formato ISO 8601)
   emit('slot-selected', {
@@ -302,7 +298,6 @@ const handleDatesSet = (dateInfo) => {
     currentDateRange.value.start !== start ||
     currentDateRange.value.end !== end
   ) {
-    console.log(' Navegando a nuevo rango:', { start, end });
 
     currentDateRange.value = { start, end };
 
@@ -320,10 +315,6 @@ const handleDatesSet = (dateInfo) => {
 const handleEventClick = (clickInfo) => {
   const reservation = clickInfo.event.extendedProps;
 
-  console.log(' Reserva clickeada:', {
-    id: reservation.reservationId,
-    purpose: reservation.purpose
-  });
 
   // TODO: Implementar modal con detalles de la reserva
   // Mostrar quién reservó, para qué, horario exacto, etc.
@@ -367,7 +358,6 @@ const loadInitialReservations = () => {
 
   currentDateRange.value = { start, end };
 
-  console.log(' Carga inicial de reservas:', { equipmentId: props.equipmentId, start, end });
 
   fetchReservationsForEquipment(props.equipmentId, start, end);
 };
@@ -384,7 +374,6 @@ watch(
   () => props.equipmentId,
   (newId, oldId) => {
     if (newId && newId !== oldId) {
-      console.log(` Equipo cambió de ${oldId} a ${newId}. Recargando calendario...`);
       loadInitialReservations();
     }
   }

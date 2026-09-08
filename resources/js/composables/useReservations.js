@@ -130,7 +130,7 @@ export function useReservations() {
    * @example
    * const success = await fetchReservationsForEquipment(5, '2025-10-15', '2025-10-22');
    * if (success) {
-   *   console.log('Reservas:', reservations.value);
+   *   
    * }
    */
   const fetchReservationsForEquipment = async (equipmentId, startDate, endDate) => {
@@ -138,10 +138,6 @@ export function useReservations() {
     loading.value = true;
 
     try {
-      console.log(` Obteniendo reservas del equipo ${equipmentId}...`, {
-        start: startDate,
-        end: endDate
-      });
 
       // Petición GET a la ruta anidada de Laravel
       const response = await api.get(`/equipment/${equipmentId}/reservations`, {
@@ -154,7 +150,6 @@ export function useReservations() {
       // Poblar el ref con los datos recibidos
       reservations.value = response.data.data || response.data;
 
-      console.log(` ${reservations.value.length} reservas cargadas`);
       return true;
 
     } catch (err) {
@@ -188,9 +183,9 @@ export function useReservations() {
    * });
    *
    * if (reservation) {
-   *   console.log(' Reserva creada:', reservation.id);
+   *   
    * } else {
-   *   console.log(' Errores:', validationErrors.value);
+   *   
    * }
    */
   const createReservation = async (payload) => {
@@ -198,14 +193,12 @@ export function useReservations() {
     loading.value = true;
 
     try {
-      console.log(' Creando nueva reserva...', payload);
 
       // Petición POST al endpoint de reservas
       const response = await api.post('/reservations', payload);
 
       const newReservation = response.data.data || response.data;
 
-      console.log(' Reserva creada exitosamente:', newReservation.id);
 
       // Agregar la nueva reserva a la lista local (útil para actualizar UI inmediatamente)
       reservations.value.push(newReservation);
@@ -231,7 +224,7 @@ export function useReservations() {
    * @example
    * const success = await fetchMyReservations();
    * if (success) {
-   *   console.log('Mis reservas:', reservations.value);
+   *   
    * }
    */
   const fetchMyReservations = async () => {
@@ -239,14 +232,12 @@ export function useReservations() {
     loading.value = true;
 
     try {
-      console.log(' Obteniendo mis reservas...');
 
       // Petición GET al endpoint personalizado
       const response = await api.get('/my-reservations');
 
       reservations.value = response.data.data || response.data;
 
-      console.log(` ${reservations.value.length} reservas del usuario cargadas`);
       return true;
 
     } catch (err) {
@@ -271,7 +262,7 @@ export function useReservations() {
    * @example
    * const success = await cancelMyReservation(123);
    * if (success) {
-   *   console.log(' Reserva cancelada');
+   *   
    *   // Actualizar la lista local
    *   await fetchMyReservations();
    * }
@@ -281,12 +272,10 @@ export function useReservations() {
     loading.value = true;
 
     try {
-      console.log(` Cancelando reserva ${reservationId}...`);
 
       // Petición PATCH al endpoint de cancelación
       await api.patch(`/reservations/${reservationId}/cancel`);
 
-      console.log(' Reserva cancelada exitosamente');
 
       // Actualizar la lista local removiendo o marcando la reserva como cancelada
       const index = reservations.value.findIndex(r => r.id === reservationId);

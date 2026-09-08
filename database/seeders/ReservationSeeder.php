@@ -49,11 +49,7 @@ class ReservationSeeder extends Seeder
                     'lab_id' => $lab->id,
                     'identifier' => 'PC-DEMO-' . str_pad($i, 3, '0', STR_PAD_LEFT),
                     'type' => 'Computadora',
-                    'specifications' => json_encode([
-                        'cpu' => 'Intel Core i5',
-                        'ram' => '8GB',
-                        'storage' => '256GB SSD'
-                    ]),
+                    'specifications' => 'CPU: Intel Core i5, RAM: 8GB, Almacenamiento: 256GB SSD',
                     'is_operational' => true
                 ]);
 
