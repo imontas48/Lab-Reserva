@@ -1,8 +1,11 @@
 *.log
 .DS_Store
+# Archivos de entorno: prohibido versionarlos (ver CLAUDE.md seccion 6)
+# Unica excepcion: .env.example, plantilla sin valores reales.
 .env
-.env.backup
-.env.production
+.env.*
+!.env.example
+env.txt
 .phpactor.json
 .phpunit.result.cache
 /.fleet
