@@ -10,11 +10,7 @@
 
     <!-- ========================================================================= -->
     <!-- PASO 1: SELECCIÓN DE LABORATORIO -->
-    <!-- ========/**
- * Maneja el cambio en el select de equipos (solo actualiza el preview)
- */
-const handleEquipmentSelection = () => {
-};=========================================================== -->
+    <!-- ============================================================== -->
     <div v-if="!selectedLab" class="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold text-sm mr-3">1</span>
@@ -183,7 +179,6 @@ const handleEquipmentSelection = () => {
         <select
           id="equipment-select"
           v-model="selectedEquipmentId"
-          @change="handleEquipmentSelection"
           class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         >
           <option :value="null" disabled>-- Selecciona un equipo --</option>
@@ -671,12 +666,6 @@ const clearLabSelection = () => {
   selectedEquipmentId.value = null;
   reservationDetails.value = null;
   showModal.value = false;
-};
-
-/**
- * Maneja el cambio en el select de equipos (solo actualiza el preview)
- */
-const handleEquipmentSelection = () => {
 };
 
 /**

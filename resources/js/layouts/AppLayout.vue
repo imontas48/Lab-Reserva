@@ -212,8 +212,6 @@ const userRoleLabel = computed(() => authStore.userRoleLabel);
 const isAdminRoute  = computed(() => ['/roles', '/permissions', '/group-role-assignments'].some(p => route.path.startsWith(p)));
 const isReservationsRoute = computed(() => route.path.startsWith('/reservations'));
 
-// Directiva simple v-click-outside registrada localmente
-
 
 const handleLogout = async () => {
   try {

@@ -41,7 +41,18 @@
     </button>
 
     <!-- Dropdown con 3 opciones -->
-    <div v-else-if="variant === 'dropdown'" class="relative">
+    <!--
+      v-click-outside va en el CONTENEDOR, no en el panel desplegable.
+      Puesta en el panel, el botón que abre el menú queda fuera del elemento
+      observado, así que el propio clic de apertura burbujea hasta document y la
+      directiva lo interpreta como "clic fuera": el menú se cerraba en el mismo
+      gesto que lo abría. Es el patrón que ya usa AppLayout en sus menús.
+    -->
+    <div
+      v-else-if="variant === 'dropdown'"
+      class="relative"
+      v-click-outside="() => (isOpen = false)"
+    >
       <button
         @click="isOpen = !isOpen"
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -78,7 +89,6 @@
         <div
           v-if="isOpen"
           class="absolute right-0 z-50 mt-2 w-40 origin-top-right rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700"
-          v-click-outside="() => (isOpen = false)"
         >
           <button
             v-for="option in themeOptions"

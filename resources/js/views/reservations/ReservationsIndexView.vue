@@ -289,10 +289,12 @@ const formatTime = (dateString) => {
 };
 
 const loadReservations = async () => {
-  const success = await fetchMyReservations();
-  if (success) {
-    toast.success(`${reservations.value.length} reservas cargadas`);
-  }
+  // Sin toast de exito: cargar una lista es el comportamiento esperado, no un
+  // logro que anunciar. Ademas saltaba en cada recarga, incluida la que sigue a
+  // cancelar una reserva, y con la lista vacia rezaba "0 reservas cargadas",
+  // que se lee como un fallo disfrazado de exito. El estado vacio de la vista
+  // ya comunica que no hay nada.
+  await fetchMyReservations();
 };
 
 const handleCancelReservation = async (reservation) => {
