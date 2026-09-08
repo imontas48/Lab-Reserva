@@ -249,7 +249,7 @@ const emit = defineEmits([
  * Usa un número aleatorio para evitar colisiones en la misma página
  */
 const selectId = computed(() => {
-    return `base-select-${Math.random().toString(36).substr(2, 9)}`;
+    return `base-select-${Math.random().toString(36).slice(2, 11)}`;
 });
 
 /**
@@ -437,7 +437,7 @@ select {
  * Icono de dropdown para dark mode
  */
 .dark select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%9CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
 }
 
 /**

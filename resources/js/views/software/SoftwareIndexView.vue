@@ -525,13 +525,6 @@ const handleEdit = (item) => {
  *
  * PERMISOS: Solo accesible por administradores
  *
- * TODO: Implementar la lógica de eliminación con:
- * - Modal de confirmación
- * - Llamada al método deleteSoftware del composable
- * - Notificación de éxito/error
- * - Actualización de la lista
- *
- * @param {Object} item - El objeto software seleccionado
  */
 const handleDelete = async (item) => {
     // Era un stub: confirm() nativo y un alert('pendiente de implementar'),

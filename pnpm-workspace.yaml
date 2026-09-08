@@ -1,2 +1,9 @@
+# Este proyecto no es un monorepo. El fichero existe porque pnpm 10+ lee aqui su
+# configuracion, y sin allowBuilds el script de instalacion de esbuild queda
+# bloqueado y `pnpm build` falla.
+#
+# Nota: con este fichero presente, `pnpm add` aborta con
+# "Cannot destructure property 'manifest'". Para anadir dependencias hay que
+# apartarlo temporalmente y devolverlo despues.
 allowBuilds:
   esbuild: true

@@ -78,7 +78,7 @@
         <div
           v-if="isOpen"
           class="absolute right-0 z-50 mt-2 w-40 origin-top-right rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700"
-          @click.outside="isOpen = false"
+          v-click-outside="() => (isOpen = false)"
         >
           <button
             v-for="option in themeOptions"
@@ -140,6 +140,7 @@
 
 <script setup>
 import { ref, computed, h } from 'vue';
+import { vClickOutside } from '@/directives/clickOutside';
 import { useThemeStore } from '@/stores/theme';
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -1,11 +1,25 @@
 <template>
-  <div>
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mi Perfil</h1>
-    <p class="mt-2 text-gray-600 dark:text-gray-300">Gestiona tu información personal</p>
-    <!-- TODO: Implementar perfil de usuario -->
-  </div>
+  <DetailPanel
+    title="Mi Perfil"
+    subtitle="Datos de tu cuenta"
+    :fields="fields"
+  />
 </template>
 
 <script setup>
-// TODO: Implementar lógica del componente
+import { computed } from 'vue';
+import DetailPanel from '@/components/ui/DetailPanel.vue';
+import { useAuthStore } from '@/stores/auth';
+
+/**
+ * Los datos ya están en el store tras restaurar la sesión, así que no hace
+ * falta ninguna petición adicional.
+ */
+const authStore = useAuthStore();
+
+const fields = computed(() => [
+  { label: 'Nombre', value: authStore.user?.name },
+  { label: 'Correo electrónico', value: authStore.user?.email },
+  { label: 'Rol', value: authStore.userRoleLabel },
+]);
 </script>
