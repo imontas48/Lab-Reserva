@@ -22,8 +22,20 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!--
+            MySQL y no SQLite en memoria: la aplicacion corre sobre MySQL y
+            SQLite no reproduce dos cosas de las que dependen las pruebas de
+            las fases siguientes. No crea indices implicitos para las claves
+            foraneas, asi que los planes de ejecucion no son comparables, y no
+            reproduce el bloqueo de filas de InnoDB, asi que la prueba de
+            concurrencia en la creacion de reservas daria un falso verde.
+
+            Base separada de la de desarrollo: RefreshDatabase la vacia entera
+            en cada ejecucion. Host, puerto y credenciales se heredan del
+            entorno (.env en local, variables del workflow en CI).
+        -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_DATABASE" value="lab_reserva_testing"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
