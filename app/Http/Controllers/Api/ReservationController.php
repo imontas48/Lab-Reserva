@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexReservationRequest;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 use App\Http\Resources\ReservationResource;
@@ -10,7 +11,6 @@ use App\Models\Equipment;
 use App\Models\Reservation;
 use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ReservationController extends Controller
@@ -23,25 +23,11 @@ class ReservationController extends Controller
      * Display a listing of all reservations (admin only).
      * GET /api/v1/reservations
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexReservationRequest $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Reservation::class);
 
-        $filters = [
-            'search' => $request->input('search'),
-            'user_id' => $request->input('user_id'),
-            'equipment_id' => $request->input('equipment_id'),
-            'lab_id' => $request->input('lab_id'),
-            'status' => $request->input('status'),
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date'),
-            'sort_by' => $request->input('sort_by', 'start_time'),
-            'sort_order' => $request->input('sort_order', 'desc'),
-        ];
-
-        $perPage = $request->input('per_page');
-
-        $reservations = $this->reservationService->getAllReservations($filters, $perPage);
+        $reservations = $this->reservationService->getAllReservations($request->filters(), $request->perPage());
 
         return ReservationResource::collection($reservations);
     }
@@ -50,22 +36,12 @@ class ReservationController extends Controller
      * Display reservations for the authenticated user.
      * GET /api/v1/my-reservations
      */
-    public function indexForUser(Request $request): AnonymousResourceCollection
+    public function indexForUser(IndexReservationRequest $request): AnonymousResourceCollection
     {
-        $filters = [
-            'status' => $request->input('status'),
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date'),
-            'sort_by' => $request->input('sort_by', 'start_time'),
-            'sort_order' => $request->input('sort_order', 'desc'),
-        ];
-
-        $perPage = $request->input('per_page', 15);
-
         $reservations = $this->reservationService->getReservationsForUser(
             $request->user(),
-            $filters,
-            $perPage
+            $request->filters(),
+            $request->perPage() ?? 15
         );
 
         return ReservationResource::collection($reservations);
@@ -75,13 +51,16 @@ class ReservationController extends Controller
      * Display reservations for a specific equipment.
      * GET /api/v1/equipment/{equipment}/reservations
      */
-    public function indexForEquipment(Equipment $equipment, Request $request): AnonymousResourceCollection
+    public function indexForEquipment(Equipment $equipment, IndexReservationRequest $request): AnonymousResourceCollection
     {
-        $filters = [
-            'status' => $request->input('status', 'confirmed'), // Por defecto solo confirmadas
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date'),
-        ];
+        // Cualquier usuario autenticado puede consultar la ocupación de un
+        // equipo: es lo que necesita para elegir una franja libre. Lo que no
+        // puede es ver de quién es cada reserva, y de eso se ocupa
+        // ReservationResource.
+        $this->authorize('view', $equipment);
+
+        // Por defecto solo las confirmadas: es lo que ocupa el equipo.
+        $filters = $request->filters() + ['status' => 'confirmed'];
 
         $reservations = $this->reservationService->getReservationsForEquipment(
             $equipment,
@@ -156,27 +135,11 @@ class ReservationController extends Controller
      *
      * @param  string  $role  - 'student' | 'teacher'
      */
-    public function indexByRole(Request $request, string $role): AnonymousResourceCollection
+    public function indexByRole(IndexReservationRequest $request, string $role): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Reservation::class);
 
-        // Validar que el rol solicitado sea válido
-        if (! in_array($role, ['student', 'teacher'])) {
-            abort(422, 'Rol no válido. Debe ser "student" o "teacher".');
-        }
-
-        $filters = [
-            'search' => $request->input('search'),
-            'status' => $request->input('status'),
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date'),
-            'sort_by' => $request->input('sort_by', 'start_time'),
-            'sort_order' => $request->input('sort_order', 'desc'),
-        ];
-
-        $perPage = $request->integer('per_page', 15);
-
-        $reservations = $this->reservationService->getReservationsByUserRole($role, $filters, $perPage);
+        $reservations = $this->reservationService->getReservationsByUserRole($role, $request->filters(), $request->perPage() ?? 15);
 
         return ReservationResource::collection($reservations);
     }

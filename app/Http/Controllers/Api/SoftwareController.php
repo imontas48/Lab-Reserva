@@ -3,39 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexSoftwareRequest;
 use App\Http\Requests\StoreSoftwareRequest;
 use App\Http\Requests\UpdateSoftwareRequest;
 use App\Http\Resources\SoftwareResource;
 use App\Models\Software;
 use App\Services\SoftwareService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SoftwareController extends Controller
 {
     public function __construct(
         private readonly SoftwareService $softwareService
-    ) {
-        // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(Software::class, 'software');
-    }
+    ) {}
 
     /**
      * Display a listing of all software.
      * GET /api/v1/software
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexSoftwareRequest $request): AnonymousResourceCollection
     {
-        $filters = [
-            'search' => $request->input('search'),
-            'sort_by' => $request->input('sort_by', 'name'),
-            'sort_order' => $request->input('sort_order', 'asc'),
-        ];
+        $this->authorize('viewAny', Software::class);
 
-        $perPage = $request->input('per_page');
-
-        $software = $this->softwareService->getAllSoftware($filters, $perPage);
+        $software = $this->softwareService->getAllSoftware($request->filters(), $request->perPage());
 
         return SoftwareResource::collection($software);
     }
@@ -46,6 +37,8 @@ class SoftwareController extends Controller
      */
     public function store(StoreSoftwareRequest $request): JsonResponse
     {
+        $this->authorize('create', Software::class);
+
         $software = $this->softwareService->createSoftware($request->validated());
 
         return (new SoftwareResource($software))
@@ -59,6 +52,8 @@ class SoftwareController extends Controller
      */
     public function show(Software $software): SoftwareResource
     {
+        $this->authorize('view', $software);
+
         // Cargamos el contador de equipos
         $software->loadCount('equipment');
 
@@ -71,6 +66,8 @@ class SoftwareController extends Controller
      */
     public function update(UpdateSoftwareRequest $request, Software $software): SoftwareResource
     {
+        $this->authorize('update', $software);
+
         $updatedSoftware = $this->softwareService->updateSoftware(
             $software,
             $request->validated()
@@ -85,6 +82,8 @@ class SoftwareController extends Controller
      */
     public function destroy(Software $software): JsonResponse
     {
+        $this->authorize('delete', $software);
+
         $this->softwareService->deleteSoftware($software);
 
         return response()->json([

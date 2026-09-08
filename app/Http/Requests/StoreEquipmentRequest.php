@@ -9,12 +9,11 @@ use Illuminate\Validation\Rule;
 class StoreEquipmentRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     * La autorización se manejará en la Policy.
+     * Consulta la misma policy que el controlador.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Equipment::class);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexLabRequest;
 use App\Http\Requests\StoreLabRequest;
 use App\Http\Requests\UpdateLabRequest;
 use App\Http\Resources\LabResource;
@@ -15,17 +16,19 @@ class LabController extends Controller
 {
     public function __construct(
         private readonly LabService $labService
-    ) {
-        // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(Lab::class, 'lab');
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(IndexLabRequest $request): AnonymousResourceCollection
     {
-        $labs = $this->labService->getAllLabs();
+        $this->authorize('viewAny', Lab::class);
+
+        // getAllLabs implementa busqueda, filtro por estado, orden y paginacion,
+        // pero se llamaba sin argumentos: los filtros de la API no hacian nada
+        // y el listado nunca paginaba.
+        $labs = $this->labService->getAllLabs($request->filters(), $request->perPage());
 
         return LabResource::collection($labs);
     }
@@ -35,6 +38,8 @@ class LabController extends Controller
      */
     public function store(StoreLabRequest $request): LabResource
     {
+        $this->authorize('create', Lab::class);
+
         $lab = $this->labService->createLab($request->validated());
 
         return new LabResource($lab);
@@ -45,6 +50,8 @@ class LabController extends Controller
      */
     public function show(Lab $lab): LabResource
     {
+        $this->authorize('view', $lab);
+
         return new LabResource($lab);
     }
 
@@ -53,6 +60,8 @@ class LabController extends Controller
      */
     public function update(UpdateLabRequest $request, Lab $lab): LabResource
     {
+        $this->authorize('update', $lab);
+
         $updatedLab = $this->labService->updateLab($lab, $request->validated());
 
         return new LabResource($updatedLab);
@@ -63,6 +72,8 @@ class LabController extends Controller
      */
     public function destroy(Lab $lab): JsonResponse
     {
+        $this->authorize('delete', $lab);
+
         $this->labService->deleteLab($lab);
 
         return response()->json([

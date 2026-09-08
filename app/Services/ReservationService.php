@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Equipment;
 use App\Models\Reservation;
 use App\Models\User;
@@ -17,7 +18,7 @@ class ReservationService
      *
      * @throws \Exception
      */
-    public function createReservation(array $validatedData, User $user): reservations
+    public function createReservation(array $validatedData, User $user): Reservation
     {
         return DB::transaction(function () use ($validatedData, $user) {
             // Asignar el usuario autenticado
@@ -33,7 +34,7 @@ class ReservationService
             );
 
             if ($hasConflict) {
-                throw new \Exception(
+                throw new BusinessRuleException(
                     'El equipo ya no está disponible en el rango de tiempo seleccionado. '.
                     'Por favor, seleccione otro horario.'
                 );
@@ -43,7 +44,7 @@ class ReservationService
             $equipment = Equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
 
             if (! $equipment->is_operational) {
-                throw new \Exception(
+                throw new BusinessRuleException(
                     'El equipo seleccionado no está operacional en este momento.'
                 );
             }
@@ -60,15 +61,14 @@ class ReservationService
      * Cancel a reservation.
      * Solo cancela si está en estado 'confirmed' y no ha comenzado.
      *
-     * @param  reservations  $reservation
      *
      * @throws \Exception
      */
-    public function cancelReservation(Reservation $reservation): reservations
+    public function cancelReservation(Reservation $reservation): Reservation
     {
         // Verificar que la reserva esté confirmada
         if ($reservation->status !== 'confirmed') {
-            throw new \Exception(
+            throw new BusinessRuleException(
                 'Solo se pueden cancelar reservas confirmadas. '.
                 'Esta reserva ya está en estado: '.$reservation->status
             );
@@ -76,7 +76,7 @@ class ReservationService
 
         // Verificar que la reserva no haya comenzado
         if ($reservation->start_time <= now()) {
-            throw new \Exception(
+            throw new BusinessRuleException(
                 'No se puede cancelar una reserva que ya ha comenzado o pasado.'
             );
         }
@@ -90,10 +90,8 @@ class ReservationService
 
     /**
      * Update a reservation (admin only - mainly for status changes).
-     *
-     * @param  reservations  $reservation
      */
-    public function updateReservation(Reservation $reservation, array $data): reservations
+    public function updateReservation(Reservation $reservation, array $data): Reservation
     {
         $reservation->update($data);
 
@@ -102,8 +100,6 @@ class ReservationService
 
     /**
      * Delete a reservation (admin only).
-     *
-     * @param  reservations  $reservation
      */
     public function deleteReservation(Reservation $reservation): bool
     {

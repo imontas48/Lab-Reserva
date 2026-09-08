@@ -30,7 +30,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Rutas públicas (sin autenticación)
-Route::prefix('v1')->group(function () {
+//
+// Límite estricto y por separado del throttle general de la API: son los dos
+// únicos endpoints sin autenticar, y son el objetivo natural de la fuerza bruta
+// de credenciales y del alta masiva de cuentas.
+Route::prefix('v1')->middleware('throttle:5,1')->group(function () {
     // Autenticación
     Route::post('/login', [AuthController::class, 'login'])->name('api.login');
     Route::post('/register', [AuthController::class, 'register'])->name('api.register');
@@ -61,7 +65,10 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Reservas - Rutas personalizadas (deben ir ANTES del resource)
     Route::get('/my-reservations', [ReservationController::class, 'indexForUser'])
         ->name('api.reservations.my');
+    // La validacion del rol vive en la restriccion de ruta y no en el
+    // controlador: un rol inexistente es una ruta que no existe.
     Route::get('/reservations/by-role/{role}', [ReservationController::class, 'indexByRole'])
+        ->whereIn('role', ['student', 'teacher'])
         ->name('api.reservations.by-role');
     Route::get('/equipment/{equipment}/reservations', [ReservationController::class, 'indexForEquipment'])
         ->name('api.equipment.reservations');

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Software;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -72,7 +73,7 @@ class SoftwareService
     {
         // Verificar si el software está asignado a algún equipo
         if ($software->equipment()->exists()) {
-            throw new \Exception(
+            throw new BusinessRuleException(
                 'No se puede eliminar el software porque está asignado a uno o más equipos. '.
                 'Primero desasigne el software de todos los equipos.'
             );

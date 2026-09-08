@@ -47,14 +47,18 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'sometimes|in:admin,teacher,student',
         ]);
 
+        // El rol NO se acepta desde la peticion. Esta ruta es publica, asi que
+        // permitir 'role' dejaba que cualquiera se registrase como admin y, con
+        // ello, tomase el control: isAdmin() gobierna toda la autorizacion.
+        // Elevar a teacher o admin es una accion deliberada de un administrador
+        // (comando lab:make-admin) o del seeder de arranque.
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'student',
+            'role' => 'student',
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -50,7 +51,7 @@ class LabService
     /**
      * Create a new lab.
      */
-    public function createLab(array $data): labs
+    public function createLab(array $data): Lab
     {
         // Establecer valores por defecto si no se proporcionan
         $data['is_active'] = $data['is_active'] ?? true;
@@ -63,17 +64,15 @@ class LabService
      *
      * @throws ModelNotFoundException
      */
-    public function getLabById(int $id): labs
+    public function getLabById(int $id): Lab
     {
         return Lab::findOrFail($id);
     }
 
     /**
      * Update an existing lab.
-     *
-     * @param  labs  $lab
      */
-    public function updateLab(Lab $lab, array $data): labs
+    public function updateLab(Lab $lab, array $data): Lab
     {
         $lab->update($data);
 
@@ -83,7 +82,6 @@ class LabService
     /**
      * Delete a lab.
      *
-     * @param  labs  $lab
      *
      * @throws \Exception
      */
@@ -91,7 +89,7 @@ class LabService
     {
         // Verificar si el laboratorio tiene equipos asociados
         if ($lab->equipment()->exists()) {
-            throw new \Exception(
+            throw new BusinessRuleException(
                 'No se puede eliminar el laboratorio porque tiene equipos asociados. '.
                 'Primero elimine o reasigne los equipos.'
             );
@@ -102,10 +100,8 @@ class LabService
 
     /**
      * Toggle active status of a lab.
-     *
-     * @param  labs  $lab
      */
-    public function toggleActiveStatus(Lab $lab): labs
+    public function toggleActiveStatus(Lab $lab): Lab
     {
         $lab->update(['is_active' => ! $lab->is_active]);
 

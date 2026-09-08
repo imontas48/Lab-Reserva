@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Equipment;
 use App\Models\Lab;
 use Illuminate\Database\Eloquent\Collection;
@@ -53,8 +54,6 @@ class EquipmentService
 
     /**
      * Get equipment for a specific lab.
-     *
-     * @param  labs  $lab
      */
     public function getEquipmentByLab(Lab $lab, array $filters = []): Collection
     {
@@ -169,7 +168,7 @@ class EquipmentService
             ->exists();
 
         if ($activeReservations) {
-            throw new \Exception(
+            throw new BusinessRuleException(
                 'No se puede eliminar el equipo porque tiene reservas activas. '.
                 'Cancele las reservas primero.'
             );

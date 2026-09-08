@@ -2,18 +2,18 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Lab;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreLabRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     * La autorización se manejará en la Policy, aquí solo verificamos que esté autenticado.
+     * Consulta la misma policy que el controlador.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Lab::class);
     }
 
     /**

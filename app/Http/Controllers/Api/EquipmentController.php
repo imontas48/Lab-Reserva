@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexEquipmentRequest;
 use App\Http\Requests\StoreEquipmentRequest;
 use App\Http\Requests\UpdateEquipmentRequest;
 use App\Http\Resources\EquipmentResource;
@@ -17,29 +18,17 @@ class EquipmentController extends Controller
 {
     public function __construct(
         private readonly EquipmentService $equipmentService
-    ) {
-        // TODO: Implementar autorización con middleware o policies
-        // $this->authorizeResource(Equipment::class, 'equipment');
-    }
+    ) {}
 
     /**
      * Display a listing of all equipment.
      * GET /api/v1/equipment
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexEquipmentRequest $request): AnonymousResourceCollection
     {
-        $filters = [
-            'search' => $request->input('search'),
-            'lab_id' => $request->input('lab_id'),
-            'type' => $request->input('type'),
-            'is_operational' => $request->input('is_operational'),
-            'sort_by' => $request->input('sort_by', 'identifier'),
-            'sort_order' => $request->input('sort_order', 'asc'),
-        ];
+        $this->authorize('viewAny', Equipment::class);
 
-        $perPage = $request->input('per_page');
-
-        $equipment = $this->equipmentService->getAllEquipment($filters, $perPage);
+        $equipment = $this->equipmentService->getAllEquipment($request->filters(), $request->perPage());
 
         return EquipmentResource::collection($equipment);
     }
@@ -50,6 +39,8 @@ class EquipmentController extends Controller
      */
     public function indexByLab(Lab $lab, Request $request): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Equipment::class);
+
         // No necesitamos autorización adicional aquí,
         // ya que heredamos el permiso de viewAny del resource
 
@@ -79,6 +70,8 @@ class EquipmentController extends Controller
      */
     public function store(StoreEquipmentRequest $request): JsonResponse
     {
+        $this->authorize('create', Equipment::class);
+
         $equipment = $this->equipmentService->createEquipment($request->validated());
 
         return (new EquipmentResource($equipment))
@@ -92,6 +85,8 @@ class EquipmentController extends Controller
      */
     public function show(Equipment $equipment): EquipmentResource
     {
+        $this->authorize('view', $equipment);
+
         // Cargamos las relaciones necesarias
         $equipment->load(['lab', 'software']);
 
@@ -104,6 +99,8 @@ class EquipmentController extends Controller
      */
     public function update(UpdateEquipmentRequest $request, Equipment $equipment): EquipmentResource
     {
+        $this->authorize('update', $equipment);
+
         $updatedEquipment = $this->equipmentService->updateEquipment(
             $equipment,
             $request->validated()
@@ -118,6 +115,8 @@ class EquipmentController extends Controller
      */
     public function destroy(Equipment $equipment): JsonResponse
     {
+        $this->authorize('delete', $equipment);
+
         $this->equipmentService->deleteEquipment($equipment);
 
         return response()->json([
