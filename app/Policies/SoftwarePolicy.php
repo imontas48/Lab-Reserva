@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
+use App\Models\Software;
 use App\Models\User;
-use App\Models\software;
-use Illuminate\Auth\Access\Response;
 
 class SoftwarePolicy
 {
@@ -14,16 +13,16 @@ class SoftwarePolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('software', 'viewAny');
     }
 
     /**
      * Determine whether the user can view the model.
      * Cualquier usuario autenticado puede ver un software específico.
      */
-    public function view(User $user, software $software): bool
+    public function view(User $user, Software $software): bool
     {
-        return true;
+        return $user->hasPermission('software', 'view');
     }
 
     /**
@@ -32,31 +31,31 @@ class SoftwarePolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('software', 'create');
     }
 
     /**
      * Determine whether the user can update the model.
      * Solo los administradores pueden actualizar software.
      */
-    public function update(User $user, software $software): bool
+    public function update(User $user, Software $software): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('software', 'update');
     }
 
     /**
      * Determine whether the user can delete the model.
      * Solo los administradores pueden eliminar software.
      */
-    public function delete(User $user, software $software): bool
+    public function delete(User $user, Software $software): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('software', 'delete');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, software $software): bool
+    public function restore(User $user, Software $software): bool
     {
         return false;
     }
@@ -64,7 +63,7 @@ class SoftwarePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, software $software): bool
+    public function forceDelete(User $user, Software $software): bool
     {
         return false;
     }

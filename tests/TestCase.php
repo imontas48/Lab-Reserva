@@ -2,9 +2,60 @@
 
 namespace Tests;
 
+use App\Models\User;
+use Database\Seeders\RbacSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Laravel\Sanctum\Sanctum;
 
 abstract class TestCase extends BaseTestCase
 {
-    //
+    /**
+     * Todas las pruebas parten de un esquema limpio.
+     *
+     * Se aplica aqui y no por caso para que ninguna prueba nueva pueda olvidarlo
+     * y acabe dependiendo del estado que dejo la anterior.
+     */
+    use RefreshDatabase;
+
+    /**
+     * Cada prueba parte del catálogo de permisos sembrado.
+     *
+     * Desde que el RBAC gobierna el control de acceso, un esquema sin sembrar
+     * deja a todo el mundo sin permiso para nada y la suite entera daría 403.
+     * Se siembra solo RbacSeeder, no DatabaseSeeder: crear además el usuario
+     * administrador de arranque contaminaría las pruebas que cuentan usuarios.
+     */
+    protected bool $seed = true;
+
+    protected string $seeder = RbacSeeder::class;
+
+    /**
+     * Autentica a un usuario recien creado con el rol indicado y lo devuelve.
+     *
+     * Usa Sanctum::actingAs porque la API se consume con tokens Bearer; el guard
+     * de sesion web no interviene en ninguna ruta de routes/api.php.
+     */
+    protected function actingAsRole(string $role): User
+    {
+        $user = User::factory()->state(['role' => $role])->create();
+        Sanctum::actingAs($user);
+
+        return $user;
+    }
+
+    protected function actingAsAdmin(): User
+    {
+        return $this->actingAsRole('admin');
+    }
+
+    protected function actingAsTeacher(): User
+    {
+        return $this->actingAsRole('teacher');
+    }
+
+    protected function actingAsStudent(): User
+    {
+        return $this->actingAsRole('student');
+    }
 }

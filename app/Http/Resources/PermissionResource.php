@@ -10,14 +10,14 @@ class PermissionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'          => $this->id,
-            'subject'     => $this->subject,
-            'action'      => $this->action,
+            'id' => $this->id,
+            'subject' => $this->subject,
+            'action' => $this->action,
             // Identificador canónico legible: "labs.create"
-            'key'         => "{$this->subject}.{$this->action}",
+            'key' => "{$this->subject}.{$this->action}",
             'description' => $this->description,
-            'created_at'  => $this->created_at?->toISOString(),
-            'updated_at'  => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

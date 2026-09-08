@@ -38,7 +38,7 @@ class UpdatePermissionOverrideRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.in'          => 'El tipo debe ser "grant" o "revoke".',
+            'type.in' => 'El tipo debe ser "grant" o "revoke".',
             'expires_at.after' => 'La fecha de expiración debe ser en el futuro.',
         ];
     }

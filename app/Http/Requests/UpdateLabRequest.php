@@ -2,24 +2,24 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateLabRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     * La autorización se manejará en la Policy, aquí solo verificamos que esté autenticado.
+     * Consulta la misma policy que el controlador.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', $this->route('lab'));
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Models\reservations;
+use App\Models\Equipment;
+use App\Models\Reservation;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReservationRequest extends FormRequest
@@ -13,13 +15,13 @@ class StoreReservationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', reservations::class);
+        return $this->user()->can('create', Reservation::class);
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -30,8 +32,8 @@ class StoreReservationRequest extends FormRequest
                 'exists:equipment,id',
                 // Validación personalizada: verificar que el equipo esté operacional
                 function ($attribute, $value, $fail) {
-                    $equipment = \App\Models\equipment::find($value);
-                    if ($equipment && !$equipment->is_operational) {
+                    $equipment = Equipment::find($value);
+                    if ($equipment && ! $equipment->is_operational) {
                         $fail('El equipo seleccionado no está operacional y no puede ser reservado.');
                     }
                 },
@@ -40,30 +42,22 @@ class StoreReservationRequest extends FormRequest
                     $startTime = $this->input('start_time');
                     $endTime = $this->input('end_time');
 
-                    // Solo validar si tenemos ambas fechas
-                    if (!$startTime || !$endTime) {
+                    // Solo validar si tenemos ambas fechas y son interpretables.
+                    // Esta regla se evalúa aunque start_time y end_time hayan
+                    // fallado su propia validación, así que sin esta guarda una
+                    // fecha ilegible llegaba hasta Carbon::parse y salía como
+                    // 500 en vez de como error de validación.
+                    if (! $startTime || ! $endTime || ! strtotime((string) $startTime) || ! strtotime((string) $endTime)) {
                         return;
                     }
 
-                    // Buscar reservas confirmadas que se solapen
-                    $hasConflict = reservations::where('equipment_id', $value)
-                        ->where('status', 'confirmed')
-                        ->where(function ($query) use ($startTime, $endTime) {
-                            // Caso 1: La nueva reserva comienza durante una existente
-                            $query->whereBetween('start_time', [$startTime, $endTime])
-                                  // Caso 2: La nueva reserva termina durante una existente
-                                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                                  // Caso 3: La nueva reserva engloba completamente una existente
-                                  ->orWhere(function ($q) use ($startTime, $endTime) {
-                                      $q->where('start_time', '>=', $startTime)
-                                        ->where('end_time', '<=', $endTime);
-                                  })
-                                  // Caso 4: Una reserva existente engloba completamente la nueva
-                                  ->orWhere(function ($q) use ($startTime, $endTime) {
-                                      $q->where('start_time', '<=', $startTime)
-                                        ->where('end_time', '>=', $endTime);
-                                  });
-                        })
+                    // Comprobacion temprana, para devolver un 422 de validacion
+                    // con el resto de errores del formulario. La garantia real
+                    // frente a concurrencia esta en ReservationService, dentro
+                    // de la transaccion y con la fila del equipo bloqueada.
+                    $hasConflict = Reservation::query()
+                        ->forEquipment($value)
+                        ->blocking($startTime, $endTime)
                         ->exists();
 
                     if ($hasConflict) {
@@ -83,7 +77,12 @@ class StoreReservationRequest extends FormRequest
                 // Validación adicional: duración máxima de reserva (ej: 8 horas)
                 function ($attribute, $value, $fail) {
                     $startTime = $this->input('start_time');
-                    if ($startTime) {
+
+                    // Las reglas de closure se evalúan aunque 'date' ya haya
+                    // fallado, así que hay que comprobar que ambos valores sean
+                    // interpretables: de lo contrario new \DateTime() lanza y
+                    // la respuesta sale como 500 en vez de como 422.
+                    if ($startTime && strtotime((string) $startTime) && strtotime((string) $value)) {
                         $start = new \DateTime($startTime);
                         $end = new \DateTime($value);
                         $diff = $start->diff($end);
@@ -137,9 +136,41 @@ class StoreReservationRequest extends FormRequest
      * Prepare the data for validation.
      * Convierte las fechas al formato correcto si es necesario.
      */
+    /**
+     * Normaliza los instantes al huso de la aplicación antes de validar.
+     *
+     * El método estaba vacío, con un comentario que decía que "asumimos que
+     * vienen en formato ISO 8601". El frontend manda de hecho dos formatos
+     * distintos al mismo endpoint —el calendario, hora local sin offset; el
+     * formulario, UTC con sufijo Z— y las columnas son DATETIME sin huso, así
+     * que sin normalizar aquí el mismo horario se guardaba desplazado según por
+     * dónde se hubiese creado la reserva.
+     *
+     * A partir de aquí todo el backend trabaja en el huso de la aplicación:
+     * validación, almacenamiento y comparación de solapamiento.
+     */
     protected function prepareForValidation(): void
     {
-        // Aquí podríamos normalizar las fechas si el frontend las envía en otro formato
-        // Por ahora, asumimos que vienen en formato ISO 8601
+        $normalized = [];
+
+        foreach (['start_time', 'end_time'] as $field) {
+            $value = $this->input($field);
+
+            if (! is_string($value) || $value === '') {
+                continue;
+            }
+
+            try {
+                $normalized[$field] = Reservation::normalizeInstant($value);
+            } catch (\Exception) {
+                // Formato irreconocible: se deja tal cual para que la regla
+                // 'date' produzca un error de validación legible en vez de una
+                // excepción aquí.
+            }
+        }
+
+        if ($normalized !== []) {
+            $this->merge($normalized);
+        }
     }
 }

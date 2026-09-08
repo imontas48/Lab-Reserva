@@ -2,23 +2,24 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Software;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSoftwareRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     * La autorización se manejará en la Policy.
+     * Consulta la misma policy que el controlador.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Software::class);
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

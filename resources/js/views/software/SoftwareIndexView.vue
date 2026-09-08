@@ -96,9 +96,6 @@
             :items="software"
             :loading="loading"
             :error="error"
-            @view-item="handleView"
-            @edit-item="handleEdit"
-            @delete-item="handleDelete"
         >
             <!-- ═══════════════════════════════════════════════════════════════
                  SLOT: Celda Personalizada - Nombre del Software
@@ -354,6 +351,8 @@ import DataTable from '@/components/ui/DataTable.vue';
 
 // Composables
 import { useSoftware } from '@/composables/useSoftware';
+import { confirmDestructive } from '@/utils/confirm';
+import { useToast } from '@/composables/useToast';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // INSTANCIACIÓN DE SERVICIOS
@@ -375,7 +374,8 @@ const authStore = useAuthStore();
  * Composable de Software
  * Extrae todo el estado reactivo y los métodos para gestionar software
  */
-const { software, loading, error, fetchSoftware } = useSoftware();
+const { software, loading, error, fetchSoftware, deleteSoftware } = useSoftware();
+const toast = useToast();
 
 // ═════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN DE COLUMNAS DEL DATATABLE
@@ -473,7 +473,6 @@ const getEquipmentCountClasses = (count) => {
  * Aquí cargamos los datos iniciales de software desde la API.
  */
 onMounted(() => {
-    console.log(' SoftwareIndexView montado. Cargando software...');
     fetchSoftware();
 });
 
@@ -491,10 +490,9 @@ onMounted(() => {
  * @param {Object} item - El objeto software seleccionado
  */
 const handleView = (item) => {
-    console.log('️ Ver detalles de software:', item.name);
 
     router.push({
-        name: 'software-show',
+        name: 'software.show',
         params: { id: item.id }
     });
 };
@@ -511,10 +509,9 @@ const handleView = (item) => {
  * @param {Object} item - El objeto software seleccionado
  */
 const handleEdit = (item) => {
-    console.log('️ Editar software:', item.name);
 
     router.push({
-        name: 'software-edit',
+        name: 'software.edit',
         params: { id: item.id }
     });
 };
@@ -528,29 +525,25 @@ const handleEdit = (item) => {
  *
  * PERMISOS: Solo accesible por administradores
  *
- * TODO: Implementar la lógica de eliminación con:
- * - Modal de confirmación
- * - Llamada al método deleteSoftware del composable
- * - Notificación de éxito/error
- * - Actualización de la lista
- *
- * @param {Object} item - El objeto software seleccionado
  */
-const handleDelete = (item) => {
-    console.log('️ Eliminar software:', item.name);
+const handleDelete = async (item) => {
+    // Era un stub: confirm() nativo y un alert('pendiente de implementar'),
+    // aunque deleteSoftware ya estaba implementado en el composable.
+    const confirmed = await confirmDestructive({
+        html: `Se eliminará el software <strong>"${item.name}"</strong>.<br>`
+            + 'Dejará de figurar en los equipos que lo tengan instalado.',
+    });
 
-    // Por ahora, solo mostramos un alert de confirmación
-    // En una implementación completa, esto debería abrir un modal de confirmación
-    const confirmed = confirm(
-        `¿Estás seguro de que deseas eliminar el software "${item.name}"?\n\n` +
-        `Esta acción no se puede deshacer y el software se eliminará de todos los equipos que lo tengan instalado.`
-    );
+    if (!confirmed) {
+        return;
+    }
 
-    if (confirmed) {
-        // TODO: Implementar la llamada al composable
-        // await deleteSoftware(item.id);
-        // Mostrar notificación de éxito
-        alert('Funcionalidad de eliminación pendiente de implementar');
+    try {
+        await deleteSoftware(item.id);
+        toast.success(`Software "${item.name}" eliminado`);
+    } catch {
+        // El composable lanza siempre y deja el motivo en error.value.
+        toast.error(error.value ?? 'No se pudo eliminar el software.');
     }
 };
 </script>

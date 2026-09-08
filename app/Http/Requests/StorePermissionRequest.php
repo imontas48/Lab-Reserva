@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Permission;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -9,7 +10,7 @@ class StorePermissionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', \App\Models\Permission::class);
+        return $this->user()->can('create', Permission::class);
     }
 
     public function rules(): array
@@ -37,9 +38,9 @@ class StorePermissionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'subject.required'     => 'El recurso (subject) es obligatorio.',
-            'subject.unique'       => 'Ya existe un permiso con esa combinación de subject y action.',
-            'action.required'      => 'La acción es obligatoria.',
+            'subject.required' => 'El recurso (subject) es obligatorio.',
+            'subject.unique' => 'Ya existe un permiso con esa combinación de subject y action.',
+            'action.required' => 'La acción es obligatoria.',
             'description.required' => 'La descripción es obligatoria.',
         ];
     }

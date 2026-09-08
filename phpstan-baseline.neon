@@ -1,0 +1,469 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$identifier\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$is_operational\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$lab\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$lab_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$software\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$specifications\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\EquipmentResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\EquipmentResource\:\:getCurrentStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\EquipmentResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Resources/EquipmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$grantedBy\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$granted_by\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$group_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$group_value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$role_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\GroupRoleAssignmentResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\GroupRoleAssignmentResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/GroupRoleAssignmentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$capacity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$location\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\LabResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/LabResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$grantedBy\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$granted_by\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$permission_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$reason\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionOverrideResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\PermissionOverrideResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/PermissionOverrideResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionResource\:\:\$action\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/PermissionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionResource\:\:\$subject\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/PermissionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\PermissionResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PermissionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$end_time\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$equipment_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$start_time\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ReservationResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/ReservationResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$is_system\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\RoleResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/RoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SoftwareResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/SoftwareResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SoftwareResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SoftwareResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SoftwareResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Resources/SoftwareResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SoftwareResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/SoftwareResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\SoftwareResource\:\:\$version\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/SoftwareResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$grantedBy\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$granted_by\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$role_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserRoleResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserRoleResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\UserRoleResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/UserRoleResource.php

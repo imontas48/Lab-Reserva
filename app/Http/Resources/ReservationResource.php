@@ -24,13 +24,33 @@ class ReservationResource extends JsonResource
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
 
-            // Relaciones (solo si están cargadas)
-            'user' => $this->whenLoaded('user', function () {
-                return [
-                    'id' => $this->user->id,
-                    'name' => $this->user->name,
-                    'email' => $this->user->email,
-                ];
+            // Relaciones (solo si están cargadas).
+            //
+            // Los datos personales solo se exponen al administrador y al dueño
+            // de la reserva. GET /equipment/{id}/reservations es accesible a
+            // cualquier usuario autenticado para poder consultar disponibilidad,
+            // y devolvía nombre y correo: bastaba con recorrer los equipos para
+            // extraer el padrón completo de la institución.
+            'user' => $this->whenLoaded('user', function () use ($request) {
+                $viewer = $request->user();
+                // Mismo criterio que ReservationPolicy::view: quien puede ver
+                // las reservas de cualquiera ve también su identidad. Se
+                // consulta el permiso y no isAdmin() para que un usuario
+                // elevado por rol individual reciba el mismo trato.
+                $canSeeIdentity = $viewer && (
+                    $viewer->hasPermission('reservations', 'viewAny')
+                    || $viewer->id === $this->user_id
+                );
+
+                return $canSeeIdentity
+                    ? [
+                        'id' => $this->user->id,
+                        'name' => $this->user->name,
+                        'email' => $this->user->email,
+                    ]
+                    : [
+                        'id' => $this->user->id,
+                    ];
             }),
             'equipment' => new EquipmentResource($this->whenLoaded('equipment')),
 

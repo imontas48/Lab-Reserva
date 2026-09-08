@@ -26,9 +26,6 @@
       :items="labs"
       :loading="loading"
       :error="error"
-      @view-item="handleView"
-      @edit-item="handleEdit"
-      @delete-item="handleDelete"
     >
       <!-- Capacidad con formato -->
       <template #cell-capacity="{ value }">
@@ -226,7 +223,6 @@ const handleDelete = async (lab) => {
 
   try {
     await deleteLab(lab.id);
-    console.log(' Laboratorio eliminado');
 
     // Mostrar notificación de éxito
     toast.success(`Laboratorio "${lab.name}" eliminado exitosamente`);

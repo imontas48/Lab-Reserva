@@ -1,431 +1,197 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import apiClient, { resetAuth } from '@/utils/api';
+import { computed, ref } from 'vue';
+import apiClient from '@/utils/api';
+import {
+    clearToken,
+    getToken,
+    setToken,
+    setUnauthorizedHandler,
+} from '@/utils/session';
 
 /**
- * ═══════════════════════════════════════════════════════════════════════════
- * STORE DE AUTENTICACIÓN - PINIA
- * ═══════════════════════════════════════════════════════════════════════════
+ * Store de autenticación.
  *
- * Gestión centralizada del estado de autenticación de la aplicación.
- *
- * RESPONSABILIDADES:
- * - Almacenar los datos del usuario autenticado
- * - Proveer getters para verificar el estado de autenticación
- * - Manejar las acciones de login, registro y logout
- * - Sincronizar el estado con el backend
- *
- * FLUJO DE AUTENTICACIÓN:
- * 1. Usuario envía credenciales → login()
- * 2. Backend valida y establece cookie de sesión
- * 3. Llamamos a getUser() para obtener los datos del usuario
- * 4. Poblamos el state.user con los datos
- * 5. El getter isAuthenticated devuelve true
- *
- * IMPORTANTE:
- * - Este store NO almacena tokens JWT (Sanctum usa cookies)
- * - Las cookies son HTTP-only y gestionadas automáticamente por el navegador
- * - Solo almacenamos los datos del usuario para mostrar en la UI
- *
- * ═══════════════════════════════════════════════════════════════════════════
+ * La aplicación autentica con token Bearer; el token lo guarda y lo lee
+ * `utils/session`, que es también quien avisa a este store cuando el servidor
+ * rechaza la sesión.
  */
 export const useAuthStore = defineStore('auth', () => {
-    // =========================================================================
-    // STATE
-    // =========================================================================
-
-    /**
-     * Usuario autenticado actual
-     * null = no autenticado
-     * object = usuario autenticado con sus datos
-     */
     const user = ref(null);
-
-    /**
-     * Errores de validación del último intento de login/registro
-     * Se usa para mostrar mensajes de error en los formularios
-     */
+    const loading = ref(false);
     const errors = ref({});
 
-    /**
-     * Indica si hay una operación en curso (login, registro, logout)
-     * Útil para mostrar spinners/loaders en la UI
-     */
-    const loading = ref(false);
-
-    // =========================================================================
-    // GETTERS
-    // =========================================================================
-
-    /**
-     * Verifica si hay un usuario autenticado
-     * @returns {boolean}
-     */
     const isAuthenticated = computed(() => !!user.value);
+    const userRole = computed(() => user.value?.role ?? null);
+    const isAdmin = computed(() => userRole.value === 'admin');
+    const isTeacher = computed(() => userRole.value === 'teacher');
+    const userName = computed(() => user.value?.name ?? '');
+
+    const userRoleLabel = computed(() => ({
+        admin: 'Admin',
+        teacher: 'Profesor',
+        student: 'Estudiante',
+    })[userRole.value] ?? 'Usuario');
 
     /**
-     * Verifica si el usuario es administrador
-     * @returns {boolean}
+     * Limpia el estado local. No llama al servidor.
      */
-    const isAdmin = computed(() => {
-        return user.value?.role === 'admin' || user.value?.is_admin === true;
+    function resetSession() {
+        user.value = null;
+        errors.value = {};
+        clearToken();
+    }
+
+    // Cuando el interceptor recibe un 401 sobre una ruta protegida, el estado
+    // local debe caer con él. Sin esto, el guard del router seguía viendo
+    // sesión iniciada y rebotaba a una ruta protegida, que daba otro 401.
+    setUnauthorizedHandler(() => {
+        user.value = null;
+        errors.value = {};
     });
 
     /**
-     * Verifica si el usuario es profesor
-     * @returns {boolean}
+     * Traduce un error de Axios al mapa de errores del formulario.
      */
-    const isTeacher = computed(() => {
-        return user.value?.role === 'teacher' || user.value?.role === 'profesor';
-    });
+    function captureError(error, fallback) {
+        if (!error.response) {
+            // Sin respuesta: red caída o servidor inalcanzable. Antes esto se
+            // presentaba igual que unas credenciales incorrectas.
+            errors.value = {
+                general: ['No se pudo contactar con el servidor. Revisa tu conexión.'],
+            };
 
-    /**
-     * Verifica si el usuario es estudiante
-     * @returns {boolean}
-     */
-    const isStudent = computed(() => {
-        return user.value?.role === 'student' || user.value?.role === 'estudiante';
-    });
-
-    /**
-     * Obtiene el nombre completo del usuario
-     * @returns {string}
-     */
-    const userName = computed(() => {
-        if (!user.value) return '';
-        return user.value.name || user.value.full_name || user.value.email;
-    });
-
-    /**
-     * Obtiene la etiqueta legible del rol del usuario
-     * @returns {string}
-     */
-    const userRoleLabel = computed(() => {
-        const role = user.value?.role;
-        const roleMap = {
-            admin: 'Admin',
-            teacher: 'Profesor',
-            profesor: 'Profesor',
-            student: 'Estudiante',
-            estudiante: 'Estudiante',
-        };
-        if (user.value?.is_admin) return 'Admin';
-        return roleMap[role] || role || '';
-    });
-
-    /**
-     * Obtiene el email del usuario
-     * @returns {string}
-     */
-    const userEmail = computed(() => {
-        return user.value?.email || '';
-    });
-
-    // =========================================================================
-    // ACTIONS
-    // =========================================================================
-
-    /**
-     * -------------------------------------------------------------------------
-     * OBTENER USUARIO AUTENTICADO
-     * -------------------------------------------------------------------------
-     *
-     * Obtiene los datos del usuario actualmente autenticado desde el backend.
-     *
-     * Esta función es crucial porque:
-     * - Sanctum usa cookies para la autenticación (no devuelve tokens)
-     * - Después de login/registro, necesitamos obtener los datos del usuario
-     * - Al recargar la página, necesitamos verificar si hay una sesión activa
-     *
-     * @returns {Promise<Object|null>} Datos del usuario o null si no está autenticado
-     */
-    const getUser = async () => {
-        try {
-            loading.value = true;
-            errors.value = {};
-
-            // Llamar al endpoint /api/v1/me (protegido por Sanctum)
-            const response = await apiClient.get('/me');
-
-            // Almacenar los datos del usuario
-            user.value = response.data.data || response.data;
-
-            console.log(' Usuario autenticado:', user.value);
-
-            return user.value;
-        } catch (error) {
-            console.error(' Error al obtener usuario:', error);
-
-            // Si hay error (ej. 401), asegurar que user sea null
-            user.value = null;
-
-            // Si es 401, no es realmente un error, solo no está autenticado
-            if (error.response?.status === 401) {
-                return null;
-            }
-
-            throw error;
-        } finally {
-            loading.value = false;
+            return;
         }
-    };
 
-    /**
-     * -------------------------------------------------------------------------
-     * LOGIN
-     * -------------------------------------------------------------------------
-     *
-     * Autentica al usuario con email y contraseña.
-     *
-     * FLUJO:
-     * 1. Axios obtiene automáticamente el token CSRF (interceptor)
-     * 2. Enviamos las credenciales a /api/login
-     * 3. Backend valida y establece cookie de sesión
-     * 4. Llamamos a getUser() para obtener los datos del usuario
-     * 5. Redirigimos al dashboard (esto se hace en el componente)
-     *
-     * @param {Object} credentials - { email, password, remember }
-     * @returns {Promise<Object>} Datos del usuario autenticado
-     */
-    const login = async (credentials) => {
+        if (error.response.status === 422) {
+            errors.value = error.response.data.errors ?? {};
+
+            return;
+        }
+
+        if (error.response.status === 429) {
+            errors.value = {
+                general: ['Demasiados intentos. Espera un minuto y vuelve a probar.'],
+            };
+
+            return;
+        }
+
+        errors.value = { general: [fallback] };
+    }
+
+    async function login(credentials) {
+        loading.value = true;
+        errors.value = {};
+
         try {
-            loading.value = true;
-            errors.value = {};
-
-            console.log(' Iniciando sesión...');
-
-            // Llamar al endpoint de login
-            const response = await apiClient.post('/login', {
+            const { data } = await apiClient.post('/login', {
                 email: credentials.email,
                 password: credentials.password,
-                remember: credentials.remember || false,
             });
 
-            console.log(' Login exitoso, guardando token...');
-
-            // Guardar el token en localStorage
-            const token = response.data.token;
-            if (token) {
-                localStorage.setItem('auth_token', token);
-                // Configurar el token en los headers de axios
-                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            if (data.token) {
+                setToken(data.token);
             }
 
-            // Guardar los datos del usuario
-            user.value = response.data.user;
-
-            console.log(' Usuario autenticado completamente');
+            user.value = data.user;
 
             return user.value;
         } catch (error) {
-            console.error(' Error en login:', error);
-
-            // Extraer errores de validación si existen
-            if (error.response?.status === 422) {
-                errors.value = error.response.data.errors || {};
-                console.error('Errores de validación:', errors.value);
-            } else if (error.response?.status === 401) {
-                // Credenciales inválidas
-                errors.value = {
-                    email: ['Las credenciales proporcionadas son incorrectas.']
-                };
-            } else {
-                // Otro tipo de error
-                errors.value = {
-                    general: ['Ocurrió un error al iniciar sesión. Por favor, intenta nuevamente.']
-                };
-            }
-
+            resetSession();
+            captureError(error, 'No se pudo iniciar sesión. Inténtalo de nuevo.');
             throw error;
         } finally {
             loading.value = false;
         }
-    };
+    }
 
-    /**
-     * -------------------------------------------------------------------------
-     * REGISTRO
-     * -------------------------------------------------------------------------
-     *
-     * Registra un nuevo usuario en el sistema.
-     *
-     * FLUJO:
-     * 1. Axios obtiene automáticamente el token CSRF (interceptor)
-     * 2. Enviamos los datos del nuevo usuario a /api/register
-     * 3. Backend crea el usuario y establece cookie de sesión
-     * 4. Llamamos a getUser() para obtener los datos del usuario
-     * 5. Redirigimos al dashboard (esto se hace en el componente)
-     *
-     * @param {Object} data - Datos del nuevo usuario
-     * @returns {Promise<Object>} Datos del usuario registrado
-     */
-    const register = async (data) => {
+    async function register(payload) {
+        loading.value = true;
+        errors.value = {};
+
         try {
-            loading.value = true;
-            errors.value = {};
+            const { data } = await apiClient.post('/register', payload);
 
-            console.log(' Registrando nuevo usuario...');
-
-            // Llamar al endpoint de registro
-            const response = await apiClient.post('/register', data);
-
-            console.log(' Registro exitoso, guardando token...');
-
-            // Guardar el token en localStorage
-            const token = response.data.token;
-            if (token) {
-                localStorage.setItem('auth_token', token);
-                // Configurar el token en los headers de axios
-                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            if (data.token) {
+                setToken(data.token);
             }
 
-            // Guardar los datos del usuario
-            user.value = response.data.user;
-
-            console.log(' Usuario registrado completamente');
+            user.value = data.user;
 
             return user.value;
         } catch (error) {
-            console.error(' Error en registro:', error);
-
-            // Extraer errores de validación si existen
-            if (error.response?.status === 422) {
-                errors.value = error.response.data.errors || {};
-                console.error('Errores de validación:', errors.value);
-            } else {
-                // Otro tipo de error
-                errors.value = {
-                    general: ['Ocurrió un error al registrar el usuario. Por favor, intenta nuevamente.']
-                };
-            }
-
+            resetSession();
+            captureError(error, 'No se pudo completar el registro. Inténtalo de nuevo.');
             throw error;
         } finally {
             loading.value = false;
         }
-    };
+    }
 
-    /**
-     * -------------------------------------------------------------------------
-     * LOGOUT
-     * -------------------------------------------------------------------------
-     *
-     * Cierra la sesión del usuario actual.
-     *
-     * FLUJO:
-     * 1. Llamamos a /api/logout
-     * 2. Backend invalida la sesión y elimina la cookie
-     * 3. Reseteamos el estado local (user = null)
-     * 4. Reseteamos el estado de autenticación en Axios
-     * 5. Redirigimos al login (esto se hace en el componente)
-     *
-     * @returns {Promise<void>}
-     */
-    const logout = async () => {
+    async function logout() {
+        loading.value = true;
+
         try {
-            loading.value = true;
-
-            console.log(' Cerrando sesión...');
-
-            // Llamar al endpoint de logout (si hay token)
-            const token = localStorage.getItem('auth_token');
-            if (token) {
+            if (getToken()) {
                 await apiClient.post('/logout');
             }
-
-            console.log(' Sesión cerrada en el servidor');
-        } catch (error) {
-            console.error(' Error al cerrar sesión:', error);
-            // Aún así, limpiar el estado local
         } finally {
-            // Limpiar el token
-            localStorage.removeItem('auth_token');
-            delete apiClient.defaults.headers.common['Authorization'];
-
-            // Resetear el estado local
-            user.value = null;
-            errors.value = {};
+            // Pase lo que pase en el servidor, la sesión local se cierra: dejar
+            // al usuario "dentro" tras pulsar salir es peor que perder la
+            // revocación del token.
+            resetSession();
             loading.value = false;
-
-            // Resetear el estado de autenticación en Axios
-            resetAuth();
-
-            console.log(' Estado local limpiado');
         }
-    };
+    }
 
     /**
-     * -------------------------------------------------------------------------
-     * LIMPIAR ERRORES
-     * -------------------------------------------------------------------------
+     * Restaura la sesión a partir del token almacenado.
      *
-     * Limpia los errores de validación almacenados.
-     * Útil para limpiar los mensajes de error cuando el usuario
-     * empieza a escribir nuevamente en el formulario.
+     * @returns {Promise<boolean>} true solo si el token es válido de verdad.
      */
-    const clearErrors = () => {
-        errors.value = {};
-    };
+    async function restoreSession() {
+        if (!getToken()) {
+            user.value = null;
 
-    /**
-     * -------------------------------------------------------------------------
-     * VERIFICAR AUTENTICACIÓN
-     * -------------------------------------------------------------------------
-     *
-     * Verifica si hay una sesión activa en el backend.
-     * Esta función se debe llamar al iniciar la aplicación
-     * para restaurar el estado de autenticación.
-     *
-     * @returns {Promise<boolean>} true si está autenticado, false si no
-     */
-    const checkAuth = async () => {
+            return false;
+        }
+
         try {
-            // Intentar cargar el token desde localStorage
-            const token = localStorage.getItem('auth_token');
+            const { data } = await apiClient.get('/me');
+            user.value = data.data ?? data;
 
-            if (token) {
-                // Configurar el token en los headers
-                apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            return true;
+        } catch {
+            // La versión anterior se tragaba el 401 dentro de getUser() y
+            // devolvía true igualmente, de modo que un token caducado se
+            // quedaba en localStorage para siempre y el guard creía que la
+            // sesión estaba restaurada. El interceptor ya lo habrá limpiado;
+            // esto lo deja explícito.
+            resetSession();
 
-                // Verificar que el token sea válido obteniendo el usuario
-                await getUser();
-                return true;
-            }
-
-            return false;
-        } catch (error) {
-            // Si hay error, limpiar el token inválido
-            localStorage.removeItem('auth_token');
-            delete apiClient.defaults.headers.common['Authorization'];
             return false;
         }
-    };
+    }
 
-    // =========================================================================
-    // RETURN (Composables API)
-    // =========================================================================
+    function clearErrors() {
+        errors.value = {};
+    }
 
     return {
-        // State
         user,
-        errors,
         loading,
-
-        // Getters
+        errors,
         isAuthenticated,
         isAdmin,
         isTeacher,
-        isStudent,
+        userRole,
         userName,
         userRoleLabel,
-        userEmail,
-
-        // Actions
-        getUser,
         login,
         register,
         logout,
+        restoreSession,
         clearErrors,
-        checkAuth,
     };
 });

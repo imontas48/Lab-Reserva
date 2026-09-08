@@ -14,6 +14,10 @@ class EquipmentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Una sola invocacion: el Resource llamaba a getCurrentStatus() dos
+        // veces por recurso, duplicando su coste.
+        $status = $this->getCurrentStatus();
+
         return [
             'id' => $this->id,
             'lab_id' => $this->lab_id,
@@ -23,10 +27,10 @@ class EquipmentResource extends JsonResource
             'is_operational' => (bool) $this->is_operational,
 
             // Estado actual calculado dinámicamente
-            'status' => $this->getCurrentStatus(),
+            'status' => $status,
 
             // Compatibilidad legacy (deprecated - usar 'status' en su lugar)
-            'is_available' => $this->getCurrentStatus()['status'] === 'available',
+            'is_available' => $status['status'] === 'available',
 
             // Relación con el laboratorio (solo si está cargada)
             'lab' => new LabResource($this->whenLoaded('lab')),
@@ -37,7 +41,7 @@ class EquipmentResource extends JsonResource
             // IDs de software (útil para formularios de edición)
             'software_ids' => $this->when(
                 $this->relationLoaded('software'),
-                fn() => $this->software->pluck('id')
+                fn () => $this->software->pluck('id')
             ),
 
             // Contadores de reservas (solo si están cargados)
@@ -47,7 +51,7 @@ class EquipmentResource extends JsonResource
             // Identificador completo (laboratorio + identificador)
             'full_identifier' => $this->when(
                 $this->relationLoaded('lab'),
-                fn() => "{$this->lab->name} - {$this->identifier}"
+                fn () => "{$this->lab->name} - {$this->identifier}"
             ),
 
             // Timestamps formateados

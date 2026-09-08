@@ -315,7 +315,6 @@ const loadSoftwareData = async () => {
         initialLoading.value = true;
         loadError.value = null;
 
-        console.log(' Cargando datos del software para edición...');
         const software = await fetchSoftwareById(route.params.id);
 
         // Poblar el formulario con los datos obtenidos
@@ -324,7 +323,6 @@ const loadSoftwareData = async () => {
             version: software.version || ''
         };
 
-        console.log(' Datos cargados en el formulario:', form.value);
     } catch (err) {
         console.error(' Error al cargar datos del software:', err);
         loadError.value = err.response?.data?.message || 'No se pudieron cargar los datos del software';
@@ -342,24 +340,17 @@ const handleSubmit = async () => {
         // Limpiar errores previos
         clearErrors();
 
-        console.log(' Enviando formulario...', {
-            mode: isEditing.value ? 'edit' : 'create',
-            data: form.value
-        });
 
         let result;
 
         if (isEditing.value) {
             // Modo edición: actualizar software existente
-            console.log(` Actualizando software ${route.params.id}...`);
             result = await updateSoftware(route.params.id, form.value);
         } else {
             // Modo creación: crear nuevo software
-            console.log(' Creando nuevo software...');
             result = await createSoftware(form.value);
         }
 
-        console.log(' Operación exitosa:', result);
 
         // Redirigir al listado de software
         router.push({
@@ -393,10 +384,6 @@ const handleSubmit = async () => {
  * - Si estamos en modo creación, el formulario ya está limpio
  */
 onMounted(() => {
-    console.log(' SoftwareCreateEditView montado', {
-        mode: isEditing.value ? 'edit' : 'create',
-        softwareId: route.params.id || 'N/A'
-    });
 
     if (isEditing.value) {
         loadSoftwareData();

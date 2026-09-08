@@ -14,7 +14,6 @@
  * Maneja el cambio en el select de equipos (solo actualiza el preview)
  */
 const handleEquipmentSelection = () => {
-  console.log(' Equipo seleccionado:', selectedEquipmentPreview.value?.name || selectedEquipmentPreview.value?.identifier);
 };=========================================================== -->
     <div v-if="!selectedLab" class="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -477,7 +476,10 @@ const handleEquipmentSelection = () => {
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useThemeStore } from '@/stores/theme';
+import { toApiDateTime, toLocalDateString } from '@/utils/datetime';
 import { useRouter } from 'vue-router';
 import { useEquipment } from '@/composables/useEquipment';
 import { useLabs } from '@/composables/useLabs';
@@ -547,13 +549,19 @@ const quickStartTime = ref(null);
 const quickEndTime = ref(null);
 /** Fecha mínima permitida en el datepicker (hoy) */
 const today = new Date();
-/** Detecta el tema oscuro activo para pasárselo al datepicker */
-const isDark = ref(document.documentElement.classList.contains('dark'));
-const themeObserver = new MutationObserver(() => {
-  isDark.value = document.documentElement.classList.contains('dark');
-});
-onMounted(() => {
-  themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
+/**
+ * Tema oscuro para el datepicker.
+ *
+ * Antes esto era un MutationObserver sobre <html> que NUNCA se desconectaba:
+ * cada visita a la vista dejaba uno vivo reteniendo el componente entero. Y
+ * ademas duplicaba una informacion que el store de tema ya expone.
+ */
+const { isDark } = storeToRefs(useThemeStore());
+
+let redirectTimer = null;
+
+onUnmounted(() => {
+  clearTimeout(redirectTimer);
 });
 
 // ============================================================================
@@ -603,7 +611,7 @@ const quickSelectError = computed(() => {
   if (!quickDate.value || !quickStartTime.value || !quickEndTime.value) return null;
 
   const dateStr = quickDate.value instanceof Date
-    ? quickDate.value.toISOString().split('T')[0]
+    ? toLocalDateString(quickDate.value)
     : quickDate.value;
   const startStr = timeToString(quickStartTime.value);
   const endStr   = timeToString(quickEndTime.value);
@@ -628,7 +636,7 @@ const formatQuickPreview = computed(() => {
   if (!quickDate.value || !quickStartTime.value || !quickEndTime.value) return '';
 
   const dateStr = quickDate.value instanceof Date
-    ? quickDate.value.toISOString().split('T')[0]
+    ? toLocalDateString(quickDate.value)
     : quickDate.value;
   const startStr = timeToString(quickStartTime.value);
   const endStr   = timeToString(quickEndTime.value);
@@ -648,7 +656,6 @@ const formatQuickPreview = computed(() => {
  * Selecciona un laboratorio y avanza al paso 2
  */
 const selectLab = async (lab) => {
-  console.log(' Laboratorio seleccionado:', lab.name);
   selectedLab.value = lab;
 
   // Cargar equipos del sistema
@@ -659,7 +666,6 @@ const selectLab = async (lab) => {
  * Limpia la selección de laboratorio y vuelve al paso 1
  */
 const clearLabSelection = () => {
-  console.log(' Limpiando selección de laboratorio...');
   selectedLab.value = null;
   selectedEquipment.value = null;
   selectedEquipmentId.value = null;
@@ -671,7 +677,6 @@ const clearLabSelection = () => {
  * Maneja el cambio en el select de equipos (solo actualiza el preview)
  */
 const handleEquipmentSelection = () => {
-  console.log('� Equipo seleccionado en preview:', selectedEquipmentId.value);
 };
 
 /**
@@ -693,7 +698,6 @@ const confirmEquipmentSelection = () => {
     return;
   }
 
-  console.log(' Confirmando selección de equipo:', equipment);
   selectedEquipment.value = equipment;
 };
 
@@ -701,7 +705,6 @@ const confirmEquipmentSelection = () => {
  * Limpia la selección de equipo y vuelve al paso 2
  */
 const clearEquipmentSelection = () => {
-  console.log(' Limpiando selección de equipo...');
   selectedEquipment.value = null;
   selectedEquipmentId.value = null;
   reservationDetails.value = null;
@@ -716,7 +719,6 @@ const clearEquipmentSelection = () => {
  * Abre el modal de confirmación
  */
 const handleSlotSelected = (slot) => {
-  console.log(' Slot seleccionado:', slot);
 
   reservationDetails.value = {
     equipmentId: selectedEquipment.value.id,
@@ -735,13 +737,15 @@ const handleQuickSelect = () => {
   if (quickSelectError.value) return;
 
   const dateStr = quickDate.value instanceof Date
-    ? quickDate.value.toISOString().split('T')[0]
+    ? toLocalDateString(quickDate.value)
     : quickDate.value;
   const startStr = timeToString(quickStartTime.value);
   const endStr   = timeToString(quickEndTime.value);
 
-  const start = new Date(`${dateStr}T${startStr}`).toISOString();
-  const end   = new Date(`${dateStr}T${endStr}`).toISOString();
+  // toApiDateTime deja explicito que lo que viaja es un instante con offset,
+  // el mismo formato que emite el calendario tras el arreglo.
+  const start = toApiDateTime(new Date(`${dateStr}T${startStr}`));
+  const end   = toApiDateTime(new Date(`${dateStr}T${endStr}`));
 
   handleSlotSelected({ start, end });
 };
@@ -751,7 +755,6 @@ const handleQuickSelect = () => {
  * Muestra notificación y redirige
  */
 const handleReservationSuccess = (reservation) => {
-  console.log(' Reserva creada exitosamente:', reservation);
 
   // Mostrar notificación de éxito
   toast.success('¡Reserva confirmada exitosamente!');
@@ -759,8 +762,10 @@ const handleReservationSuccess = (reservation) => {
   // Cerrar modal
   showModal.value = false;
 
-  // Redirigir a "Mis Reservas"
-  setTimeout(() => {
+  // Redirigir a "Mis Reservas". Se guarda la referencia: sin cancelarlo, si
+  // el usuario navegaba a otra pantalla en ese segundo y medio, el temporizador
+  // lo sacaba de donde estuviera.
+  redirectTimer = setTimeout(() => {
     router.push('/reservations');
   }, 1500);
 };
@@ -784,7 +789,6 @@ watch(selectedLab, (newLab) => {
 // ============================================================================
 
 onMounted(async () => {
-  console.log(' Cargando laboratorios...');
 
   // Solo cargar laboratorios al inicio
   // Los equipos se cargarán cuando se seleccione un laboratorio

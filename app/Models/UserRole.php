@@ -61,11 +61,11 @@ class UserRole extends Model
     /**
      * Solo asignaciones vigentes (no expiradas).
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeNotExpired(Builder $query): Builder
     {
         return $query->where(function (Builder $q) {
             $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>', now());
+                ->orWhere('expires_at', '>', now());
         });
     }
 
@@ -75,6 +75,6 @@ class UserRole extends Model
     public function scopeExpired(Builder $query): Builder
     {
         return $query->whereNotNull('expires_at')
-                     ->where('expires_at', '<=', now());
+            ->where('expires_at', '<=', now());
     }
 }

@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
+use App\Models\Equipment;
 use App\Models\User;
-use App\Models\equipment;
-use Illuminate\Auth\Access\Response;
 
 class EquipmentPolicy
 {
@@ -14,16 +13,16 @@ class EquipmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('equipment', 'viewAny');
     }
 
     /**
      * Determine whether the user can view the model.
      * Cualquier usuario autenticado puede ver un equipo específico.
      */
-    public function view(User $user, equipment $equipment): bool
+    public function view(User $user, Equipment $equipment): bool
     {
-        return true;
+        return $user->hasPermission('equipment', 'view');
     }
 
     /**
@@ -32,31 +31,31 @@ class EquipmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('equipment', 'create');
     }
 
     /**
      * Determine whether the user can update the model.
      * Solo los administradores pueden actualizar equipos.
      */
-    public function update(User $user, equipment $equipment): bool
+    public function update(User $user, Equipment $equipment): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('equipment', 'update');
     }
 
     /**
      * Determine whether the user can delete the model.
      * Solo los administradores pueden eliminar equipos.
      */
-    public function delete(User $user, equipment $equipment): bool
+    public function delete(User $user, Equipment $equipment): bool
     {
-        return $user->isAdmin();
+        return $user->hasPermission('equipment', 'delete');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, equipment $equipment): bool
+    public function restore(User $user, Equipment $equipment): bool
     {
         return false;
     }
@@ -64,7 +63,7 @@ class EquipmentPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, equipment $equipment): bool
+    public function forceDelete(User $user, Equipment $equipment): bool
     {
         return false;
     }

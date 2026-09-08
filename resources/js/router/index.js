@@ -34,10 +34,12 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        redirect: (to) => {
-            const authStore = useAuthStore();
-            return authStore.isAuthenticated ? '/dashboard' : '/login';
-        }
+        // Sin redirect(): las redirecciones declaradas se resuelven en
+        // router.resolve(), ANTES de que beforeEach restaure la sesion, asi
+        // que en un arranque en frio isAuthenticated era siempre false y la
+        // navegacion iba a /login para rebotar acto seguido a /dashboard.
+        // El guard decide, que es quien sabe si hay sesion.
+        redirect: { name: 'dashboard' },
     },
 
     /**
@@ -234,21 +236,23 @@ const routes = [
             {
                 path: '/reservations/students',
                 name: 'reservations.students',
-                component: () => import('@/views/reservations/ReservationsStudentsView.vue'),
+                component: () => import('@/views/reservations/ReservationsByRoleView.vue'),
                 meta: {
                     title: 'Reservas de Estudiantes',
                     requiresAuth: true,
                     requiresAdmin: true,
+                    reservationRole: 'student',
                 }
             },
             {
                 path: '/reservations/teachers',
                 name: 'reservations.teachers',
-                component: () => import('@/views/reservations/ReservationsTeachersView.vue'),
+                component: () => import('@/views/reservations/ReservationsByRoleView.vue'),
                 meta: {
                     title: 'Reservas de Maestros',
                     requiresAuth: true,
                     requiresAdmin: true,
+                    reservationRole: 'teacher',
                 }
             },
             {
@@ -393,11 +397,9 @@ router.beforeEach(async (to, from, next) => {
     // Si es la primera navegación, verificar si hay una sesión activa
     // ─────────────────────────────────────────────────────────────────────────
     if (from.name === undefined && !authStore.user) {
-        console.log(' Primera navegación, verificando sesión...');
         try {
-            await authStore.checkAuth();
+            await authStore.restoreSession();
         } catch (error) {
-            console.log('️ No hay sesión activa');
         }
     }
 
@@ -415,7 +417,6 @@ router.beforeEach(async (to, from, next) => {
     // ─────────────────────────────────────────────────────────────────────────
     if (to.meta.requiresAuth) {
         if (!authStore.isAuthenticated) {
-            console.log(' Ruta protegida, redirigiendo a login...');
             return next({
                 name: 'login',
                 query: { redirect: to.fullPath } // Guardar la ruta a la que quería ir
@@ -426,7 +427,6 @@ router.beforeEach(async (to, from, next) => {
         // Verificar si requiere permisos de administrador
         // ─────────────────────────────────────────────────────────────────────
         if (to.meta.requiresAdmin && !authStore.isAdmin) {
-            console.log(' Requiere permisos de administrador');
             return next({
                 name: 'dashboard',
                 replace: true
@@ -437,7 +437,6 @@ router.beforeEach(async (to, from, next) => {
         // Verificar si requiere permisos de profesor
         // ─────────────────────────────────────────────────────────────────────
         if (to.meta.requiresTeacher && !authStore.isTeacher && !authStore.isAdmin) {
-            console.log(' Requiere permisos de profesor');
             return next({
                 name: 'dashboard',
                 replace: true
@@ -449,7 +448,6 @@ router.beforeEach(async (to, from, next) => {
     // Verificar si la ruta es solo para invitados (guest)
     // ─────────────────────────────────────────────────────────────────────────
     if (to.meta.guest && authStore.isAuthenticated) {
-        console.log(' Usuario autenticado intentando acceder a ruta de invitado, redirigiendo a dashboard...');
         return next({ name: 'dashboard', replace: true });
     }
 
@@ -468,7 +466,6 @@ router.beforeEach(async (to, from, next) => {
  * Útil para analytics, logging, etc.
  */
 router.afterEach((to, from) => {
-    console.log(` Navegación: ${from.name || 'inicio'} → ${to.name}`);
 });
 
 /**

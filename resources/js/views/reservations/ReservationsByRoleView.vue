@@ -3,9 +3,9 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Reservas de Estudiantes</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ copy.title }}</h1>
         <p class="mt-2 text-gray-600 dark:text-gray-400">
-          Todas las reservas realizadas por estudiantes
+          {{ copy.subtitle }}
         </p>
       </div>
     </div>
@@ -23,7 +23,7 @@
       <select
         v-model="statusFilter"
         class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-        @change="loadReservations"
+        @change="applyFilters"
       >
         <option value="">Todos los estados</option>
         <option value="confirmed">Confirmadas</option>
@@ -32,7 +32,7 @@
       </select>
 
       <button
-        @click="loadReservations"
+        @click="applyFilters"
         class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
       >
         <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@
           <h3 class="text-sm font-medium text-red-800 dark:text-red-300">Error al cargar reservas</h3>
           <p class="mt-1 text-sm text-red-700 dark:text-red-400">{{ error }}</p>
           <button
-            @click="loadReservations"
+            @click="applyFilters"
             class="mt-2 text-sm font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
           >
             Intentar nuevamente
@@ -83,7 +83,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
       </svg>
       <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">Sin reservas</h3>
-      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No se encontraron reservas de estudiantes con los filtros aplicados.</p>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ copy.emptyState }}</p>
     </div>
 
     <!-- Reservations Table -->
@@ -92,7 +92,7 @@
         <thead class="bg-gray-50 dark:bg-gray-700/50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">#</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Estudiante</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ copy.personColumn }}</th>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Equipo / Laboratorio</th>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Inicio</th>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Fin</th>
@@ -194,10 +194,37 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useReservations } from '@/composables/useReservations';
 
 const { reservations, loading, error, paginationMeta, fetchReservationsByRole } = useReservations();
+
+const route = useRoute();
+
+/**
+ * El rol sale de la ruta. Antes existian dos vistas identicas al 98% que solo
+ * diferian en cinco cadenas y en este valor, de modo que cada fallo habia que
+ * arreglarlo dos veces.
+ */
+const role = computed(() => route.meta.reservationRole ?? 'student');
+
+const COPY = {
+  student: {
+    title: 'Reservas de Estudiantes',
+    subtitle: 'Todas las reservas realizadas por estudiantes',
+    emptyState: 'No se encontraron reservas de estudiantes con los filtros aplicados.',
+    personColumn: 'Estudiante',
+  },
+  teacher: {
+    title: 'Reservas de Maestros',
+    subtitle: 'Todas las reservas realizadas por maestros',
+    emptyState: 'No se encontraron reservas de maestros con los filtros aplicados.',
+    personColumn: 'Maestro',
+  },
+};
+
+const copy = computed(() => COPY[role.value] ?? COPY.student);
 
 const searchQuery = ref('');
 const statusFilter = ref('');
@@ -205,26 +232,59 @@ const currentPage = ref(1);
 
 let debounceTimer = null;
 
-const debouncedFetch = () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    currentPage.value = 1;
-    loadReservations();
-  }, 400);
-};
+// Contador de peticion: solo la ultima lanzada puede escribir el resultado.
+// Sin esto, pulsar 2 -> 3 -> 4 deprisa dejaba en pantalla la respuesta que
+// llegase la ultima, que no tiene por que ser la de la pagina 4.
+let requestId = 0;
 
 const loadReservations = async () => {
   const params = { page: currentPage.value };
   if (searchQuery.value) params.search = searchQuery.value;
   if (statusFilter.value) params.status = statusFilter.value;
 
-  await fetchReservationsByRole('student', params);
+  const current = ++requestId;
+  await fetchReservationsByRole(role.value, params);
+
+  if (current !== requestId) {
+    return;
+  }
+
+  // Reconciliar con lo que respondio el servidor: si se pidio una pagina que
+  // ya no existe, el indicador local se quedaba desincronizado.
+  if (paginationMeta.value?.current_page) {
+    currentPage.value = paginationMeta.value.current_page;
+  }
+};
+
+/**
+ * Cualquier cambio de filtro vuelve a la primera pagina.
+ *
+ * El desplegable de estado y el boton de buscar llamaban directamente a
+ * loadReservations sin resetear currentPage: estando en la pagina 5, filtrar
+ * por "Canceladas" pedia la pagina 5 de un conjunto que quiza tenia una, y la
+ * vista mostraba "Sin reservas" aunque hubiera resultados.
+ */
+const applyFilters = () => {
+  currentPage.value = 1;
+  loadReservations();
+};
+
+const debouncedFetch = () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(applyFilters, 400);
 };
 
 const goToPage = (page) => {
   currentPage.value = page;
   loadReservations();
 };
+
+// El temporizador sobrevivia al componente: si el usuario tecleaba y navegaba
+// antes de los 400 ms, loadReservations se ejecutaba sobre refs huerfanos.
+onUnmounted(() => {
+  clearTimeout(debounceTimer);
+  requestId++;
+});
 
 const visiblePages = computed(() => {
   if (!paginationMeta.value) return [];

@@ -276,3 +276,65 @@ const handleSubmit = async () => {
 **NO generes solo HTML.** Genera un **componente Vue 3 completo y funcional**, listo para integrarse en un proyecto Laravel con Vite, siguiendo todas las convenciones y mejores prácticas establecidas en este documento.
 
 ---
+
+## 6. REGLA DE SEGURIDAD: Variables de Entorno (PROHIBICIÓN ABSOLUTA)
+
+Esta sección tiene prioridad sobre cualquier otra instrucción de este documento.
+
+### Prohibido versionar archivos de entorno
+
+**NUNCA** se debe agregar al control de versiones, ni proponer agregar, ningún archivo
+que contenga variables de entorno reales. Esto incluye, sin excepción:
+
+*   `.env`
+*   `.env.local`, `.env.testing`, `.env.staging`, `.env.production`, `.env.backup`
+*   Cualquier otro archivo que coincida con el patrón `.env*`
+*   Copias, renombrados o respaldos de los anteriores (ej. `env.txt`, `.env.bak`, `config/env.php`)
+*   Volcados de configuración que incluyan credenciales (logs de `php artisan config:show`,
+    dumps de `phpinfo()`, capturas de paneles con claves visibles)
+
+El `.gitignore` ya bloquea estos patrones. Si un archivo de entorno aparece bloqueado,
+ese es el comportamiento correcto: **no lo fuerces**.
+
+### Única excepción permitida: `.env.example`
+
+`.env.example` es la plantilla de onboarding del proyecto y sí está versionada, porque
+el CI (`.github/workflows/tests.yml`), los scripts `setup` y `post-root-package-install`
+de `composer.json` y el README dependen de ella.
+
+Sobre esta excepción rigen dos condiciones estrictas:
+
+1.  **Jamás debe contener un valor real.** Toda clave sensible se mantiene vacía
+    (`APP_KEY=`, `DB_PASSWORD=`, `AWS_SECRET_ACCESS_KEY=`) o con un marcador evidente.
+    Una contraseña, token, clave de API o cadena de conexión real en este archivo es un
+    incidente de seguridad, no un descuido de formato.
+2.  **Solo se agregan variables nuevas, nunca valores.** Al introducir una integración,
+    añade la clave con su valor vacío y un comentario que explique qué se espera, para
+    que quien clone el proyecto sepa qué configurar.
+
+Ningún otro archivo `.env*` queda cubierto por esta excepción.
+
+### Directivas operativas para la IA
+
+1.  **Nunca ejecutes `git add` sobre un archivo de entorno**, ni siquiera con `-f`.
+    La única ruta versionable es `.env.example`, y solo bajo las condiciones de arriba.
+2.  **Nunca imprimas el contenido de un `.env` real** en respuestas, logs, mensajes de
+    commit, descripciones de PR ni ejemplos de código. Si necesitas mostrar una variable,
+    usa su nombre y un valor de ejemplo inventado.
+3.  **Antes de cualquier commit**, verifica que no se esté incluyendo un archivo de entorno:
+    ```bash
+    git diff --cached --name-only | grep -iE '(^|/)\.env' | grep -v '^\.env\.example$' \
+      && echo "ABORTAR: archivo de entorno en el stage"
+    ```
+4.  **Al modificar `.env.example`**, revisa que ningún valor sensible venga relleno:
+    ```bash
+    grep -nE '^(APP_KEY|[A-Z_]*PASSWORD|AWS_[A-Z_]*KEY[A-Z_]*|[A-Z_]*SECRET[A-Z_]*|[A-Z_]*TOKEN[A-Z_]*)=.+' .env.example \
+      | grep -vEi '=(null|true|false|""|changeme|your[-_.a-z]*|<[^>]*>)$' \
+      && echo "ABORTAR: valor real en la plantilla"
+    ```
+    El segundo `grep` descarta los placeholders legitimos de Laravel (`null`, `false`),
+    de modo que solo se dispara ante un valor de verdad.
+5.  **Si detectas un archivo de entorno ya versionado** fuera de la excepción, no lo pases
+    por alto: repórtalo de inmediato como incidente de seguridad y propón eliminarlo del
+    índice y del historial, además de **rotar toda credencial expuesta** (la rotación es
+    obligatoria: reescribir el historial no invalida una clave que ya se publicó).

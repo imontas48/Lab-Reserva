@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\equipment;
-use App\Models\reservations;
+use App\Exceptions\BusinessRuleException;
+use App\Models\Equipment;
+use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -15,20 +16,37 @@ class ReservationService
      * Create a new reservation.
      * Usa transacciones para evitar race conditions.
      *
-     * @param array $validatedData
-     * @param User $user
-     * @return reservations
      * @throws \Exception
      */
-    public function createReservation(array $validatedData, User $user): reservations
+    public function createReservation(array $validatedData, User $user): Reservation
     {
         return DB::transaction(function () use ($validatedData, $user) {
             // Asignar el usuario autenticado
             $validatedData['user_id'] = $user->id;
-            $validatedData['status'] = 'confirmed';
+            $validatedData['status'] = Reservation::STATUS_CONFIRMED;
 
-            // Doble comprobación de disponibilidad dentro de la transacción
-            // Esto protege contra race conditions
+            // El bloqueo va PRIMERO. Antes se comprobaba la disponibilidad con
+            // un SELECT sin bloqueo y solo despues se bloqueaba la fila de
+            // equipment, de modo que el lock no protegia nada: dos peticiones
+            // simultaneas leian ambas "sin conflicto" y ambas insertaban.
+            //
+            // Bloquear la fila del equipo serializa todos los intentos de
+            // reserva sobre ese equipo, que es la seccion critica real. MySQL
+            // no admite restricciones de exclusion sobre intervalos (eso es
+            // EXCLUDE de PostgreSQL), asi que este lock es la garantia: no hay
+            // red de seguridad posible en el esquema.
+            $equipment = Equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
+
+            if (! $equipment->is_operational) {
+                throw new BusinessRuleException(
+                    'El equipo seleccionado no está operacional en este momento.'
+                );
+            }
+
+            // Ya dentro del lock. La comprobacion tambien es una lectura con
+            // bloqueo: bajo REPEATABLE READ una lectura normal veria el
+            // snapshot del inicio de la transaccion y no las filas que la otra
+            // transaccion acaba de confirmar.
             $hasConflict = $this->checkEquipmentAvailability(
                 $validatedData['equipment_id'],
                 $validatedData['start_time'],
@@ -36,26 +54,17 @@ class ReservationService
             );
 
             if ($hasConflict) {
-                throw new \Exception(
-                    'El equipo ya no está disponible en el rango de tiempo seleccionado. ' .
+                throw new BusinessRuleException(
+                    'El equipo ya no está disponible en el rango de tiempo seleccionado. '.
                     'Por favor, seleccione otro horario.'
                 );
             }
 
-            // Verificar nuevamente que el equipo esté operacional
-            $equipment = equipment::lockForUpdate()->findOrFail($validatedData['equipment_id']);
-
-            if (!$equipment->is_operational) {
-                throw new \Exception(
-                    'El equipo seleccionado no está operacional en este momento.'
-                );
-            }
-
             // Crear la reserva
-            $reservation = reservations::create($validatedData);
+            $reservation = Reservation::create($validatedData);
 
             // Cargar las relaciones para la respuesta
-            return $reservation->load(['user', 'equipment.lab']);
+            return $reservation->load(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
         });
     }
 
@@ -63,23 +72,22 @@ class ReservationService
      * Cancel a reservation.
      * Solo cancela si está en estado 'confirmed' y no ha comenzado.
      *
-     * @param reservations $reservation
-     * @return reservations
+     *
      * @throws \Exception
      */
-    public function cancelReservation(reservations $reservation): reservations
+    public function cancelReservation(Reservation $reservation): Reservation
     {
         // Verificar que la reserva esté confirmada
-        if ($reservation->status !== 'confirmed') {
-            throw new \Exception(
-                'Solo se pueden cancelar reservas confirmadas. ' .
-                'Esta reserva ya está en estado: ' . $reservation->status
+        if (! $reservation->canTransitionTo(Reservation::STATUS_CANCELLED)) {
+            throw new BusinessRuleException(
+                'Solo se pueden cancelar reservas confirmadas. '.
+                'Esta reserva ya está en estado: '.$reservation->status
             );
         }
 
         // Verificar que la reserva no haya comenzado
         if ($reservation->start_time <= now()) {
-            throw new \Exception(
+            throw new BusinessRuleException(
                 'No se puede cancelar una reserva que ya ha comenzado o pasado.'
             );
         }
@@ -88,44 +96,53 @@ class ReservationService
         $reservation->update(['status' => 'cancelled']);
 
         // Recargar con relaciones
-        return $reservation->fresh(['user', 'equipment.lab']);
+        return $reservation->fresh(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
     }
 
     /**
      * Update a reservation (admin only - mainly for status changes).
-     *
-     * @param reservations $reservation
-     * @param array $data
-     * @return reservations
      */
-    public function updateReservation(reservations $reservation, array $data): reservations
+    public function updateReservation(Reservation $reservation, array $data): Reservation
     {
+        // Antes esto era un update() directo. Como UpdateReservationRequest
+        // acepta cualquiera de los tres estados y ReservationPolicy::update
+        // autoriza al dueño, un usuario podia cancelar su reserva, esperar a
+        // que otro ocupase la franja y volver a confirmarla: dos reservas
+        // solapadas sin pasar por ninguna comprobacion de disponibilidad.
+        // Tambien podia marcarse reservas como 'completed' a voluntad y
+        // falsear las estadisticas.
+        if (isset($data['status']) && $data['status'] !== $reservation->status) {
+            if (! $reservation->canTransitionTo($data['status'])) {
+                $allowed = $reservation->allowedTransitions();
+
+                throw new BusinessRuleException(
+                    "No se puede pasar de '{$reservation->status}' a '{$data['status']}'. ".
+                    ($allowed === []
+                        ? "El estado '{$reservation->status}' es final."
+                        : 'Transiciones permitidas: '.implode(', ', $allowed).'.')
+                );
+            }
+        }
+
         $reservation->update($data);
 
-        return $reservation->fresh(['user', 'equipment.lab']);
+        return $reservation->fresh(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
     }
 
     /**
      * Delete a reservation (admin only).
-     *
-     * @param reservations $reservation
-     * @return bool
      */
-    public function deleteReservation(reservations $reservation): bool
+    public function deleteReservation(Reservation $reservation): bool
     {
         return $reservation->delete();
     }
 
     /**
      * Get all reservations with advanced filtering (admin only).
-     *
-     * @param array $filters
-     * @param int|null $perPage
-     * @return LengthAwarePaginator
      */
     public function getAllReservations(array $filters = [], ?int $perPage = null): LengthAwarePaginator
     {
-        $query = reservations::with(['user', 'equipment.lab']);
+        $query = Reservation::with(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
 
         // Filtrar por usuario
         if (isset($filters['user_id'])) {
@@ -164,11 +181,11 @@ class ReservationService
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('name', 'like', "%{$search}%")
-                              ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })
-                ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
-                    $equipmentQuery->where('identifier', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
+                        $equipmentQuery->where('identifier', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -183,16 +200,11 @@ class ReservationService
 
     /**
      * Get reservations for a specific user.
-     *
-     * @param User $user
-     * @param array $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
     public function getReservationsForUser(User $user, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = reservations::where('user_id', $user->id)
-            ->with(['equipment.lab']);
+        $query = Reservation::where('user_id', $user->id)
+            ->with(['equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation']);
 
         // Filtrar por estado si se proporciona
         if (isset($filters['status'])) {
@@ -218,14 +230,11 @@ class ReservationService
      * Permite al administrador ver todas las reservas hechas por
      * un tipo de usuario específico (student o teacher).
      *
-     * @param string $role - 'student' | 'teacher'
-     * @param array $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @param  string  $role  - 'student' | 'teacher'
      */
     public function getReservationsByUserRole(string $role, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = reservations::with(['user', 'equipment.lab'])
+        $query = Reservation::with(['user', 'equipment.lab', 'equipment.currentReservation', 'equipment.nextReservation'])
             ->whereHas('user', function ($q) use ($role) {
                 $q->where('role', $role);
             });
@@ -250,11 +259,11 @@ class ReservationService
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('name', 'like', "%{$search}%")
-                              ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })
-                ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
-                    $equipmentQuery->where('identifier', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('equipment', function ($equipmentQuery) use ($search) {
+                        $equipmentQuery->where('identifier', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -268,12 +277,8 @@ class ReservationService
     /**
      * Get reservations for a specific equipment.
      * Útil para calendarios y visualización de disponibilidad.
-     *
-     * @param equipment $equipment
-     * @param array $filters
-     * @return Collection
      */
-    public function getReservationsForEquipment(equipment $equipment, array $filters = []): Collection
+    public function getReservationsForEquipment(Equipment $equipment, array $filters = []): Collection
     {
         $query = $equipment->reservations()->with('user');
 
@@ -293,37 +298,6 @@ class ReservationService
     }
 
     /**
-     * Get active reservations (currently in progress).
-     *
-     * @return Collection
-     */
-    public function getActiveReservations(): Collection
-    {
-        return reservations::with(['user', 'equipment.lab'])
-            ->where('status', 'confirmed')
-            ->where('start_time', '<=', now())
-            ->where('end_time', '>=', now())
-            ->orderBy('end_time', 'asc')
-            ->get();
-    }
-
-    /**
-     * Get upcoming reservations (confirmed and in the future).
-     *
-     * @param int $limit
-     * @return Collection
-     */
-    public function getUpcomingReservations(int $limit = 10): Collection
-    {
-        return reservations::with(['user', 'equipment.lab'])
-            ->confirmed()
-            ->where('start_time', '>', now())
-            ->orderBy('start_time', 'asc')
-            ->limit($limit)
-            ->get();
-    }
-
-    /**
      * Mark expired reservations as completed.
      * Este método puede ser llamado por un comando scheduled.
      *
@@ -331,59 +305,16 @@ class ReservationService
      */
     public function markExpiredReservationsAsCompleted(): int
     {
-        return reservations::where('status', 'confirmed')
+        return Reservation::where('status', 'confirmed')
             ->where('end_time', '<', now())
             ->update(['status' => 'completed']);
-    }
-
-    /**
-     * Get reservation statistics for a user.
-     *
-     * @param User $user
-     * @return array
-     */
-    public function getUserStatistics(User $user): array
-    {
-        $total = reservations::where('user_id', $user->id)->count();
-        $confirmed = reservations::where('user_id', $user->id)->confirmed()->count();
-        $cancelled = reservations::where('user_id', $user->id)->cancelled()->count();
-        $completed = reservations::where('user_id', $user->id)->completed()->count();
-
-        return [
-            'total' => $total,
-            'confirmed' => $confirmed,
-            'cancelled' => $cancelled,
-            'completed' => $completed,
-        ];
-    }
-
-    /**
-     * Get reservation statistics for an equipment.
-     *
-     * @param equipment $equipment
-     * @return array
-     */
-    public function getEquipmentStatistics(equipment $equipment): array
-    {
-        $total = $equipment->reservations()->count();
-        $confirmed = $equipment->reservations()->confirmed()->count();
-        $completed = $equipment->reservations()->completed()->count();
-
-        return [
-            'total' => $total,
-            'confirmed' => $confirmed,
-            'completed' => $completed,
-        ];
     }
 
     /**
      * Check if equipment is available for a given time range.
      * Método privado para verificación de disponibilidad.
      *
-     * @param int $equipmentId
-     * @param string $startTime
-     * @param string $endTime
-     * @param int|null $excludeReservationId Para actualización de reservas
+     * @param  int|null  $excludeReservationId  Para actualización de reservas
      * @return bool True si hay conflicto, False si está disponible
      */
     private function checkEquipmentAvailability(
@@ -392,72 +323,19 @@ class ReservationService
         string $endTime,
         ?int $excludeReservationId = null
     ): bool {
-        $query = reservations::where('equipment_id', $equipmentId)
-            ->where('status', 'confirmed')
-            ->where(function ($q) use ($startTime, $endTime) {
-                // Mismo algoritmo de detección de solapamiento que en la validación
-                $q->whereBetween('start_time', [$startTime, $endTime])
-                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                  ->orWhere(function ($query) use ($startTime, $endTime) {
-                      $query->where('start_time', '>=', $startTime)
-                            ->where('end_time', '<=', $endTime);
-                  })
-                  ->orWhere(function ($query) use ($startTime, $endTime) {
-                      $query->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                  });
-            });
+        $query = Reservation::query()
+            ->forEquipment($equipmentId)
+            ->blocking($startTime, $endTime);
 
         // Excluir una reserva específica (útil para actualizaciones)
         if ($excludeReservationId) {
             $query->where('id', '!=', $excludeReservationId);
         }
 
-        return $query->exists();
-    }
-
-    /**
-     * Get available time slots for an equipment on a specific date.
-     * Útil para el frontend mostrar slots disponibles.
-     *
-     * @param equipment $equipment
-     * @param string $date Formato: Y-m-d
-     * @param int $slotDuration En minutos (default: 60)
-     * @return array
-     */
-    public function getAvailableTimeSlots(
-        equipment $equipment,
-        string $date,
-        int $slotDuration = 60
-    ): array {
-        // Horario de operación (ejemplo: 8 AM a 8 PM)
-        $startHour = 8;
-        $endHour = 20;
-
-        $availableSlots = [];
-        $currentTime = new \DateTime("$date $startHour:00:00");
-        $endTime = new \DateTime("$date $endHour:00:00");
-
-        while ($currentTime < $endTime) {
-            $slotEnd = clone $currentTime;
-            $slotEnd->modify("+$slotDuration minutes");
-
-            // Verificar si el slot está disponible
-            $isAvailable = !$this->checkEquipmentAvailability(
-                $equipment->id,
-                $currentTime->format('Y-m-d H:i:s'),
-                $slotEnd->format('Y-m-d H:i:s')
-            );
-
-            $availableSlots[] = [
-                'start' => $currentTime->format('H:i'),
-                'end' => $slotEnd->format('H:i'),
-                'available' => $isAvailable,
-            ];
-
-            $currentTime = $slotEnd;
-        }
-
-        return $availableSlots;
+        // Lectura con bloqueo: ver createReservation. Dentro de la transaccion
+        // es lo que garantiza leer las filas que otra transaccion acaba de
+        // confirmar, en vez del snapshot de REPEATABLE READ. En autocommit el
+        // bloqueo se toma y se libera dentro de la propia sentencia.
+        return $query->lockForUpdate()->exists();
     }
 }

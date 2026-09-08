@@ -1,0 +1,25 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    paths:
+        - app
+        - database
+        - routes
+        - tests
+
+    # Nivel 1. Es donde se detectan las dos clases de fallo que este proyecto ha
+    # sufrido de verdad:
+    #
+    #  - class.notFound, que habria cazado `use App\Models\labs` el primer dia
+    #    (el proyecto no arrancaba en Linux) y los dos imports que faltaban en
+    #    los FormRequests de equipos y software;
+    #  - property.notFound, que habria cazado `equipment->name`, una columna
+    #    inexistente que devolvia null en silencio en el dashboard.
+    #
+    # Los 111 errores existentes estan en la linea base: son en su mayoria ruido
+    # de tipado de Eloquent, que PHPStan no resuelve sin anotar cada modelo con
+    # @property. Subir de nivel exige hacer ese trabajo primero; mientras tanto,
+    # la linea base garantiza que no aparezcan errores NUEVOS.
+    level: 1

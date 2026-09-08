@@ -197,6 +197,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { confirmDestructive } from '@/utils/confirm';
 import { useReservations } from '@/composables/useReservations';
 import { useToast } from '@/composables/useToast';
 
@@ -295,7 +296,13 @@ const loadReservations = async () => {
 };
 
 const handleCancelReservation = async (reservation) => {
-  if (!confirm(`¿Estás seguro de cancelar la reserva del ${formatDate(reservation.start_time)}?`)) {
+  const confirmed = await confirmDestructive({
+    title: '¿Cancelar la reserva?',
+    html: `Se cancelará la reserva del <strong>${formatDate(reservation.start_time)}</strong>.`,
+    confirmText: 'Sí, cancelar',
+  });
+
+  if (!confirmed) {
     return;
   }
 
@@ -321,7 +328,6 @@ const handleCancelReservation = async (reservation) => {
 // ============================================================================
 
 onMounted(async () => {
-  console.log(' ReservationsIndexView montado');
   await loadReservations();
 });
 </script>

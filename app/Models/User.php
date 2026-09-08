@@ -3,16 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\PermissionService;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    /** @use HasFactory<UserFactory> */
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -54,7 +57,7 @@ class User extends Authenticatable
      */
     public function reservations(): HasMany
     {
-        return $this->hasMany(reservations::class);
+        return $this->hasMany(Reservation::class);
     }
 
     /**
@@ -62,7 +65,7 @@ class User extends Authenticatable
      */
     public function activeReservations(): HasMany
     {
-        return $this->hasMany(reservations::class)->where('status', 'confirmed');
+        return $this->hasMany(Reservation::class)->where('status', 'confirmed');
     }
 
     /**
@@ -100,6 +103,19 @@ class User extends Authenticatable
     /**
      * Check if the user is an admin.
      */
+    /**
+     * ¿Tiene el usuario este permiso efectivo?
+     *
+     * Resuelve roles por grupo, roles individuales vigentes y sobreescrituras,
+     * con caché. Es lo que consultan las policies desde que el RBAC gobierna de
+     * verdad el control de acceso: antes las 41 decisiones se tomaban con
+     * isAdmin() y las cinco tablas del RBAC no influían en nada.
+     */
+    public function hasPermission(string $subject, string $action): bool
+    {
+        return app(PermissionService::class)->userHasPermission($this, $subject, $action);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

@@ -83,6 +83,6 @@ class GroupRoleAssignment extends Model
     public function scopeForGroupValue(Builder $query, string $groupType, string $groupValue): Builder
     {
         return $query->where('group_type', $groupType)
-                     ->where('group_value', $groupValue);
+            ->where('group_value', $groupValue);
     }
 }

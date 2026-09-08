@@ -35,8 +35,8 @@ class UserRoleService
         }
 
         return UserRole::create([
-            'user_id'    => $user->id,
-            'role_id'    => $role->id,
+            'user_id' => $user->id,
+            'role_id' => $role->id,
             'granted_by' => $admin->id,
             'expires_at' => $data['expires_at'] ?? null,
         ]);
@@ -47,7 +47,12 @@ class UserRoleService
      */
     public function updateAssignment(UserRole $userRole, array $data): UserRole
     {
-        $userRole->update(['expires_at' => $data['expires_at'] ?? null]);
+        // '?? null' borraba la fecha de expiracion en cualquier PATCH que no
+        // la incluyese, convirtiendo en permanente una asignacion temporal sin
+        // que nadie se enterase. Solo se escribe si el cliente la envio.
+        if (array_key_exists('expires_at', $data)) {
+            $userRole->update(['expires_at' => $data['expires_at']]);
+        }
 
         return $userRole->fresh();
     }
@@ -94,11 +99,11 @@ class UserRoleService
         }
 
         return GroupRoleAssignment::create([
-            'role_id'     => $data['role_id'],
-            'group_type'  => $data['group_type'],
+            'role_id' => $data['role_id'],
+            'group_type' => $data['group_type'],
             'group_value' => $data['group_value'],
-            'granted_by'  => $admin->id,
-            'is_active'   => $data['is_active'] ?? true,
+            'granted_by' => $admin->id,
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 

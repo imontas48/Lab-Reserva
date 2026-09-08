@@ -24,7 +24,7 @@ class RoleService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('display_name', 'like', "%{$search}%");
+                    ->orWhere('display_name', 'like', "%{$search}%");
             });
         }
 
@@ -39,24 +39,24 @@ class RoleService
     public function getRoleWithPermissions(Role $role): Role
     {
         return $role->loadCount(['permissions', 'userRoles'])
-                    ->load('permissions');
+            ->load('permissions');
     }
 
     /**
      * Crea un nuevo rol y opcionalmente asigna permisos.
      *
-     * @param array{name: string, display_name: string, description: ?string, color: ?string, is_active: ?bool, permission_ids: ?array<int>} $data
+     * @param  array{name: string, display_name: string, description: ?string, color: ?string, is_active: ?bool, permission_ids: ?array<int>}  $data
      */
     public function createRole(array $data): Role
     {
         return DB::transaction(function () use ($data) {
             $role = Role::create([
-                'name'         => $data['name'],
+                'name' => $data['name'],
                 'display_name' => $data['display_name'],
-                'description'  => $data['description'] ?? null,
-                'color'        => $data['color'] ?? 'blue',
-                'is_active'    => $data['is_active'] ?? true,
-                'is_system'    => false, // Los roles creados por admins nunca son de sistema
+                'description' => $data['description'] ?? null,
+                'color' => $data['color'] ?? 'blue',
+                'is_active' => $data['is_active'] ?? true,
+                'is_system' => false, // Los roles creados por admins nunca son de sistema
             ]);
 
             if (! empty($data['permission_ids'])) {
@@ -71,16 +71,17 @@ class RoleService
      * Actualiza los datos descriptivos de un rol.
      * El slug (name) es inmutable para evitar romper referencias en código.
      *
-     * @param array{display_name?: string, description?: ?string, color?: string, is_active?: bool} $data
+     * @param  array{display_name?: string, description?: ?string, color?: string, is_active?: bool}  $data
      */
     public function updateRole(Role $role, array $data): Role
     {
-        $role->update(array_filter([
-            'display_name' => $data['display_name'] ?? null,
-            'description'  => array_key_exists('description', $data) ? $data['description'] : null,
-            'color'        => $data['color'] ?? null,
-            'is_active'    => $data['is_active'] ?? null,
-        ], fn ($v) => $v !== null));
+        // Antes esto era un array_filter que descartaba los null, de modo que
+        // enviar description: null respondia 200 pero no vaciaba el campo. Lo
+        // correcto es distinguir "clave ausente" de "clave con valor null":
+        // solo se escriben las claves que el cliente envio de verdad.
+        $role->update(
+            array_intersect_key($data, array_flip(['display_name', 'description', 'color', 'is_active']))
+        );
 
         return $role->fresh();
     }
@@ -108,7 +109,8 @@ class RoleService
      * Reemplaza el conjunto de permisos de un rol de forma atómica (sync).
      * Enviar un array vacío revoca todos los permisos del rol.
      *
-     * @param int[] $permissionIds
+     * @param  int[]  $permissionIds
+     *
      * @throws \RuntimeException
      */
     public function syncPermissions(Role $role, array $permissionIds): Role
@@ -118,6 +120,10 @@ class RoleService
         }
 
         $role->permissions()->sync($permissionIds);
+
+        // sync() sobre la tabla pivote no dispara eventos de modelo, asi que la
+        // invalidacion centralizada no la cubre.
+        PermissionService::flushCache();
 
         return $role->load('permissions');
     }

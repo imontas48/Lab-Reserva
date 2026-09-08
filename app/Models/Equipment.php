@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -40,7 +42,7 @@ class Equipment extends Model
      */
     public function lab(): BelongsTo
     {
-        return $this->belongsTo(labs::class, 'lab_id');
+        return $this->belongsTo(Lab::class, 'lab_id');
     }
 
     /**
@@ -48,7 +50,7 @@ class Equipment extends Model
      */
     public function software(): BelongsToMany
     {
-        return $this->belongsToMany(software::class, 'equipment_software');
+        return $this->belongsToMany(Software::class, 'equipment_software');
     }
 
     /**
@@ -56,7 +58,50 @@ class Equipment extends Model
      */
     public function reservations(): HasMany
     {
-        return $this->hasMany(reservations::class);
+        return $this->hasMany(Reservation::class);
+    }
+
+    /**
+     * La reserva que ocupa el equipo en este instante, si la hay.
+     *
+     * Existe para que getCurrentStatus() pueda resolverse con datos ya cargados.
+     * Antes consultaba con $this->reservations(), un query builder nuevo que
+     * ignora cualquier eager loading, de modo que serializar un listado de
+     * equipos disparaba dos consultas por equipo (y cuatro, porque el Resource
+     * llamaba al método dos veces).
+     */
+    public function currentReservation(): HasOne
+    {
+        return $this->hasOne(Reservation::class)->ofMany(
+            ['start_time' => 'max'],
+            fn ($query) => $query
+                ->confirmed()
+                ->where('start_time', '<=', now())
+                ->where('end_time', '>', now())
+        );
+    }
+
+    /**
+     * La siguiente reserva futura del equipo, si la hay.
+     */
+    public function nextReservation(): HasOne
+    {
+        return $this->hasOne(Reservation::class)->ofMany(
+            ['start_time' => 'min'],
+            fn ($query) => $query
+                ->confirmed()
+                ->where('start_time', '>', now())
+        );
+    }
+
+    /**
+     * Relaciones necesarias para resolver getCurrentStatus() sin consultas extra.
+     *
+     * @return array<int, string>
+     */
+    public static function statusRelations(): array
+    {
+        return ['currentReservation', 'nextReservation'];
     }
 
     /**
@@ -64,39 +109,7 @@ class Equipment extends Model
      */
     public function activeReservations(): HasMany
     {
-        return $this->hasMany(reservations::class)->where('status', 'confirmed');
-    }
-
-    /**
-     * Scope to get only operational equipment.
-     */
-    public function scopeOperational($query)
-    {
-        return $query->where('is_operational', true);
-    }
-
-    /**
-     * Scope to filter by lab.
-     */
-    public function scopeInLab($query, $labId)
-    {
-        return $query->where('lab_id', $labId);
-    }
-
-    /**
-     * Scope to filter by equipment type.
-     */
-    public function scopeOfType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
-
-    /**
-     * Get the full identifier including lab name.
-     */
-    public function getFullIdentifierAttribute(): string
-    {
-        return "{$this->lab->name} - {$this->identifier}";
+        return $this->hasMany(Reservation::class)->where('status', 'confirmed');
     }
 
     /**
@@ -113,48 +126,39 @@ class Equipment extends Model
     public function getCurrentStatus(): array
     {
         // Si el equipo está fuera de servicio físicamente
-        if (!$this->is_operational) {
+        if (! $this->is_operational) {
             return [
                 'status' => 'out_of_service',
                 'details' => 'Equipo en mantenimiento',
                 'color' => 'red',
-                'icon' => 'wrench'
+                'icon' => 'wrench',
             ];
         }
 
-        $now = now();
-
-        // Buscar reserva activa (está en uso AHORA)
-        $activeReservation = $this->reservations()
-            ->where('status', 'confirmed')
-            ->where('start_time', '<=', $now)
-            ->where('end_time', '>', $now)
-            ->first();
+        // Acceso a la RELACIÓN, no al query builder: si el listado la cargó por
+        // adelantado no se dispara ninguna consulta, y si no, se resuelve al
+        // vuelo igual que antes.
+        $activeReservation = $this->currentReservation;
 
         if ($activeReservation) {
             return [
                 'status' => 'in_use',
-                'details' => 'En uso hasta ' . $activeReservation->end_time->format('H:i'),
+                'details' => 'En uso hasta '.$activeReservation->end_time->format('H:i'),
                 'until' => $activeReservation->end_time,
                 'color' => 'blue',
-                'icon' => 'clock'
+                'icon' => 'clock',
             ];
         }
 
-        // Buscar próxima reserva futura
-        $nextReservation = $this->reservations()
-            ->where('status', 'confirmed')
-            ->where('start_time', '>', $now)
-            ->orderBy('start_time', 'asc')
-            ->first();
+        $nextReservation = $this->nextReservation;
 
         if ($nextReservation) {
             return [
                 'status' => 'reserved',
-                'details' => 'Reservado para ' . $nextReservation->start_time->format('d/m H:i'),
+                'details' => 'Reservado para '.$nextReservation->start_time->format('d/m H:i'),
                 'next_reservation' => $nextReservation->start_time,
                 'color' => 'yellow',
-                'icon' => 'calendar'
+                'icon' => 'calendar',
             ];
         }
 
@@ -163,53 +167,7 @@ class Equipment extends Model
             'status' => 'available',
             'details' => 'Disponible',
             'color' => 'green',
-            'icon' => 'check'
+            'icon' => 'check',
         ];
-    }
-
-    /**
-     * Verifica si el equipo está disponible en un rango de tiempo específico.
-     *
-     * @param string $startTime Fecha/hora de inicio
-     * @param string $endTime Fecha/hora de fin
-     * @return bool
-     */
-    public function isAvailableInRange($startTime, $endTime): bool
-    {
-        // Si está fuera de servicio, no está disponible
-        if (!$this->is_operational) {
-            return false;
-        }
-
-        // Verificar si hay conflictos con reservas existentes
-        $conflicts = $this->reservations()
-            ->where('status', 'confirmed')
-            ->where(function ($query) use ($startTime, $endTime) {
-                // Detectar solapamiento de rangos de tiempo
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($q) use ($startTime, $endTime) {
-                        $q->where('start_time', '<=', $startTime)
-                          ->where('end_time', '>=', $endTime);
-                    });
-            })
-            ->exists();
-
-        return !$conflicts;
-    }
-
-    /**
-     * Scope para obtener solo equipos disponibles AHORA.
-     */
-    public function scopeCurrentlyAvailable($query)
-    {
-        $now = now();
-
-        return $query->where('is_operational', true)
-            ->whereDoesntHave('reservations', function ($q) use ($now) {
-                $q->where('status', 'confirmed')
-                  ->where('start_time', '<=', $now)
-                  ->where('end_time', '>', $now);
-            });
     }
 }

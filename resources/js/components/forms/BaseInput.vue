@@ -64,6 +64,8 @@
              ═══════════════════════════════════════════════════════════════════ -->
         <input
             :id="inputId"
+            :name="name || undefined"
+            :autocomplete="autocomplete || undefined"
             :type="type"
             :value="modelValue"
             :placeholder="placeholder"
@@ -137,6 +139,18 @@ import { computed, ref } from 'vue';
  * @property {Boolean} disabled - Indica si el input está deshabilitado
  */
 const props = defineProps({
+    /** Atributo name del input, necesario para los gestores de contrasenas */
+    name: {
+        type: String,
+        default: '',
+    },
+
+    /** Pista de autocompletado del navegador */
+    autocomplete: {
+        type: String,
+        default: '',
+    },
+
     modelValue: {
         type: [String, Number],
         default: ''

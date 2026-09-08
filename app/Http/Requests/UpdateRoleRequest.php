@@ -44,7 +44,7 @@ class UpdateRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'color.in'         => 'El color debe ser: blue, green, red, yellow, purple, orange o gray.',
+            'color.in' => 'El color debe ser: blue, green, red, yellow, purple, orange o gray.',
             'display_name.max' => 'El nombre del rol no puede superar los 128 caracteres.',
         ];
     }

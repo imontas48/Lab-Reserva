@@ -193,6 +193,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { vClickOutside } from '@/directives/clickOutside';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/composables/useToast';
@@ -212,17 +213,7 @@ const isAdminRoute  = computed(() => ['/roles', '/permissions', '/group-role-ass
 const isReservationsRoute = computed(() => route.path.startsWith('/reservations'));
 
 // Directiva simple v-click-outside registrada localmente
-const vClickOutside = {
-  mounted(el, binding) {
-    el._clickOutsideHandler = (event) => {
-      if (!el.contains(event.target)) binding.value(event);
-    };
-    document.addEventListener('click', el._clickOutsideHandler);
-  },
-  unmounted(el) {
-    document.removeEventListener('click', el._clickOutsideHandler);
-  },
-};
+
 
 const handleLogout = async () => {
   try {
