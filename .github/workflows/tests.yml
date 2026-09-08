@@ -67,7 +67,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
-          coverage: none
+          coverage: pcov
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
@@ -106,8 +106,22 @@ jobs:
         # fallo de prueba: si esta paso falla, el problema es una migracion.
         run: php artisan migrate --force
 
-      - name: Execute tests
-        run: php artisan test
+      - name: Static analysis
+        # Nivel 1 con linea base: falla ante errores NUEVOS de clase o de
+        # propiedad inexistente, que son las dos familias de fallo que este
+        # proyecto ha sufrido de verdad.
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Execute backend tests
+        # La cobertura se reporta pero todavia NO bloquea: no hay driver de
+        # cobertura en el entorno de desarrollo, asi que el porcentaje real
+        # se desconoce y fijar un minimo a ciegas solo serviria para dejar el
+        # pipeline en rojo. Anadir --min=<valor> cuando la primera ejecucion
+        # publique la cifra.
+        run: php artisan test --coverage
+
+      - name: Execute frontend tests
+        run: pnpm test
 
       - name: Audit PHP dependencies
         run: composer audit
