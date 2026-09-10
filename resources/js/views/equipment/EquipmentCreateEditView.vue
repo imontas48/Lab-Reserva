@@ -241,6 +241,32 @@
                         />
                     </div>
 
+                    <!-- Software instalado -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Software instalado</h2>
+                        <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
+                            Permite a los usuarios buscar un equipo por el programa que necesitan.
+                        </p>
+                        <p v-if="softwareOptions.length === 0" class="text-sm text-gray-500 dark:text-gray-400">
+                            No hay software registrado. Créalo primero en la sección Software.
+                        </p>
+                        <div v-else class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <label
+                                v-for="sw in softwareOptions"
+                                :key="sw.id"
+                                class="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 dark:border-gray-600 dark:text-gray-200"
+                            >
+                                <input
+                                    v-model="form.software"
+                                    type="checkbox"
+                                    :value="sw.id"
+                                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                {{ sw.name }}<span v-if="sw.version" class="text-gray-500"> {{ sw.version }}</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- ═════════════════════════════════════════════════════════
                          ACCIONES DEL FORMULARIO
                          ═════════════════════════════════════════════════════════ -->
@@ -298,6 +324,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useEquipment } from '@/composables/useEquipment';
 import { useLabs } from '@/composables/useLabs';
+import { useSoftware } from '@/composables/useSoftware';
 import BaseInput from '@/components/forms/BaseInput.vue';
 import BaseSelect from '@/components/forms/BaseSelect.vue';
 
@@ -345,8 +372,13 @@ const form = ref({
     type: '',
     lab_id: '',
     specifications: '',
-    is_operational: '1' // Por defecto: operacional
+    is_operational: '1', // Por defecto: operacional
+    software: [],
 });
+
+// Software disponible para asociar al equipo
+const { software: softwareList, fetchSoftware } = useSoftware();
+const softwareOptions = computed(() => softwareList.value ?? []);
 
 // Estado de envío
 const isSubmitting = ref(false);
@@ -442,7 +474,9 @@ onMounted(async () => {
 
     try {
         // PASO 1: Cargar laboratorios (SIEMPRE necesario para el BaseSelect)
+        // y el catálogo de software para las casillas.
         await fetchLabs();
+        fetchSoftware({ per_page: 100 }).catch(() => {});
 
         // PASO 2: Si estamos en modo edición, cargar datos del equipment
         if (isEditing.value) {
@@ -457,7 +491,8 @@ onMounted(async () => {
                     type: equipment.type || '',
                     lab_id: String(equipment.lab_id || ''),
                     specifications: equipment.specifications || '',
-                    is_operational: String(equipment.is_operational ? '1' : '0')
+                    is_operational: String(equipment.is_operational ? '1' : '0'),
+                    software: equipment.software_ids ?? (equipment.software ?? []).map((sw) => sw.id),
                 };
 
             } else {
