@@ -41,6 +41,12 @@
       </BaseButton>
 
       <div class="text-center text-sm">
+        <router-link to="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+          ¿Olvidaste tu contraseña?
+        </router-link>
+      </div>
+
+      <div class="text-center text-sm">
         <span class="text-gray-600 dark:text-gray-400">¿No tienes cuenta?</span>
         <router-link
           to="/register"
