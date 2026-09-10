@@ -81,7 +81,7 @@ class EquipmentController extends Controller
         $this->authorize('view', $equipment);
 
         // Cargamos las relaciones necesarias
-        $equipment->load(['lab', 'software', 'currentReservation', 'nextReservation']);
+        $equipment->load(['lab', 'software', ...Equipment::statusRelations()]);
 
         return new EquipmentResource($equipment);
     }

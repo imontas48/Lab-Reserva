@@ -2,22 +2,30 @@
 
 namespace App\Providers;
 
+use App\Models\AcademicPeriod;
 use App\Models\Equipment;
+use App\Models\EquipmentIncident;
 use App\Models\GroupRoleAssignment;
 use App\Models\Lab;
+use App\Models\LabClosure;
 use App\Models\Permission;
 use App\Models\PermissionOverride;
 use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\Software;
+use App\Models\User;
 use App\Models\UserRole;
 use App\Policies\EquipmentPolicy;
+use App\Policies\IncidentPolicy;
 use App\Policies\LabPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\ReservationPolicy;
 use App\Policies\RolePolicy;
+use App\Policies\SchedulePolicy;
 use App\Policies\SoftwarePolicy;
+use App\Policies\UserPolicy;
 use App\Services\PermissionService;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -46,9 +54,20 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Permission::class, PermissionPolicy::class);
         Gate::policy(Reservation::class, ReservationPolicy::class);
+        Gate::policy(LabClosure::class, SchedulePolicy::class);
+        Gate::policy(AcademicPeriod::class, SchedulePolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(EquipmentIncident::class, IncidentPolicy::class);
 
         $this->configureRateLimiting();
         $this->invalidatePermissionCacheOnRbacWrites();
+
+        // El enlace de recuperacion apunta a la SPA: no existe una ruta web
+        // 'password.reset', que es la que usa la notificacion por defecto.
+        ResetPassword::createUrlUsing(fn (User $user, string $token) => url('/reset-password?'.http_build_query([
+            'token' => $token,
+            'email' => $user->email,
+        ])));
     }
 
     /**
