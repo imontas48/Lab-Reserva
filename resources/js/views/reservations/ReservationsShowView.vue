@@ -45,12 +45,19 @@
     </DetailPanel>
 
     <div
-      v-if="item?.check_in_code && item.status === 'confirmed' && !item.checked_in_at && !item.is_past"
+      v-if="showCheckInNotice"
       class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
     >
-      Tu código de check-in es
-      <code class="rounded bg-white px-2 py-0.5 font-mono text-base font-bold dark:bg-gray-800">{{ item.check_in_code }}</code>.
-      Podrás registrar tu llegada desde {{ formatDateTime(item.check_in_opens_at) }}; si no lo haces dentro del periodo de gracia, la reserva se liberará.
+      <template v-if="isOwner">
+        Tu código de check-in es
+        <code class="rounded bg-white px-2 py-0.5 font-mono text-base font-bold dark:bg-gray-800">{{ item.check_in_code }}</code>.
+        Podrás registrar tu llegada desde {{ formatDateTime(item.check_in_opens_at) }}; si no lo haces dentro del periodo de gracia, la reserva se liberará.
+      </template>
+      <template v-else>
+        Código de check-in del usuario:
+        <code class="rounded bg-white px-2 py-0.5 font-mono text-base font-bold dark:bg-gray-800">{{ item.check_in_code }}</code>.
+        El check-in se abre a las {{ formatDateTime(item.check_in_opens_at) }}.
+      </template>
     </div>
 
     <CheckInModal v-model="showCheckIn" :loading="busy === 'check-in'" :server-message="checkInError" @confirm="handleCheckIn" />
@@ -121,6 +128,13 @@ const fields = computed(() => (item.value ? [
   { label: 'Inasistencia registrada', value: formatDateTime(item.value.no_show_at) },
   { label: 'Serie', value: isInSeries(item.value) ? 'Clase semanal recurrente' : null },
 ] : []));
+
+const isOwner = computed(() => item.value?.user_id === authStore.user?.id);
+
+const showCheckInNotice = computed(() => !!item.value?.check_in_code
+  && item.value.status === 'confirmed'
+  && !item.value.checked_in_at
+  && !item.value.is_past);
 
 // El servidor vuelve a comprobarlo (policy + reglas de negocio); aquí solo
 // se decide si mostrar el botón.

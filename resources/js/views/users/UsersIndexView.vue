@@ -6,8 +6,8 @@
     </div>
 
     <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-      <BaseInput v-model="search" name="search" label="Buscar" placeholder="Nombre o correo" class="w-64" @update:model-value="debouncedLoad" />
-      <BaseSelect v-model="role" name="role" label="Rol" placeholder="Todos" :options="ROLE_OPTIONS" class="w-44" @update:model-value="reload" />
+      <div class="w-64"><BaseInput v-model="search" name="search" label="Buscar" placeholder="Nombre o correo" @update:model-value="debouncedLoad" /></div>
+      <div class="w-44"><BaseSelect v-model="role" name="role" label="Rol" placeholder="Todos" :options="ROLE_OPTIONS" @update:model-value="reload" /></div>
       <label class="flex items-center gap-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
         <input v-model="blocked" type="checkbox" class="h-4 w-4 rounded border-gray-300" @change="reload" />
         Solo bloqueados

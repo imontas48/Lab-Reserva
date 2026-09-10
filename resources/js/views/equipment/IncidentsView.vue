@@ -6,7 +6,7 @@
     </div>
 
     <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-      <BaseSelect v-model="labId" name="lab_id" label="Laboratorio" placeholder="Todos" :options="labOptions" class="w-56" @update:model-value="load" />
+      <div class="w-56"><BaseSelect v-model="labId" name="lab_id" label="Laboratorio" placeholder="Todos" :options="labOptions" @update:model-value="load" /></div>
       <label class="flex items-center gap-2 pb-2 text-sm text-gray-700 dark:text-gray-300">
         <input v-model="includeResolved" type="checkbox" class="h-4 w-4 rounded border-gray-300" @change="load" />
         Incluir resueltas

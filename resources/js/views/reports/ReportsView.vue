@@ -24,9 +24,9 @@
           {{ preset.label }}
         </button>
       </div>
-      <BaseInput v-model="from" name="from" type="date" label="Desde" class="w-40" @update:model-value="activePreset = null" />
-      <BaseInput v-model="to" name="to" type="date" label="Hasta" class="w-40" @update:model-value="activePreset = null" />
-      <BaseSelect v-model="labId" name="lab_id" label="Laboratorio" placeholder="Todos" :options="labOptions" class="w-56" />
+      <div class="w-44"><BaseInput v-model="from" name="from" type="date" label="Desde" @update:model-value="activePreset = null" /></div>
+      <div class="w-44"><BaseInput v-model="to" name="to" type="date" label="Hasta" @update:model-value="activePreset = null" /></div>
+      <div class="w-60"><BaseSelect v-model="labId" name="lab_id" label="Laboratorio" placeholder="Todos" :options="labOptions" /></div>
       <BaseButton :loading="loading" @click="load">Aplicar</BaseButton>
     </div>
 
