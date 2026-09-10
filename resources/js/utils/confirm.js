@@ -33,3 +33,31 @@ export async function confirmDestructive({
 
     return isConfirmed;
 }
+
+/**
+ * Confirmación de una acción NO destructiva pero con consecuencias (aprobar
+ * una solicitud, por ejemplo). Misma apariencia que la destructiva, con el
+ * botón principal en el color de acción y el foco en confirmar.
+ *
+ * @param {{ title?: string, html: string, confirmText?: string }} options
+ * @returns {Promise<boolean>} true si el usuario confirma
+ */
+export async function confirmAction({
+    title = '¿Confirmar?',
+    html,
+    confirmText = 'Sí, continuar',
+}) {
+    const { isConfirmed } = await Swal.fire({
+        title,
+        html,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: confirmText,
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+    });
+
+    return isConfirmed;
+}

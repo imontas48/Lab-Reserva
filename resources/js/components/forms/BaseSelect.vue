@@ -90,6 +90,7 @@
                 v-for="option in options"
                 :key="option.value"
                 :value="option.value"
+                :disabled="option.disabled === true"
             >
                 {{ option.text }}
             </option>

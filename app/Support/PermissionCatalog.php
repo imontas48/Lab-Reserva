@@ -50,6 +50,26 @@ class PermissionCatalog
             'update' => 'Modificar una reserva propia',
             'cancel' => 'Cancelar una reserva propia',
             'delete' => 'Eliminar reservas',
+            'createLab' => 'Reservar un laboratorio completo para una clase',
+            'approve' => 'Aprobar o rechazar solicitudes de laboratorio completo',
+        ],
+        'schedule' => [
+            'view' => 'Consultar horarios, cierres y periodos académicos',
+            'manage' => 'Gestionar horarios de apertura, cierres y periodos académicos',
+        ],
+        'users' => [
+            'viewAny' => 'Listar usuarios',
+            'view' => 'Ver el detalle de un usuario',
+            'update' => 'Modificar usuarios y su rol base',
+            'delete' => 'Dar de baja usuarios',
+        ],
+        'reports' => [
+            'view' => 'Consultar reportes de uso y exportar datos',
+        ],
+        'incidents' => [
+            'create' => 'Reportar incidencias sobre un equipo',
+            'viewAny' => 'Ver todas las incidencias',
+            'update' => 'Atender y resolver incidencias',
         ],
     ];
 
@@ -61,8 +81,10 @@ class PermissionCatalog
      * cualquier autenticado (los estudiantes lo necesitan para reservar) y su
      * administracion es exclusiva del administrador.
      *
-     * teacher y student coinciden hoy: la diferencia entre ambos no estaba
-     * implementada en ninguna parte. Ahora es un cambio de datos, no de codigo.
+     * La unica diferencia entre teacher y student es reservations.createLab:
+     * el profesor puede apartar un laboratorio completo para dar una clase.
+     * Aprobar esas solicitudes (reservations.approve) es exclusivo del
+     * administrador.
      *
      * @var array<string, array<int, string>|string>
      */
@@ -74,6 +96,9 @@ class PermissionCatalog
             'software.viewAny', 'software.view',
             'reservations.create', 'reservations.view',
             'reservations.update', 'reservations.cancel',
+            'reservations.createLab',
+            'schedule.view',
+            'incidents.create',
         ],
         'student' => [
             'labs.viewAny', 'labs.view',
@@ -81,6 +106,8 @@ class PermissionCatalog
             'software.viewAny', 'software.view',
             'reservations.create', 'reservations.view',
             'reservations.update', 'reservations.cancel',
+            'schedule.view',
+            'incidents.create',
         ],
     ];
 
@@ -97,7 +124,7 @@ class PermissionCatalog
         ],
         'teacher' => [
             'display_name' => 'Profesor',
-            'description' => 'Consulta el catálogo y gestiona sus propias reservas.',
+            'description' => 'Consulta el catálogo, gestiona sus reservas y solicita laboratorios completos para sus clases.',
             'color' => 'blue',
         ],
         'student' => [

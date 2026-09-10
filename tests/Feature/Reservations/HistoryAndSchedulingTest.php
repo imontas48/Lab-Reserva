@@ -3,6 +3,7 @@
 namespace Tests\Feature\Reservations;
 
 use App\Models\Equipment;
+use App\Models\Lab;
 use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Database\QueryException;
@@ -35,6 +36,36 @@ class HistoryAndSchedulingTest extends TestCase
         $this->artisan('reservations:complete-expired')->assertSuccessful();
 
         $this->assertSame(Reservation::STATUS_CANCELLED, $cancelada->fresh()->status);
+    }
+
+    /**
+     * Una solicitud que llega a su hora sin decision no puede seguir ocupando
+     * la franja para siempre: se expira, que no es lo mismo que rechazarla.
+     */
+    public function test_el_comando_expira_las_solicitudes_pendientes_vencidas(): void
+    {
+        $vencida = Reservation::factory()->forLab(Lab::factory()->create())->past()->create();
+        $futura = Reservation::factory()->forLab(Lab::factory()->create())->future()->create();
+
+        $this->artisan('reservations:complete-expired')->assertSuccessful();
+
+        $this->assertSame(Reservation::STATUS_EXPIRED, $vencida->fresh()->status);
+        $this->assertSame(Reservation::STATUS_PENDING, $futura->fresh()->status);
+    }
+
+    public function test_una_solicitud_expirada_deja_de_bloquear_la_franja(): void
+    {
+        $lab = Lab::factory()->create();
+        $inicio = Carbon::yesterday()->setTimeFromTimeString('10:00:00');
+        $fin = Carbon::yesterday()->setTimeFromTimeString('11:00:00');
+
+        Reservation::factory()->forLab($lab)->between($inicio, $fin)->create();
+
+        $this->assertSame(1, Reservation::query()->forLab($lab->id)->blocking($inicio, $fin)->count());
+
+        $this->artisan('reservations:complete-expired');
+
+        $this->assertSame(0, Reservation::query()->forLab($lab->id)->blocking($inicio, $fin)->count());
     }
 
     public function test_una_reserva_vencida_deja_de_bloquear_la_franja(): void

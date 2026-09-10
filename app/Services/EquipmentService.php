@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\BusinessRuleException;
 use App\Models\Equipment;
 use App\Models\Lab;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -15,7 +16,7 @@ class EquipmentService
      */
     public function getAllEquipment(array $filters = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
-        $query = Equipment::with(['lab', 'software', 'currentReservation', 'nextReservation']);
+        $query = Equipment::with(['lab', 'software', ...Equipment::statusRelations()]);
 
         // Filtrar por laboratorio
         if (isset($filters['lab_id'])) {
@@ -42,6 +43,8 @@ class EquipmentService
             });
         }
 
+        $this->applyCapabilityFilters($query, $filters);
+
         // Ordenamiento
         $sortBy = $filters['sort_by'] ?? 'identifier';
         $sortOrder = $filters['sort_order'] ?? 'asc';
@@ -52,11 +55,34 @@ class EquipmentService
     }
 
     /**
+     * "Un equipo con X libre de A a B": software instalado y ausencia de
+     * reservas que bloqueen la franja, tanto del equipo como de su
+     * laboratorio (una clase ocupa todos los puestos).
+     *
+     * @param  Builder<Equipment>  $query
+     */
+    private function applyCapabilityFilters($query, array $filters): void
+    {
+        if (isset($filters['software_id'])) {
+            $query->whereHas('software', fn ($q) => $q->where('software.id', $filters['software_id']));
+        }
+
+        if (isset($filters['available_from'], $filters['available_to'])) {
+            $from = $filters['available_from'];
+            $to = $filters['available_to'];
+
+            $query->where('is_operational', true)
+                ->whereDoesntHave('reservations', fn ($q) => $q->blocking($from, $to))
+                ->whereDoesntHave('lab.reservations', fn ($q) => $q->blocking($from, $to));
+        }
+    }
+
+    /**
      * Get equipment for a specific lab.
      */
     public function getEquipmentByLab(Lab $lab, array $filters = []): Collection
     {
-        $query = $lab->equipment()->with(['software', 'currentReservation', 'nextReservation']);
+        $query = $lab->equipment()->with(['software', ...Equipment::statusRelations()]);
 
         // Filtrar por tipo
         if (isset($filters['type'])) {
@@ -108,7 +134,7 @@ class EquipmentService
         }
 
         // Recargar con relaciones
-        return $equipment->load(['lab', 'software', 'currentReservation', 'nextReservation']);
+        return $equipment->load(['lab', 'software', ...Equipment::statusRelations()]);
     }
 
     /**
@@ -140,8 +166,7 @@ class EquipmentService
     public function deleteEquipment(Equipment $equipment): bool
     {
         // Verificar si el equipo tiene reservas activas
-        $activeReservations = $equipment->reservations()
-            ->where('status', 'confirmed')
+        $activeReservations = $equipment->activeReservations()
             ->where('end_time', '>=', now())
             ->exists();
 

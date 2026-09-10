@@ -10,6 +10,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $lab_id
+ * @property string $identifier
+ * @property string $type
+ * @property string|null $specifications
+ * @property bool $is_operational
+ * @property int|null $grid_row
+ * @property int|null $grid_col
+ * @property-read Lab $lab
+ * @property-read Reservation|null $currentReservation
+ * @property-read Reservation|null $nextReservation
+ */
 class Equipment extends Model
 {
     use HasFactory, SoftDeletes;
@@ -23,6 +36,8 @@ class Equipment extends Model
         'type',
         'specifications',
         'is_operational',
+        'grid_row',
+        'grid_col',
     ];
 
     /**
@@ -59,6 +74,16 @@ class Equipment extends Model
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(EquipmentIncident::class);
+    }
+
+    public function openIncidents(): HasMany
+    {
+        return $this->hasMany(EquipmentIncident::class)->open();
     }
 
     /**
@@ -101,7 +126,7 @@ class Equipment extends Model
      */
     public static function statusRelations(): array
     {
-        return ['currentReservation', 'nextReservation'];
+        return ['currentReservation', 'nextReservation', 'lab.currentReservation'];
     }
 
     /**
@@ -109,7 +134,8 @@ class Equipment extends Model
      */
     public function activeReservations(): HasMany
     {
-        return $this->hasMany(Reservation::class)->where('status', 'confirmed');
+        return $this->hasMany(Reservation::class)
+            ->whereIn('status', Reservation::BLOCKING_STATUSES);
     }
 
     /**
@@ -132,6 +158,21 @@ class Equipment extends Model
                 'details' => 'Equipo en mantenimiento',
                 'color' => 'red',
                 'icon' => 'wrench',
+            ];
+        }
+
+        // Una clase en curso bloquea todos los equipos del laboratorio. Solo se
+        // consulta si el laboratorio vino cargado, para no reabrir el N+1 en
+        // los listados (statusRelations() incluye lab.currentReservation).
+        $labClass = $this->relationLoaded('lab') ? $this->lab?->currentReservation : null;
+
+        if ($labClass) {
+            return [
+                'status' => 'in_use',
+                'details' => 'Laboratorio en clase hasta '.$labClass->end_time->format('H:i'),
+                'until' => $labClass->end_time,
+                'color' => 'purple',
+                'icon' => 'academic',
             ];
         }
 

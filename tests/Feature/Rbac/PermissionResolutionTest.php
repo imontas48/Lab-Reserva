@@ -37,6 +37,23 @@ class PermissionResolutionTest extends TestCase
         $this->assertFalse($student->hasPermission('labs', 'create'));
     }
 
+    /**
+     * La unica diferencia entre profesor y estudiante: apartar un laboratorio
+     * completo. Aprobar sigue siendo del administrador.
+     */
+    public function test_el_profesor_puede_solicitar_laboratorios_pero_no_aprobarlos(): void
+    {
+        $teacher = User::factory()->teacher()->create();
+        $student = User::factory()->student()->create();
+
+        $this->assertTrue($teacher->hasPermission('reservations', 'createLab'));
+        $this->assertFalse($teacher->hasPermission('reservations', 'approve'));
+        $this->assertFalse($student->hasPermission('reservations', 'createLab'));
+        $this->assertFalse($student->hasPermission('reservations', 'approve'));
+        $this->assertTrue($student->hasPermission('schedule', 'view'));
+        $this->assertFalse($teacher->hasPermission('schedule', 'manage'));
+    }
+
     public function test_el_administrador_tiene_todo_el_catalogo(): void
     {
         $admin = User::factory()->admin()->create();

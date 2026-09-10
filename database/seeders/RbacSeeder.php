@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\GroupRoleAssignment;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Services\PermissionService;
 use App\Support\PermissionCatalog;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +32,12 @@ class RbacSeeder extends Seeder
             $this->attachPermissionsToRoles($roles, $permissions);
             $this->seedGroupAssignments($roles);
         });
+
+        // sync() no dispara eventos de modelo, asi que la invalidacion
+        // automatica del AppServiceProvider no ve el cambio de permisos por
+        // rol. Sin esto, resembrar tras ampliar el catalogo dejaba a los
+        // usuarios ya conectados con la lista antigua hasta 30 minutos.
+        PermissionService::flushCache();
 
         $this->command?->info('RBAC sembrado: '
             .count(PermissionCatalog::allKeys()).' permisos, '

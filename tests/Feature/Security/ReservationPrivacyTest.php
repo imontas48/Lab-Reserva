@@ -3,6 +3,7 @@
 namespace Tests\Feature\Security;
 
 use App\Models\Equipment;
+use App\Models\Lab;
 use App\Models\Reservation;
 use App\Models\User;
 use Tests\TestCase;
@@ -56,6 +57,29 @@ class ReservationPrivacyTest extends TestCase
         $this->getJson("/api/v1/equipment/{$equipment->id}/reservations")
             ->assertOk()
             ->assertJsonPath('data.0.user.email', 'ana@lab-reserva.test');
+    }
+
+    /**
+     * La ocupacion de un equipo incluye ahora las clases de su laboratorio, y
+     * la ocupacion del laboratorio esta abierta a cualquier autenticado. Ni
+     * una ni otra pueden filtrar quien dio la clase.
+     */
+    public function test_las_clases_del_laboratorio_tampoco_revelan_al_profesor(): void
+    {
+        $profesor = User::factory()->teacher()->create(['name' => 'Luis Docente', 'email' => 'luis@lab-reserva.test']);
+        $lab = Lab::factory()->create();
+        $equipment = Equipment::factory()->inLab($lab)->create();
+        Reservation::factory()->forLab($lab)->forUser($profesor)->confirmed()->create();
+
+        $this->actingAsStudent();
+
+        foreach (["/api/v1/equipment/{$equipment->id}/reservations", "/api/v1/labs/{$lab->id}/reservations"] as $url) {
+            $response = $this->getJson($url)->assertOk();
+
+            $response->assertJsonPath('data.0.type', 'lab');
+            $response->assertJsonMissing(['email' => 'luis@lab-reserva.test']);
+            $response->assertJsonMissing(['name' => 'Luis Docente']);
+        }
     }
 
     public function test_el_listado_general_sigue_siendo_solo_de_administradores(): void

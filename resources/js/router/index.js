@@ -69,6 +69,24 @@ const routes = [
                     guest: true,
                 }
             },
+            {
+                path: '/forgot-password',
+                name: 'password.forgot',
+                component: () => import('@/views/auth/ForgotPasswordView.vue'),
+                meta: {
+                    title: 'Recuperar Contraseña',
+                    guest: true,
+                }
+            },
+            {
+                path: '/reset-password',
+                name: 'password.reset',
+                component: () => import('@/views/auth/ResetPasswordView.vue'),
+                meta: {
+                    title: 'Nueva Contraseña',
+                    guest: true,
+                }
+            },
         ]
     },
 
@@ -265,6 +283,117 @@ const routes = [
                 }
             },
             {
+                path: '/labs/:id/map',
+                name: 'labs.map',
+                component: () => import('@/views/labs/LabMapView.vue'),
+                meta: {
+                    title: 'Mapa del Laboratorio',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/labs/:id/layout',
+                name: 'labs.layout',
+                component: () => import('@/views/labs/LabLayoutEditorView.vue'),
+                meta: {
+                    title: 'Plano del Laboratorio',
+                    requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/incidents',
+                name: 'incidents.index',
+                component: () => import('@/views/equipment/IncidentsView.vue'),
+                meta: {
+                    title: 'Incidencias',
+                    requiresAuth: true,
+                    requiresPermission: 'incidents.viewAny',
+                }
+            },
+            {
+                path: '/labs/:id/schedule',
+                name: 'labs.schedule',
+                component: () => import('@/views/labs/LabScheduleView.vue'),
+                meta: {
+                    title: 'Horario del Laboratorio',
+                    requiresAuth: true,
+                    requiresPermission: 'schedule.manage',
+                }
+            },
+            {
+                path: '/closures',
+                name: 'closures.index',
+                component: () => import('@/views/schedule/ClosuresView.vue'),
+                meta: {
+                    title: 'Cierres',
+                    requiresAuth: true,
+                    requiresPermission: 'schedule.manage',
+                }
+            },
+            {
+                path: '/academic-periods',
+                name: 'academic-periods.index',
+                component: () => import('@/views/schedule/AcademicPeriodsView.vue'),
+                meta: {
+                    title: 'Periodos Académicos',
+                    requiresAuth: true,
+                    requiresPermission: 'schedule.manage',
+                }
+            },
+            {
+                path: '/users',
+                name: 'users.index',
+                component: () => import('@/views/users/UsersIndexView.vue'),
+                meta: {
+                    title: 'Usuarios',
+                    requiresAuth: true,
+                    requiresPermission: 'users.viewAny',
+                }
+            },
+            {
+                path: '/users/:id',
+                name: 'users.show',
+                component: () => import('@/views/users/UserDetailView.vue'),
+                meta: {
+                    title: 'Detalle de Usuario',
+                    requiresAuth: true,
+                    requiresPermission: 'users.view',
+                }
+            },
+            {
+                path: '/reports',
+                name: 'reports.index',
+                component: () => import('@/views/reports/ReportsView.vue'),
+                meta: {
+                    title: 'Reportes',
+                    requiresAuth: true,
+                    requiresPermission: 'reports.view',
+                }
+            },
+            {
+                path: '/notifications',
+                name: 'notifications.index',
+                component: () => import('@/views/NotificationsView.vue'),
+                meta: {
+                    title: 'Notificaciones',
+                    requiresAuth: true,
+                }
+            },
+            {
+                path: '/reservations/pending',
+                name: 'reservations.pending',
+                component: () => import('@/views/reservations/ReservationsPendingView.vue'),
+                meta: {
+                    title: 'Solicitudes Pendientes',
+                    requiresAuth: true,
+                    // Por permiso y no por rol: quien tenga reservations.approve
+                    // (el administrador, o quien lo reciba por rol individual)
+                    // ve la cola.
+                    requiresPermission: 'reservations.approve',
+                }
+            },
+            {
                 path: '/reservations/:id',
                 name: 'reservations.show',
                 component: () => import('@/views/reservations/ReservationsShowView.vue'),
@@ -437,6 +566,16 @@ router.beforeEach(async (to, from, next) => {
         // Verificar si requiere permisos de profesor
         // ─────────────────────────────────────────────────────────────────────
         if (to.meta.requiresTeacher && !authStore.isTeacher && !authStore.isAdmin) {
+            return next({
+                name: 'dashboard',
+                replace: true
+            });
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Verificar un permiso efectivo concreto (subject.action)
+        // ─────────────────────────────────────────────────────────────────────
+        if (to.meta.requiresPermission && !authStore.can(to.meta.requiresPermission)) {
             return next({
                 name: 'dashboard',
                 replace: true

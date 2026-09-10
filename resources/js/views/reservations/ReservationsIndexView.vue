@@ -1,91 +1,58 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mis Reservas</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">Gestiona tus reservas de laboratorio</p>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Gestiona tus reservas de equipos y tus solicitudes de laboratorio</p>
       </div>
 
       <router-link
         to="/reservations/create"
         class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
       >
-        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-        </svg>
-        Nueva Reserva
+        + Nueva reserva
       </router-link>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="loading && reservations.length === 0" class="flex items-center justify-center py-12">
-      <div class="text-center">
-        <svg
-          class="mx-auto h-12 w-12 animate-spin text-blue-600"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando tus reservas...</p>
-      </div>
+    <div v-if="loading && reservations.length === 0" class="flex flex-col items-center justify-center py-12">
+      <BaseSpinner size="lg" class="text-blue-600" label="Cargando reservas" />
+      <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando tus reservas...</p>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-      <div class="flex">
-        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800 dark:text-red-300">Error al cargar reservas</h3>
-          <p class="mt-1 text-sm text-red-700 dark:text-red-400">{{ error }}</p>
-          <button
-            @click="loadReservations"
-            class="mt-2 text-sm font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
-          >
-            Intentar nuevamente
-          </button>
-        </div>
-      </div>
+    <div
+      v-else-if="error"
+      class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300"
+      role="alert"
+    >
+      {{ error }}
+      <button class="ml-2 font-medium underline" @click="loadReservations">Intentar nuevamente</button>
     </div>
 
-    <!-- Empty State -->
     <div v-else-if="reservations.length === 0" class="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center dark:border-gray-600">
-      <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-      </svg>
-      <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No tienes reservas</h3>
-      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Comienza creando tu primera reserva de equipo</p>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">No tienes reservas</h3>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Comienza creando tu primera reserva.</p>
       <router-link
         to="/reservations/create"
         class="mt-4 inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
       >
-        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-        </svg>
-        Crear Reserva
+        Crear reserva
       </router-link>
     </div>
 
-    <!-- Reservations List -->
     <div v-else class="space-y-4">
-      <!-- Filters/Tabs -->
       <div class="border-b border-gray-200 dark:border-gray-700">
-        <nav class="-mb-px flex space-x-8">
+        <nav class="-mb-px flex flex-wrap gap-x-6" aria-label="Filtrar reservas">
           <button
             v-for="tab in tabs"
             :key="tab.value"
-            @click="activeTab = tab.value"
+            type="button"
             :class="[
               activeTab === tab.value
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300',
               'whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors'
             ]"
+            @click="activeTab = tab.value"
           >
             {{ tab.label }}
             <span
@@ -96,217 +63,129 @@
                 'ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium'
               ]"
             >
-              {{ getCountForTab(tab.value) }}
+              {{ counts[tab.value] }}
             </span>
           </button>
         </nav>
       </div>
 
-      <!-- Reservations Cards -->
-      <div class="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
-        <div
+      <p v-if="filteredReservations.length === 0" class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        No hay reservas en esta categoría.
+      </p>
+
+      <div v-else class="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
+        <ReservationCard
           v-for="reservation in filteredReservations"
           :key="reservation.id"
-          class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-        >
-          <!-- Status Badge -->
-          <div class="mb-4 flex items-start justify-between">
-            <span
-              :class="{
-                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': reservation.is_future,
-                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400': reservation.is_active,
-                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': reservation.is_past,
-                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': reservation.status === 'cancelled'
-              }"
-              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
-            >
-              <span
-                :class="{
-                  'bg-green-400': reservation.is_future,
-                  'bg-blue-400': reservation.is_active,
-                  'bg-gray-400': reservation.is_past,
-                  'bg-red-400': reservation.status === 'cancelled'
-                }"
-                class="mr-2 h-2 w-2 rounded-full"
-              ></span>
-              {{ getStatusLabel(reservation) }}
-            </span>
-
-            <span class="text-xs text-gray-500 dark:text-gray-400">#{{ reservation.id }}</span>
-          </div>
-
-          <!-- Equipment Info -->
-          <div class="mb-4">
-            <div class="flex items-center text-gray-900 dark:text-white">
-              <svg class="mr-2 h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-              <span class="font-medium">
-                {{ reservation.equipment?.identifier || `Equipo #${reservation.equipment_id}` }}
-              </span>
-            </div>
-
-            <div v-if="reservation.equipment?.lab" class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
-              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-              </svg>
-              {{ reservation.equipment.lab.name }}
-            </div>
-          </div>
-
-          <!-- Date & Time Info -->
-          <div class="space-y-2 border-t border-gray-200 pt-4 dark:border-gray-700">
-            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
-              <svg class="mr-2 h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              <span>{{ formatDate(reservation.start_time) }}</span>
-            </div>
-
-            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
-              <svg class="mr-2 h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>{{ formatTime(reservation.start_time) }} - {{ formatTime(reservation.end_time) }}</span>
-              <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">({{ reservation.duration_minutes }} min)</span>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div v-if="reservation.is_future && reservation.status === 'confirmed'" class="mt-4 flex justify-end">
-            <button
-              @click="handleCancelReservation(reservation)"
-              :disabled="cancellingId === reservation.id"
-              class="inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 dark:border-red-600 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20 dark:focus:ring-offset-gray-800"
-            >
-              <svg v-if="cancellingId === reservation.id" class="mr-2 h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <svg v-else class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-              {{ cancellingId === reservation.id ? 'Cancelando...' : 'Cancelar Reserva' }}
-            </button>
-          </div>
-        </div>
+          :reservation="reservation"
+          :cancelling="cancellingId === reservation.id"
+          :checking-in="checkingInId === reservation.id"
+          @cancel="handleCancel"
+          @check-in="openCheckIn"
+        />
       </div>
     </div>
+
+    <CheckInModal
+      v-model="showCheckIn"
+      :loading="checkingInId !== null"
+      :server-message="checkInError"
+      @confirm="handleCheckIn"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { confirmDestructive } from '@/utils/confirm';
+import { computed, onMounted, ref } from 'vue';
+import BaseSpinner from '@/components/ui/BaseSpinner.vue';
+import CheckInModal from '@/components/reservations/CheckInModal.vue';
+import ReservationCard from '@/components/reservations/ReservationCard.vue';
 import { useReservations } from '@/composables/useReservations';
 import { useToast } from '@/composables/useToast';
+import { confirmDestructive } from '@/utils/confirm';
+import { RESERVATION_STATUS, isPending } from '@/utils/reservationStatus';
 
-// ============================================================================
-// COMPOSABLES
-// ============================================================================
-
-const { reservations, loading, error, fetchMyReservations, cancelMyReservation } = useReservations();
+const {
+  reservations, loading, error, fetchMyReservations, cancelMyReservation, checkIn,
+} = useReservations();
 const toast = useToast();
-
-// ============================================================================
-// STATE
-// ============================================================================
 
 const activeTab = ref('upcoming');
 const cancellingId = ref(null);
+const checkingInId = ref(null);
+const showCheckIn = ref(false);
+const checkInError = ref(null);
+const checkInTarget = ref(null);
 
 const tabs = [
   { label: 'Próximas', value: 'upcoming' },
+  { label: 'Pendientes', value: 'pending' },
   { label: 'Activas', value: 'active' },
   { label: 'Pasadas', value: 'past' },
-  { label: 'Canceladas', value: 'cancelled' }
+  { label: 'Canceladas', value: 'cancelled' },
+  { label: 'Rechazadas', value: 'rejected' },
+  { label: 'Inasistencias', value: 'no_show' },
 ];
 
-// ============================================================================
-// COMPUTED
-// ============================================================================
+const FILTERS = {
+  upcoming: (r) => r.status === RESERVATION_STATUS.CONFIRMED && r.is_future,
+  pending: (r) => isPending(r),
+  active: (r) => r.status === RESERVATION_STATUS.CONFIRMED && r.is_active,
+  past: (r) => r.status === RESERVATION_STATUS.COMPLETED || (r.status === RESERVATION_STATUS.CONFIRMED && r.is_past),
+  cancelled: (r) => r.status === RESERVATION_STATUS.CANCELLED,
+  rejected: (r) => [RESERVATION_STATUS.REJECTED, RESERVATION_STATUS.EXPIRED].includes(r.status),
+  no_show: (r) => r.status === RESERVATION_STATUS.NO_SHOW,
+};
 
-const filteredReservations = computed(() => {
-  switch (activeTab.value) {
-    case 'upcoming':
-      return reservations.value.filter(r => r.is_future && r.status === 'confirmed');
-    case 'active':
-      return reservations.value.filter(r => r.is_active && r.status === 'confirmed');
-    case 'past':
-      return reservations.value.filter(r => r.is_past && r.status !== 'cancelled');
-    case 'cancelled':
-      return reservations.value.filter(r => r.status === 'cancelled');
-    default:
-      return reservations.value;
+function openCheckIn(reservation) {
+  checkInTarget.value = reservation;
+  checkInError.value = null;
+  showCheckIn.value = true;
+}
+
+async function handleCheckIn(code) {
+  if (!checkInTarget.value) return;
+
+  checkingInId.value = checkInTarget.value.id;
+  checkInError.value = null;
+
+  try {
+    const updated = await checkIn(checkInTarget.value.id, code);
+
+    if (updated) {
+      toast.success('Llegada registrada. ¡Buen trabajo!');
+      showCheckIn.value = false;
+    } else {
+      checkInError.value = error.value ?? 'No se pudo registrar la llegada.';
+    }
+  } finally {
+    checkingInId.value = null;
   }
-});
+}
 
-// ============================================================================
-// METHODS
-// ============================================================================
+const filteredReservations = computed(() => reservations.value.filter(FILTERS[activeTab.value] ?? (() => true)));
 
-const getCountForTab = (tabValue) => {
-  switch (tabValue) {
-    case 'upcoming':
-      return reservations.value.filter(r => r.is_future && r.status === 'confirmed').length;
-    case 'active':
-      return reservations.value.filter(r => r.is_active && r.status === 'confirmed').length;
-    case 'past':
-      return reservations.value.filter(r => r.is_past && r.status !== 'cancelled').length;
-    case 'cancelled':
-      return reservations.value.filter(r => r.status === 'cancelled').length;
-    default:
-      return 0;
-  }
-};
+const counts = computed(() => Object.fromEntries(
+  tabs.map((tab) => [tab.value, reservations.value.filter(FILTERS[tab.value]).length]),
+));
 
-const getStatusLabel = (reservation) => {
-  if (reservation.status === 'cancelled') return 'Cancelada';
-  if (reservation.is_active) return 'En Uso Ahora';
-  if (reservation.is_future) return 'Programada';
-  if (reservation.is_past) return 'Completada';
-  return reservation.status;
-};
+const loadReservations = () => fetchMyReservations();
 
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+async function handleCancel(reservation) {
+  const pending = isPending(reservation);
+  const dateLabel = new Date(reservation.start_time).toLocaleDateString('es-ES', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
-};
 
-const formatTime = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('es-ES', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
-
-const loadReservations = async () => {
-  // Sin toast de exito: cargar una lista es el comportamiento esperado, no un
-  // logro que anunciar. Ademas saltaba en cada recarga, incluida la que sigue a
-  // cancelar una reserva, y con la lista vacia rezaba "0 reservas cargadas",
-  // que se lee como un fallo disfrazado de exito. El estado vacio de la vista
-  // ya comunica que no hay nada.
-  await fetchMyReservations();
-};
-
-const handleCancelReservation = async (reservation) => {
   const confirmed = await confirmDestructive({
-    title: '¿Cancelar la reserva?',
-    html: `Se cancelará la reserva del <strong>${formatDate(reservation.start_time)}</strong>.`,
-    confirmText: 'Sí, cancelar',
+    title: pending ? '¿Retirar la solicitud?' : '¿Cancelar la reserva?',
+    html: pending
+      ? `Se retirará la solicitud de laboratorio del <strong>${dateLabel}</strong>.`
+      : `Se cancelará la reserva del <strong>${dateLabel}</strong>.`,
+    confirmText: pending ? 'Sí, retirar' : 'Sí, cancelar',
   });
 
-  if (!confirmed) {
-    return;
-  }
+  if (!confirmed) return;
 
   cancellingId.value = reservation.id;
 
@@ -314,22 +193,15 @@ const handleCancelReservation = async (reservation) => {
     const success = await cancelMyReservation(reservation.id);
 
     if (success) {
-      toast.success('Reserva cancelada exitosamente');
-      // Recargar la lista
+      toast.success(pending ? 'Solicitud retirada.' : 'Reserva cancelada exitosamente.');
       await loadReservations();
     } else {
-      toast.error('No se pudo cancelar la reserva');
+      toast.error(error.value ?? 'No se pudo cancelar la reserva.');
     }
   } finally {
     cancellingId.value = null;
   }
-};
+}
 
-// ============================================================================
-// LIFECYCLE
-// ============================================================================
-
-onMounted(async () => {
-  await loadReservations();
-});
+onMounted(loadReservations);
 </script>

@@ -72,6 +72,18 @@
                     Mis Reservas
                   </router-link>
 
+                  <router-link
+                    v-if="authStore.canApproveReservations"
+                    to="/reservations/pending"
+                    @click="reservationsMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Solicitudes pendientes
+                  </router-link>
+
                   <template v-if="authStore.isAdmin">
                     <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
                     <router-link
@@ -121,6 +133,37 @@
                   class="absolute left-0 top-full z-20 mt-1 w-52 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
                 >
                   <router-link
+                    to="/users"
+                    @click="adminMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Usuarios
+                  </router-link>
+                  <router-link
+                    to="/reports"
+                    @click="adminMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Reportes
+                  </router-link>
+                  <router-link
+                    to="/incidents"
+                    @click="adminMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    Incidencias
+                  </router-link>
+                  <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
+                  <router-link
                     to="/roles"
                     @click="adminMenuOpen = false"
                     class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -150,6 +193,27 @@
                     </svg>
                     Reglas de Grupo
                   </router-link>
+                  <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
+                  <router-link
+                    to="/closures"
+                    @click="adminMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                    Cierres y festivos
+                  </router-link>
+                  <router-link
+                    to="/academic-periods"
+                    @click="adminMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Periodos académicos
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -157,10 +221,12 @@
 
           <!-- Menú de usuario y tema -->
           <div class="flex items-center gap-4">
+            <NotificationBell />
+
             <!-- Toggle de tema -->
             <ThemeToggle variant="dropdown" />
 
-            <div class="flex-shrink-0 flex items-center gap-2">
+            <router-link to="/profile" class="hidden flex-shrink-0 items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 sm:flex" title="Mi perfil">
               <span class="text-sm text-gray-700 dark:text-gray-300">{{ userName }}</span>
               <span
                 v-if="userRoleLabel"
@@ -168,8 +234,8 @@
               >
                 {{ userRoleLabel }}
               </span>
-            </div>
-            <div class="flex-shrink-0">
+            </router-link>
+            <div class="hidden flex-shrink-0 sm:block">
               <button
                 @click="handleLogout"
                 class="rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-800"
@@ -177,8 +243,48 @@
                 Cerrar Sesión
               </button>
             </div>
+
+            <!-- Hamburguesa (solo móvil) -->
+            <button
+              type="button"
+              class="rounded-md p-2 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-300 dark:hover:bg-gray-700 sm:hidden"
+              :aria-expanded="mobileMenuOpen"
+              aria-controls="mobile-menu"
+              aria-label="Abrir menú"
+              @click="mobileMenuOpen = !mobileMenuOpen"
+            >
+              <svg v-if="!mobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              <svg v-else class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
           </div>
         </div>
+      </div>
+
+      <!-- Menú móvil: mismo contenido que la barra, apilado -->
+      <div v-if="mobileMenuOpen" id="mobile-menu" class="border-t border-gray-200 sm:hidden dark:border-gray-700">
+        <nav class="space-y-1 px-4 py-3" aria-label="Menú principal">
+          <router-link
+            v-for="link in mobileLinks"
+            :key="link.to"
+            :to="link.to"
+            class="block rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700"
+            active-class="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200"
+            @click="mobileMenuOpen = false"
+          >
+            {{ link.label }}
+          </router-link>
+          <div class="my-2 border-t border-gray-100 dark:border-gray-700"></div>
+          <router-link to="/profile" class="block rounded-md px-3 py-2 text-sm text-gray-700 dark:text-gray-200" @click="mobileMenuOpen = false">
+            {{ userName }} · {{ userRoleLabel }}
+          </router-link>
+          <button type="button" class="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20" @click="handleLogout">
+            Cerrar sesión
+          </button>
+        </nav>
       </div>
     </nav>
 
@@ -192,12 +298,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { vClickOutside } from '@/directives/clickOutside';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/composables/useToast';
 import ThemeToggle from '@/components/ui/ThemeToggle.vue';
+import NotificationBell from '@/components/notifications/NotificationBell.vue';
 
 const router = useRouter();
 const route  = useRoute();
@@ -206,10 +313,43 @@ const toast = useToast();
 
 const adminMenuOpen = ref(false);
 const reservationsMenuOpen = ref(false);
+const mobileMenuOpen = ref(false);
+
+// Enlaces del menú móvil, según permisos: mismo contenido que la barra.
+const mobileLinks = computed(() => {
+  const links = [
+    { to: '/dashboard', label: 'Dashboard' },
+    { to: '/labs', label: 'Laboratorios' },
+    { to: '/equipment', label: 'Equipos' },
+    { to: '/reservations', label: 'Mis Reservas' },
+    { to: '/reservations/create', label: 'Nueva reserva' },
+    { to: '/notifications', label: 'Notificaciones' },
+  ];
+
+  if (authStore.canApproveReservations) links.push({ to: '/reservations/pending', label: 'Solicitudes pendientes' });
+
+  if (authStore.isAdmin) {
+    links.push(
+      { to: '/reservations/students', label: 'Reservas de Estudiantes' },
+      { to: '/reservations/teachers', label: 'Reservas de Maestros' },
+      { to: '/users', label: 'Usuarios' },
+      { to: '/reports', label: 'Reportes' },
+      { to: '/incidents', label: 'Incidencias' },
+      { to: '/closures', label: 'Cierres y festivos' },
+      { to: '/academic-periods', label: 'Periodos académicos' },
+      { to: '/roles', label: 'Roles' },
+    );
+  }
+
+  return links;
+});
+
+// Al navegar, el menú móvil se cierra aunque el enlace no pase por @click.
+watch(() => route.path, () => { mobileMenuOpen.value = false; });
 
 const userName = computed(() => authStore.userName || 'Usuario');
 const userRoleLabel = computed(() => authStore.userRoleLabel);
-const isAdminRoute  = computed(() => ['/roles', '/permissions', '/group-role-assignments'].some(p => route.path.startsWith(p)));
+const isAdminRoute  = computed(() => ['/roles', '/permissions', '/group-role-assignments', '/closures', '/academic-periods', '/users', '/reports', '/incidents'].some(p => route.path.startsWith(p)));
 const isReservationsRoute = computed(() => route.path.startsWith('/reservations'));
 
 

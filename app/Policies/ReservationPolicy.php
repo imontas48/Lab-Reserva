@@ -48,6 +48,58 @@ class ReservationPolicy
     }
 
     /**
+     * Solicitar un laboratorio completo para una clase.
+     */
+    public function createLab(User $user): bool
+    {
+        return $user->hasPermission('reservations', 'createLab');
+    }
+
+    /**
+     * Ver la cola de solicitudes pendientes.
+     */
+    public function viewPending(User $user): bool
+    {
+        return $user->hasPermission('reservations', 'approve');
+    }
+
+    /**
+     * Aprobar una solicitud. Que esté pendiente y no haya comenzado lo
+     * comprueba ReservationService.
+     */
+    public function approve(User $user, Reservation $reservation): bool
+    {
+        return $user->hasPermission('reservations', 'approve');
+    }
+
+    public function reject(User $user, Reservation $reservation): bool
+    {
+        return $user->hasPermission('reservations', 'approve');
+    }
+
+    /**
+     * Registrar la llegada: el dueño de la reserva, o quien ve cualquiera
+     * (kiosco del administrador).
+     */
+    public function checkIn(User $user, Reservation $reservation): bool
+    {
+        if ($user->hasPermission('reservations', 'viewAny')) {
+            return true;
+        }
+
+        return $user->hasPermission('reservations', 'view')
+            && $user->id === $reservation->user_id;
+    }
+
+    /**
+     * Marcar una inasistencia a mano.
+     */
+    public function markNoShow(User $user, Reservation $reservation): bool
+    {
+        return $user->hasPermission('reservations', 'approve');
+    }
+
+    /**
      * Modificar una reserva.
      *
      * Qué transiciones de estado son válidas no se decide aquí, sino en la
@@ -65,8 +117,8 @@ class ReservationPolicy
     }
 
     /**
-     * Cancelar una reserva. Que esté confirmada y no haya comenzado lo
-     * comprueba ReservationService, no la policy.
+     * Cancelar una reserva o retirar una solicitud. Que esté en un estado
+     * cancelable y no haya comenzado lo comprueba ReservationService.
      */
     public function cancel(User $user, Reservation $reservation): bool
     {

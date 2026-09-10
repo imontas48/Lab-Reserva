@@ -15,7 +15,7 @@
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Buscar por nombre, email o equipo..."
+        placeholder="Buscar por nombre, email, equipo, laboratorio o motivo..."
         class="flex-1 min-w-48 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
         @input="debouncedFetch"
       />
@@ -26,9 +26,9 @@
         @change="applyFilters"
       >
         <option value="">Todos los estados</option>
-        <option value="confirmed">Confirmadas</option>
-        <option value="cancelled">Canceladas</option>
-        <option value="completed">Completadas</option>
+        <option v-for="option in STATUS_FILTER_OPTIONS" :key="option.value" :value="option.value">
+          {{ option.text }}
+        </option>
       </select>
 
       <button
@@ -97,6 +97,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Inicio</th>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Fin</th>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Estado</th>
+            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -115,11 +116,17 @@
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ reservation.user?.email ?? '' }}</div>
             </td>
             <td class="px-6 py-4">
-              <div class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ reservation.equipment?.identifier ?? `Equipo #${reservation.equipment_id}` }}
+              <div class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+                {{ targetLabel(reservation) }}
+                <span
+                  v-if="isLabReservation(reservation)"
+                  class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+                >
+                  Clase
+                </span>
               </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400">
-                {{ reservation.equipment?.lab?.name ?? '—' }}
+              <div v-if="reservation.purpose" class="text-xs text-gray-500 dark:text-gray-400">
+                {{ reservation.purpose }}
               </div>
             </td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
@@ -130,16 +137,26 @@
             </td>
             <td class="whitespace-nowrap px-6 py-4">
               <span
-                :class="{
-                  'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': reservation.status === 'confirmed' && reservation.is_future,
-                  'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400': reservation.status === 'confirmed' && reservation.is_active,
-                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': reservation.status === 'confirmed' && reservation.is_past,
-                  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': reservation.status === 'cancelled',
-                }"
+                :class="statusClasses(reservation)"
                 class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
               >
                 {{ statusLabel(reservation) }}
               </span>
+            </td>
+            <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+              <ReservationApprovalActions
+                v-if="isPending(reservation) && authStore.canApproveReservations"
+                :reservation="reservation"
+                @approved="loadReservations"
+                @rejected="loadReservations"
+              />
+              <router-link
+                v-else
+                :to="`/reservations/${reservation.id}`"
+                class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
+              >
+                Ver detalle
+              </router-link>
             </td>
           </tr>
         </tbody>
@@ -196,11 +213,22 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
+import ReservationApprovalActions from '@/components/reservations/ReservationApprovalActions.vue';
+import { useAuthStore } from '@/stores/auth';
 import { useReservations } from '@/composables/useReservations';
+import {
+  STATUS_FILTER_OPTIONS,
+  isLabReservation,
+  isPending,
+  statusClasses,
+  statusLabel,
+  targetLabel,
+} from '@/utils/reservationStatus';
 
 const { reservations, loading, error, paginationMeta, fetchReservationsByRole } = useReservations();
 
 const route = useRoute();
+const authStore = useAuthStore();
 
 /**
  * El rol sale de la ruta. Antes existian dos vistas identicas al 98% que solo
@@ -306,14 +334,6 @@ const formatDateTime = (dateString) => {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(dateString));
-};
-
-const statusLabel = (reservation) => {
-  if (reservation.status === 'cancelled') return 'Cancelada';
-  if (reservation.is_active) return 'En Uso';
-  if (reservation.is_future) return 'Programada';
-  if (reservation.is_past) return 'Completada';
-  return reservation.status;
 };
 
 onMounted(() => loadReservations());

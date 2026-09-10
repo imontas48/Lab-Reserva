@@ -33,6 +33,26 @@ export const useAuthStore = defineStore('auth', () => {
     })[userRole.value] ?? 'Usuario');
 
     /**
+     * Permisos efectivos ("subject.action") que el backend resolvió para el
+     * usuario. La interfaz los usa para decidir qué mostrar; la autorización
+     * real la sigue haciendo el servidor en cada petición.
+     */
+    const permissions = computed(() => user.value?.permissions ?? []);
+
+    /**
+     * Cuotas y ventanas de reserva del rol del usuario, para validar en
+     * cliente antes de enviar.
+     */
+    const reservationLimits = computed(() => user.value?.reservation_limits ?? null);
+
+    function can(permission) {
+        return permissions.value.includes(permission);
+    }
+
+    const canCreateLabReservation = computed(() => can('reservations.createLab'));
+    const canApproveReservations = computed(() => can('reservations.approve'));
+
+    /**
      * Limpia el estado local. No llama al servidor.
      */
     function resetSession() {
@@ -178,6 +198,34 @@ export const useAuthStore = defineStore('auth', () => {
         errors.value = {};
     }
 
+    /**
+     * Edita nombre y correo. Los errores 422 los gestiona el formulario.
+     */
+    async function updateProfile(payload) {
+        const { data } = await apiClient.patch('/profile', payload);
+        user.value = data.data ?? data;
+
+        return user.value;
+    }
+
+    async function changePassword(payload) {
+        const { data } = await apiClient.put('/profile/password', payload);
+
+        return data.message;
+    }
+
+    async function forgotPassword(email) {
+        const { data } = await apiClient.post('/forgot-password', { email });
+
+        return data.message;
+    }
+
+    async function resetPassword(payload) {
+        const { data } = await apiClient.post('/reset-password', payload);
+
+        return data.message;
+    }
+
     return {
         user,
         loading,
@@ -188,10 +236,19 @@ export const useAuthStore = defineStore('auth', () => {
         userRole,
         userName,
         userRoleLabel,
+        permissions,
+        reservationLimits,
+        can,
+        canCreateLabReservation,
+        canApproveReservations,
         login,
         register,
         logout,
         restoreSession,
         clearErrors,
+        updateProfile,
+        changePassword,
+        forgotPassword,
+        resetPassword,
     };
 });
