@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { routerBase } from '@/utils/basePath';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -513,7 +514,9 @@ const routes = [
  * ═══════════════════════════════════════════════════════════════════════════
  */
 const router = createRouter({
-    history: createWebHistory(),
+    // El prefijo llega de VITE_BASE_PATH: '/' en local, '/lab-reserva/' en el
+    // despliegue compartido. Ver utils/basePath.js.
+    history: createWebHistory(routerBase),
     routes,
 
     // Scroll al inicio al cambiar de ruta

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { clearToken, getToken, terminateSession } from './session';
+import { basePath } from './basePath';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -20,7 +21,8 @@ import { clearToken, getToken, terminateSession } from './session';
  */
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+    // La API cuelga del mismo prefijo que la SPA (ver utils/basePath.js).
+    baseURL: import.meta.env.VITE_API_URL || `${basePath}/api/v1`,
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

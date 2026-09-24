@@ -37,6 +37,26 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.changed' => EnsurePasswordIsChanged::class,
         ]);
 
+        // Detras de un proxy inverso (nginx del host -> contenedor) la peticion
+        // llega con la IP del proxy y en http plano. Sin confiar en el proxy,
+        // el throttle agruparia a todos los usuarios bajo una sola IP y las URL
+        // (reset de contrasena, assets) saldrian en http. Se lee de entorno para
+        // que en local, sin proxy, nadie pueda falsear X-Forwarded-*.
+        // Se confia ademas en X-Forwarded-Prefix: cuando el proxy monta la app
+        // bajo un subdirectorio (/lab-reserva) y recorta ese prefijo antes de
+        // reenviar, Laravel lo recupera de esa cabecera y url(), asset() y las
+        // redirecciones vuelven a salir con el prefijo puesto.
+        $trustedProxies = env('TRUSTED_PROXIES');
+        if (is_string($trustedProxies) && $trustedProxies !== '') {
+            $middleware->trustProxies(
+                at: $trustedProxies === '*' ? '*' : array_map('trim', explode(',', $trustedProxies)),
+                headers: Request::HEADER_X_FORWARDED_FOR
+                    | Request::HEADER_X_FORWARDED_HOST
+                    | Request::HEADER_X_FORWARDED_PORT
+                    | Request::HEADER_X_FORWARDED_PROTO
+                    | Request::HEADER_X_FORWARDED_PREFIX
+            );
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // El bloque estaba vacio, de modo que toda excepcion de negocio salia

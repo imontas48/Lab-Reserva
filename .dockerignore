@@ -1,0 +1,23 @@
+# Nada de secretos ni artefactos locales dentro de la imagen.
+# Los directorios de storage/ se copian tal cual (solo traen su .gitignore):
+# el contenedor necesita que existan para cachear vistas y escribir logs.
+.git
+.github
+.env
+.env.*
+!.env.example
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+.phpunit.result.cache
+.phpunit.cache
+docs
+tests
+*.md
+!README.md
+.idea
+.vscode
+.fleet
+.zed
