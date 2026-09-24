@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Exceptions\BusinessRuleException;
 use App\Models\User;
+use App\Support\InvitedUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -36,6 +39,32 @@ class UserService
         return $query
             ->orderBy($filters['sort_by'] ?? 'name', $filters['sort_order'] ?? 'asc')
             ->paginate($perPage);
+    }
+
+    /**
+     * Da de alta a un usuario con contrasena temporal.
+     *
+     * Es la unica via por la que una cuenta nace con must_change_password:
+     * el registro publico no la marca porque ahi la contrasena la elige el
+     * propio usuario. Si el administrador no indica contrasena se genera una
+     * de 12 caracteres sin simbolos, facil de dictar y de escribir.
+     *
+     * @param  array{name: string, email: string, role: string, password?: ?string}  $data
+     */
+    public function invite(array $data): InvitedUser
+    {
+        $temporaryPassword = $data['password'] ?? Str::password(12, symbols: false);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($temporaryPassword),
+            'role' => $data['role'],
+        ]);
+
+        $user->forceFill(['must_change_password' => true])->save();
+
+        return new InvitedUser($user->fresh(), $temporaryPassword);
     }
 
     /**

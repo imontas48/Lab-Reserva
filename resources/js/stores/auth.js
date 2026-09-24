@@ -26,6 +26,13 @@ export const useAuthStore = defineStore('auth', () => {
     const isTeacher = computed(() => userRole.value === 'teacher');
     const userName = computed(() => user.value?.name ?? '');
 
+    /**
+     * Entró con una contraseña temporal asignada por un administrador. El
+     * guard del router lo lleva a la pantalla de cambio y el backend rechaza
+     * cualquier otra llamada hasta que la cambie.
+     */
+    const mustChangePassword = computed(() => Boolean(user.value?.must_change_password));
+
     const userRoleLabel = computed(() => ({
         admin: 'Admin',
         teacher: 'Profesor',
@@ -211,6 +218,12 @@ export const useAuthStore = defineStore('auth', () => {
     async function changePassword(payload) {
         const { data } = await apiClient.put('/profile/password', payload);
 
+        // El servidor ya levantó la marca; reflejarlo aquí evita otra llamada
+        // a /me solo para que el guard deje pasar.
+        if (user.value) {
+            user.value = { ...user.value, must_change_password: false };
+        }
+
         return data.message;
     }
 
@@ -236,6 +249,7 @@ export const useAuthStore = defineStore('auth', () => {
         userRole,
         userName,
         userRoleLabel,
+        mustChangePassword,
         permissions,
         reservationLimits,
         can,

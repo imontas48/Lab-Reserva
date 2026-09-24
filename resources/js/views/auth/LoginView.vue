@@ -101,6 +101,15 @@ const submit = handleSubmit(async (values) => {
   try {
     await authStore.login(values);
 
+    // Contraseña temporal: el guard lo forzaría igual, pero así el mensaje
+    // y el destino son coherentes desde el primer momento.
+    if (authStore.mustChangePassword) {
+      toast.info('Elige tu contraseña definitiva para continuar.');
+      await router.push({ name: 'password.change' });
+
+      return;
+    }
+
     toast.success(`¡Bienvenido, ${authStore.userName}!`);
 
     // Vuelve a donde el guard interrumpió, si venía de una ruta protegida.

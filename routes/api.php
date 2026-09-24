@@ -53,7 +53,10 @@ Route::prefix('v1')->middleware('throttle:5,1')->group(function () {
 });
 
 // Rutas protegidas (requieren autenticación)
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+//
+// password.changed: quien entra con una contrasena temporal solo puede
+// consultar /me, cambiarla y cerrar sesion (App\Http\Middleware\EnsurePasswordIsChanged).
+Route::middleware(['auth:sanctum', 'password.changed'])->prefix('v1')->group(function () {
     // Autenticación
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
     Route::get('/me', [AuthController::class, 'me'])->name('api.me');
@@ -128,9 +131,10 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     Route::patch('/users/{user}/unblock', [UserController::class, 'unblock'])
         ->name('api.users.unblock');
     Route::apiResource('users', UserController::class)
-        ->only(['index', 'show', 'update', 'destroy'])
+        ->only(['index', 'store', 'show', 'update', 'destroy'])
         ->names([
             'index' => 'api.users.index',
+            'store' => 'api.users.store',
             'show' => 'api.users.show',
             'update' => 'api.users.update',
             'destroy' => 'api.users.destroy',

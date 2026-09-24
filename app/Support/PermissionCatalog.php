@@ -60,6 +60,7 @@ class PermissionCatalog
         'users' => [
             'viewAny' => 'Listar usuarios',
             'view' => 'Ver el detalle de un usuario',
+            'create' => 'Dar de alta usuarios con contrasena temporal',
             'update' => 'Modificar usuarios y su rol base',
             'delete' => 'Dar de baja usuarios',
         ],

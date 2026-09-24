@@ -30,6 +30,9 @@ class AuthUserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
+            // La interfaz lo usa para llevar al usuario a la pantalla de cambio
+            // de contrasena; el middleware password.changed lo impone en la API.
+            'must_change_password' => $this->mustChangePassword(),
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'permissions' => app(PermissionService::class)->effectivePermissionKeys($this->resource),

@@ -19,6 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $email
  * @property string $role
  * @property int $no_show_count
+ * @property bool $must_change_password
  * @property Carbon|null $reservation_blocked_until
  */
 class User extends Authenticatable
@@ -58,8 +59,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
             'reservation_blocked_until' => 'datetime',
         ];
+    }
+
+    /**
+     * Todavia usa la contrasena temporal que le asigno un administrador:
+     * la API le exige cambiarla antes de hacer nada mas.
+     */
+    public function mustChangePassword(): bool
+    {
+        return (bool) $this->must_change_password;
     }
 
     /**

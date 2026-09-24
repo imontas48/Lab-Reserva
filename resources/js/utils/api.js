@@ -65,6 +65,13 @@ apiClient.interceptors.response.use(
             }
         }
 
+        // 403 con código propio: el servidor exige cambiar la contraseña
+        // temporal. Puede pasar si la sesión se restauró desde otra pestaña
+        // con datos viejos; se lleva al usuario a la pantalla de cambio.
+        if (status === 403 && error.response?.data?.code === 'password_change_required') {
+            window.router?.push({ name: 'password.change' });
+        }
+
         return Promise.reject(error);
     }
 );

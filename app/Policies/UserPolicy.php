@@ -21,6 +21,11 @@ class UserPolicy
         return $user->hasPermission('users', 'view');
     }
 
+    public function create(User $user): bool
+    {
+        return $user->hasPermission('users', 'create');
+    }
+
     public function update(User $user, User $target): bool
     {
         return $user->hasPermission('users', 'update');

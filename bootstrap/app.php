@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\BusinessRuleException;
+use App\Http\Middleware\EnsurePasswordIsChanged;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -29,6 +30,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // abierta a fuerza bruta contra /login, que ademas ejecuta Hash::check
         // con 12 rondas de bcrypt y por tanto servia como vector de DoS.
         $middleware->throttleApi();
+
+        // Se aplica en routes/api.php al grupo autenticado, no globalmente:
+        // las rutas publicas no tienen usuario y no hay nada que comprobar.
+        $middleware->alias([
+            'password.changed' => EnsurePasswordIsChanged::class,
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // El bloque estaba vacio, de modo que toda excepcion de negocio salia

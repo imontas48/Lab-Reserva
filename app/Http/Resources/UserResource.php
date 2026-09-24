@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'no_show_count' => (int) $this->no_show_count,
             'reservation_blocked_until' => $this->reservation_blocked_until?->toIso8601String(),
             'is_blocked' => $this->isBlockedFromReserving(),
+            'must_change_password' => $this->mustChangePassword(),
             'reservations_count' => $this->whenCounted('reservations'),
             'active_reservations_count' => $this->whenCounted('activeReservations'),
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),

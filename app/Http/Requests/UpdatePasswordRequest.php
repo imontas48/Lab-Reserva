@@ -19,7 +19,8 @@ class UpdatePasswordRequest extends FormRequest
     {
         return [
             'current_password' => ['required', 'current_password:sanctum'],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            // different: una contrasena temporal no se puede "cambiar" por si misma.
+            'password' => ['required', 'confirmed', 'different:current_password', Password::min(8)],
         ];
     }
 
@@ -32,6 +33,7 @@ class UpdatePasswordRequest extends FormRequest
             'current_password.required' => 'Indica tu contraseña actual.',
             'current_password.current_password' => 'La contraseña actual no es correcta.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.different' => 'La nueva contraseña debe ser distinta de la actual.',
         ];
     }
 }

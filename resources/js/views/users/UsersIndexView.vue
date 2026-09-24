@@ -1,9 +1,14 @@
 <template>
   <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Usuarios</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Roles base, bloqueos por inasistencia y bajas. Las cuentas se crean desde el registro público.</p>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Usuarios</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Roles base, bloqueos por inasistencia, bajas y altas con contraseña temporal.</p>
+      </div>
+      <BaseButton v-if="authStore.can('users.create')" @click="creating = true">Nuevo usuario</BaseButton>
     </div>
+
+    <UserCreateModal v-model="creating" @created="onCreated" />
 
     <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
       <div class="w-64"><BaseInput v-model="search" name="search" label="Buscar" placeholder="Nombre o correo" @update:model-value="debouncedLoad" /></div>
@@ -19,8 +24,9 @@
         <router-link :to="`/users/${item.id}`" class="font-medium text-gray-900 hover:underline dark:text-white">{{ item.name }}</router-link>
         <div class="text-xs text-gray-500 dark:text-gray-400">{{ item.email }}</div>
       </template>
-      <template #cell-role="{ value }">
+      <template #cell-role="{ item, value }">
         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium" :class="ROLE_CLASSES[value]">{{ ROLE_LABELS[value] ?? value }}</span>
+        <span v-if="item.must_change_password" class="ml-2 inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" title="Aún no ha cambiado la contraseña temporal">Temporal</span>
       </template>
       <template #cell-no_show_count="{ item }">
         <span class="tabular-nums">{{ item.no_show_count }}</span>
@@ -50,9 +56,21 @@ import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseInput from '@/components/forms/BaseInput.vue';
 import BaseSelect from '@/components/forms/BaseSelect.vue';
 import DataTable from '@/components/ui/DataTable.vue';
+import UserCreateModal from '@/components/users/UserCreateModal.vue';
 import { useUsers } from '@/composables/useUsers';
+import { useAuthStore } from '@/stores/auth';
 
+const authStore = useAuthStore();
 const { users, meta, loading, error, fetchUsers } = useUsers();
+const creating = ref(false);
+
+/**
+ * La lista se recarga en vez de insertar a mano: el modal usa su propia
+ * instancia del composable, así que sus items no son estos.
+ */
+function onCreated() {
+  reload();
+}
 
 const ROLE_OPTIONS = [
   { value: 'admin', text: 'Administrador' },

@@ -90,6 +90,28 @@ const routes = [
         ]
     },
 
+    /**
+     * Cambio de contraseña obligatorio. Requiere sesión pero usa AuthLayout:
+     * el usuario con contraseña temporal no debe ver el menú de la aplicación,
+     * porque el backend le rechaza todo lo que no sea este cambio.
+     */
+    {
+        path: '/change-password',
+        component: () => import('@/layouts/AuthLayout.vue'),
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: '',
+                name: 'password.change',
+                component: () => import('@/views/auth/ChangePasswordView.vue'),
+                meta: {
+                    title: 'Elige tu contraseña',
+                    requiresAuth: true,
+                }
+            },
+        ]
+    },
+
     // =========================================================================
     // RUTAS PROTEGIDAS (Requieren autenticación)
     // =========================================================================
@@ -550,6 +572,17 @@ router.beforeEach(async (to, from, next) => {
                 name: 'login',
                 query: { redirect: to.fullPath } // Guardar la ruta a la que quería ir
             });
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Contraseña temporal: la única ruta permitida es la de cambiarla
+        // ─────────────────────────────────────────────────────────────────────
+        if (authStore.mustChangePassword && to.name !== 'password.change') {
+            return next({ name: 'password.change', replace: true });
+        }
+
+        if (!authStore.mustChangePassword && to.name === 'password.change') {
+            return next({ name: 'dashboard', replace: true });
         }
 
         // ─────────────────────────────────────────────────────────────────────
