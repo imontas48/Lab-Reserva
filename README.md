@@ -109,3 +109,8 @@ La aplicación estará disponible en la URL que indique Vite (usualmente `http:/
 
 ## Contribución
 Este proyecto sigue directrices estrictas de **Clean Code** y una arquitectura basada en componentes modulares en el Frontend y Controladores delgados / Servicios en el Backend. Consulta la documentación interna ubicada en la carpeta `docs/` y el archivo `ExplicationsLabReserva.md` antes de realizar aportes estructurales importantes.
+
+## Licencia
+**Este proyecto NO es software libre ni de código abierto.** El código se publica únicamente para su lectura y consulta con fines académicos y de referencia. Queda prohibido copiarlo, modificarlo, redistribuirlo, desplegarlo o usarlo con fines comerciales o institucionales sin autorización expresa y por escrito del titular. Consulta el archivo [`LICENSE`](LICENSE) para conocer los términos completos en español e inglés.
+
+Copyright © 2026 Idelfin Montas Espinal. Todos los derechos reservados.
