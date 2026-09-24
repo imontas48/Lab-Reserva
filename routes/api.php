@@ -1,15 +1,25 @@
 <?php
 
+use App\Http\Controllers\Api\AcademicPeriodController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\GroupRoleAssignmentController;
+use App\Http\Controllers\Api\IncidentController;
+use App\Http\Controllers\Api\LabClosureController;
 use App\Http\Controllers\Api\LabController;
+use App\Http\Controllers\Api\LabLayoutController;
+use App\Http\Controllers\Api\LabScheduleController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PermissionOverrideController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SoftwareController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserRoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,13 +48,20 @@ Route::prefix('v1')->middleware('throttle:5,1')->group(function () {
     // Autenticación
     Route::post('/login', [AuthController::class, 'login'])->name('api.login');
     Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('api.password.email');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('api.password.reset');
 });
 
 // Rutas protegidas (requieren autenticación)
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+//
+// password.changed: quien entra con una contrasena temporal solo puede
+// consultar /me, cambiarla y cerrar sesion (App\Http\Middleware\EnsurePasswordIsChanged).
+Route::middleware(['auth:sanctum', 'password.changed'])->prefix('v1')->group(function () {
     // Autenticación
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
     Route::get('/me', [AuthController::class, 'me'])->name('api.me');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('api.profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('api.profile.password');
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('api.dashboard.stats');
@@ -72,8 +89,92 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         ->name('api.reservations.by-role');
     Route::get('/equipment/{equipment}/reservations', [ReservationController::class, 'indexForEquipment'])
         ->name('api.equipment.reservations');
+    Route::get('/labs/{lab}/reservations', [ReservationController::class, 'indexForLab'])
+        ->name('api.labs.reservations');
+
+    // Incidencias de equipos y plano del laboratorio
+    Route::get('/equipment/{equipment}/incidents', [IncidentController::class, 'indexForEquipment'])
+        ->name('api.equipment.incidents.index');
+    Route::post('/equipment/{equipment}/incidents', [IncidentController::class, 'store'])
+        ->name('api.equipment.incidents.store');
+    Route::get('/incidents', [IncidentController::class, 'index'])->name('api.incidents.index');
+    Route::get('/incidents/{incident}', [IncidentController::class, 'show'])->name('api.incidents.show');
+    Route::patch('/incidents/{incident}', [IncidentController::class, 'update'])->name('api.incidents.update');
+    Route::get('/labs/{lab}/map', [LabLayoutController::class, 'show'])->name('api.labs.map');
+    Route::put('/labs/{lab}/layout', [LabLayoutController::class, 'update'])->name('api.labs.layout');
+
+    // Horario de apertura, cierres y periodos academicos
+    Route::get('/labs/{lab}/schedule', [LabScheduleController::class, 'show'])
+        ->name('api.labs.schedule');
+    Route::put('/labs/{lab}/opening-hours', [LabScheduleController::class, 'syncOpeningHours'])
+        ->name('api.labs.opening-hours.sync');
+    Route::apiResource('closures', LabClosureController::class)
+        ->parameters(['closures' => 'closure'])
+        ->names([
+            'index' => 'api.closures.index',
+            'store' => 'api.closures.store',
+            'show' => 'api.closures.show',
+            'update' => 'api.closures.update',
+            'destroy' => 'api.closures.destroy',
+        ]);
+    Route::apiResource('academic-periods', AcademicPeriodController::class)
+        ->names([
+            'index' => 'api.academic-periods.index',
+            'store' => 'api.academic-periods.store',
+            'show' => 'api.academic-periods.show',
+            'update' => 'api.academic-periods.update',
+            'destroy' => 'api.academic-periods.destroy',
+        ]);
+
+    // Gestion de usuarios (las rutas anidadas users/{user}/roles y
+    // permission-overrides se declaran mas abajo; no chocan con el resource)
+    Route::patch('/users/{user}/unblock', [UserController::class, 'unblock'])
+        ->name('api.users.unblock');
+    Route::apiResource('users', UserController::class)
+        ->only(['index', 'store', 'show', 'update', 'destroy'])
+        ->names([
+            'index' => 'api.users.index',
+            'store' => 'api.users.store',
+            'show' => 'api.users.show',
+            'update' => 'api.users.update',
+            'destroy' => 'api.users.destroy',
+        ]);
+
+    // Reportes
+    Route::get('/reports/summary', [ReportController::class, 'summary'])->name('api.reports.summary');
+    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('api.reports.occupancy');
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('api.reports.export');
+
+    // Centro de notificaciones del usuario autenticado
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('api.notifications.index');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])
+        ->name('api.notifications.unread-count');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+        ->name('api.notifications.read-all');
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+        ->name('api.notifications.read');
     Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])
         ->name('api.reservations.cancel');
+
+    // Reserva de laboratorio completo y flujo de aprobacion. 'pending' debe
+    // declararse antes del resource para que {reservation} no lo capture.
+    Route::post('/lab-reservations', [ReservationController::class, 'storeLab'])
+        ->name('api.reservations.store-lab');
+    Route::post('/lab-reservations/recurring', [ReservationController::class, 'storeRecurringLab'])
+        ->name('api.reservations.store-recurring-lab');
+    Route::post('/reservations/{reservation}/check-in', [ReservationController::class, 'checkIn'])
+        ->name('api.reservations.check-in');
+    Route::post('/reservations/{reservation}/no-show', [ReservationController::class, 'markNoShow'])
+        ->name('api.reservations.no-show');
+    Route::patch('/reservations/{reservation}/cancel-series', [ReservationController::class, 'cancelSeries'])
+        ->name('api.reservations.cancel-series');
+    Route::get('/reservations/pending', [ReservationController::class, 'pending'])
+        ->name('api.reservations.pending');
+    Route::patch('/reservations/{reservation}/approve', [ReservationController::class, 'approve'])
+        ->name('api.reservations.approve');
+    Route::patch('/reservations/{reservation}/reject', [ReservationController::class, 'reject'])
+        ->name('api.reservations.reject');
 
     // Reservas (CRUD completo)
     Route::apiResource('reservations', ReservationController::class);

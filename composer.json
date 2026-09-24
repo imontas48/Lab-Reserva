@@ -1,10 +1,10 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "idelfin-montas/lab-reserva",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Sistema de gestion de reservas para laboratorios de computo. Codigo propietario, solo lectura (ver LICENSE).",
     "keywords": ["laravel", "framework"],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",

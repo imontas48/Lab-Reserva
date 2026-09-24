@@ -104,6 +104,70 @@ class ResourceContractTest extends TestCase
         $this->assertNotNull($response->json('upcoming_reservations.0.lab_name'));
     }
 
+    public function test_el_recurso_de_reserva_de_laboratorio_expone_el_laboratorio_y_el_motivo(): void
+    {
+        $lab = Lab::factory()->create();
+        $duenio = $this->actingAsTeacher();
+        $reserva = Reservation::factory()->forLab($lab, 'Examen final')->forUser($duenio)->future()->create();
+
+        $this->getJson("/api/v1/reservations/{$reserva->id}")
+            ->assertOk()
+            ->assertJsonPath('data.type', 'lab')
+            ->assertJsonPath('data.status', 'pending')
+            ->assertJsonPath('data.is_pending', true)
+            ->assertJsonPath('data.purpose', 'Examen final')
+            ->assertJsonPath('data.lab.name', $lab->name)
+            ->assertJsonPath('data.equipment_id', null)
+            ->assertJsonPath('data.reviewer', null)
+            ->assertJsonStructure(['data' => ['id', 'type', 'lab_id', 'purpose', 'rejection_reason', 'reviewed_at']]);
+    }
+
+    public function test_el_dashboard_describe_una_reserva_de_laboratorio_completo(): void
+    {
+        $lab = Lab::factory()->create();
+        $user = User::factory()->teacher()->create();
+        Reservation::factory()->forLab($lab)->forUser($user)->future()->create();
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->getJson('/api/v1/dashboard/stats')->assertOk();
+
+        $this->assertSame($lab->name, $response->json('upcoming_reservations.0.lab_name'));
+        $this->assertSame('Laboratorio completo', $response->json('upcoming_reservations.0.equipment_name'));
+        $this->assertSame('lab', $response->json('upcoming_reservations.0.type'));
+        $this->assertSame(1, $response->json('stats.active_reservations'));
+    }
+
+    /**
+     * El frontend decide que mostrar (por ejemplo, la opcion de reservar un
+     * laboratorio completo) a partir de los permisos efectivos, no del rol.
+     */
+    public function test_me_expone_los_permisos_efectivos(): void
+    {
+        $this->actingAsTeacher();
+
+        $response = $this->getJson('/api/v1/me')->assertOk();
+
+        $permisos = $response->json('data.permissions');
+        $this->assertContains('reservations.createLab', $permisos);
+        $this->assertNotContains('reservations.approve', $permisos);
+        $this->assertSame('teacher', $response->json('data.role'));
+    }
+
+    public function test_el_login_devuelve_los_permisos_del_estudiante(): void
+    {
+        $user = User::factory()->student()->create(['password' => 'password']);
+
+        $response = $this->postJson('/api/v1/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertOk();
+
+        $this->assertNotContains('reservations.createLab', $response->json('user.permissions'));
+        $this->assertContains('reservations.create', $response->json('user.permissions'));
+        $this->assertSame('student', $response->json('user.role'));
+    }
+
     public function test_el_dashboard_cuenta_solo_las_reservas_del_usuario(): void
     {
         $user = User::factory()->create();

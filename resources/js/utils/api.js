@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { clearToken, getToken, terminateSession } from './session';
+import { basePath } from './basePath';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -20,7 +21,8 @@ import { clearToken, getToken, terminateSession } from './session';
  */
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+    // La API cuelga del mismo prefijo que la SPA (ver utils/basePath.js).
+    baseURL: import.meta.env.VITE_API_URL || `${basePath}/api/v1`,
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -63,6 +65,13 @@ apiClient.interceptors.response.use(
             } else {
                 clearToken();
             }
+        }
+
+        // 403 con código propio: el servidor exige cambiar la contraseña
+        // temporal. Puede pasar si la sesión se restauró desde otra pestaña
+        // con datos viejos; se lleva al usuario a la pantalla de cambio.
+        if (status === 403 && error.response?.data?.code === 'password_change_required') {
+            window.router?.push({ name: 'password.change' });
         }
 
         return Promise.reject(error);

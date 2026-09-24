@@ -1,33 +1,123 @@
 Copyright (c) 2026 Idelfin Montas Espinal. All rights reserved.
+Copyright (c) 2026 Idelfin Montas Espinal. Todos los derechos reservados.
 
-PROPRIETARY AND CLOSED SOURCE LICENSE
-=====================================
+LAB-RESERVA SOURCE-AVAILABLE LICENSE (VIEW ONLY)
+LICENCIA DE CODIGO FUENTE VISIBLE DE LAB-RESERVA (SOLO LECTURA)
+===============================================================
 
-ENGLISH
--------
-This software and its associated documentation files (the "Software") are proprietary and confidential. 
-
-The source code is shared privately and is made available SOLELY for the purpose of academic review and evaluation. 
-
-You are strictly PROHIBITED from:
-1. Copying, duplicating, or reproducing the Software in whole or in part.
-2. Modifying, adapting, translating, or creating derivative works based on the Software.
-3. Distributing, publishing, sharing, sublicensing, leasing, or selling the Software.
-4. Using the Software for any commercial or non-commercial purpose other than the specific academic review explicitly authorized.
-
-Any use, reproduction, or distribution of this Software without the prior explicit written consent of the copyright holder is strictly prohibited and constitutes a violation of copyright law.
+This is NOT an open source license. / Esta NO es una licencia de codigo abierto.
 
 
 ESPAÑOL
 -------
-Este software y sus archivos de documentación asociados (el "Software") son propietarios y confidenciales.
 
-El código fuente se comparte de forma privada y está disponible ÚNICAMENTE con fines de revisión y evaluación académica.
+1. Titularidad. Este software, su codigo fuente, documentacion, diseños,
+   diagramas, textos, nombre y marca "Lab-Reserva" (en conjunto, el
+   "Software") son propiedad exclusiva de Idelfin Montas Espinal (el
+   "Titular") y estan protegidos por las leyes de derechos de autor y los
+   tratados internacionales aplicables.
 
-Queda estrictamente PROHIBIDO:
-1. Copiar, duplicar o reproducir el Software total o parcialmente.
-2. Modificar, adaptar, traducir o crear obras derivadas basadas en el Software.
-3. Distribuir, publicar, compartir, sublicenciar, arrendar o vender el Software.
-4. Utilizar el Software para cualquier fin comercial o no comercial que no sea la revisión académica específica autorizada explícitamente.
+2. Permiso concedido. El Titular publica el Software en un repositorio de
+   acceso publico UNICAMENTE para que pueda ser LEIDO Y CONSULTADO con fines
+   de revision academica, evaluacion, aprendizaje personal y referencia. No
+   se concede ningun otro derecho, expreso ni implicito.
 
-Cualquier uso, reproducción o distribución de este Software sin el previo consentimiento explícito por escrito del titular de los derechos de autor está estrictamente prohibido y constituye una violación de las leyes de derechos de autor.
+3. Prohibiciones. Sin el consentimiento previo, expreso y por escrito del
+   Titular, queda estrictamente PROHIBIDO:
+   a) Copiar, reproducir o descargar el Software para cualquier uso distinto
+      de su lectura y consulta.
+   b) Modificar, adaptar, traducir o crear obras derivadas del Software, en
+      todo o en parte, incluyendo la reutilizacion de fragmentos de codigo,
+      esquemas de base de datos, interfaces o flujos de trabajo.
+   c) Distribuir, publicar, compartir, sublicenciar, arrendar, vender u
+      ofrecer el Software o cualquier obra derivada a terceros.
+   d) Ejecutar, desplegar u operar el Software, o un servicio basado en el,
+      con fines comerciales, institucionales o de produccion.
+   e) Usar el nombre "Lab-Reserva", su logotipo o su identidad visual para
+      identificar otro producto o servicio.
+   f) Eliminar u ocultar los avisos de derechos de autor o de licencia.
+
+4. Bifurcaciones (forks) en plataformas de alojamiento. La funcionalidad de
+   "fork" o "star" que ofrecen plataformas como GitHub, permitida por sus
+   propios terminos de servicio, se tolera unicamente como mecanismo de
+   consulta dentro de dicha plataforma. Una bifurcacion NO otorga derecho
+   alguno a modificar, distribuir ni usar el Software mas alla de lo previsto
+   en la seccion 2.
+
+5. Contribuciones. Cualquier sugerencia, correccion o contribucion que se
+   envie voluntariamente al Titular se entiende cedida a este, sin
+   contraprestacion, para su libre uso e integracion en el Software.
+
+6. Autorizaciones. Quien desee usar, desplegar o adaptar el Software debe
+   solicitar una licencia por escrito al Titular. El Titular puede conceder
+   permisos adicionales a personas o instituciones concretas mediante acuerdo
+   separado, sin que ello modifique esta licencia para el resto.
+
+7. Terminacion. Cualquier incumplimiento de esta licencia pone fin de forma
+   automatica e inmediata al permiso de la seccion 2, sin perjuicio de las
+   acciones legales que correspondan.
+
+8. Sin garantia. El Software se muestra "TAL CUAL", sin garantia de ningun
+   tipo, expresa o implicita. El Titular no sera responsable de ningun daño
+   derivado del acceso al Software o de su uso no autorizado.
+
+9. Ley aplicable. Esta licencia se rige por las leyes de la Republica
+   Dominicana y por los tratados internacionales en materia de propiedad
+   intelectual de los que dicho pais sea parte.
+
+
+ENGLISH
+-------
+
+1. Ownership. This software, its source code, documentation, designs,
+   diagrams, texts, and the "Lab-Reserva" name and brand (collectively, the
+   "Software") are the exclusive property of Idelfin Montas Espinal (the
+   "Owner") and are protected by copyright law and applicable international
+   treaties.
+
+2. Permission granted. The Owner publishes the Software in a publicly
+   accessible repository SOLELY so that it may be READ AND CONSULTED for
+   academic review, evaluation, personal learning and reference. No other
+   right is granted, whether express or implied.
+
+3. Prohibitions. Without the Owner's prior, express, written consent, you
+   are strictly PROHIBITED from:
+   a) Copying, reproducing or downloading the Software for any use other
+      than reading and consultation.
+   b) Modifying, adapting, translating or creating derivative works of the
+      Software, in whole or in part, including the reuse of code fragments,
+      database schemas, user interfaces or workflows.
+   c) Distributing, publishing, sharing, sublicensing, leasing, selling or
+      offering the Software or any derivative work to third parties.
+   d) Running, deploying or operating the Software, or a service based on
+      it, for commercial, institutional or production purposes.
+   e) Using the "Lab-Reserva" name, logo or visual identity to identify
+      another product or service.
+   f) Removing or obscuring copyright or license notices.
+
+4. Forks on hosting platforms. The "fork" or "star" features offered by
+   platforms such as GitHub, as allowed by their own terms of service, are
+   tolerated only as a means of consultation within that platform. A fork
+   does NOT grant any right to modify, distribute or use the Software beyond
+   what Section 2 provides.
+
+5. Contributions. Any suggestion, fix or contribution voluntarily submitted
+   to the Owner is deemed assigned to the Owner, free of charge, for
+   unrestricted use and integration into the Software.
+
+6. Authorizations. Anyone wishing to use, deploy or adapt the Software must
+   request a written license from the Owner. The Owner may grant additional
+   permissions to specific persons or institutions under a separate
+   agreement, which does not alter this license for anyone else.
+
+7. Termination. Any breach of this license automatically and immediately
+   terminates the permission in Section 2, without prejudice to any legal
+   action that may apply.
+
+8. No warranty. The Software is displayed "AS IS", without warranty of any
+   kind, express or implied. The Owner shall not be liable for any damage
+   arising from access to the Software or from its unauthorized use.
+
+9. Governing law. This license is governed by the laws of the Dominican
+   Republic and by the international intellectual property treaties to which
+   that country is a party.

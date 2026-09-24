@@ -447,21 +447,19 @@ input[type="number"] {
     appearance: textfield;
 }
 
-/* Mejorar apariencia de autofill en navegadores */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px white inset;
-    -webkit-text-fill-color: inherit;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-/* Autofill en dark mode */
-@media (prefers-color-scheme: dark) {
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus {
-        -webkit-box-shadow: 0 0 0 1000px rgb(17 24 39) inset;
-    }
-}
+/*
+ * El autorrelleno se estiliza en resources/css/app.css, no aquí.
+ *
+ * Aquí había una regla propia cuya variante oscura dependía de
+ * `@media (prefers-color-scheme: dark)`, es decir, de la preferencia del
+ * SISTEMA. Pero el tema de la aplicación lo gobierna la clase `.dark`
+ * (`darkMode: 'class'`), que el usuario puede fijar a claro desde el selector
+ * de tema. Con el sistema en oscuro y la aplicación en claro, las dos
+ * condiciones se contradecían: la media query pintaba el campo autorrellenado
+ * de gris muy oscuro mientras el texto heredaba el `text-gray-900` del modo
+ * claro. Campo oscuro con letra casi negra, ilegible.
+ *
+ * Además, al ser un estilo `scoped` quedaba fuera de las capas de Tailwind y
+ * ganaba a cualquier regla global, así que no bastaba con añadir la correcta.
+ */
 </style>

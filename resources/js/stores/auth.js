@@ -26,11 +26,38 @@ export const useAuthStore = defineStore('auth', () => {
     const isTeacher = computed(() => userRole.value === 'teacher');
     const userName = computed(() => user.value?.name ?? '');
 
+    /**
+     * Entró con una contraseña temporal asignada por un administrador. El
+     * guard del router lo lleva a la pantalla de cambio y el backend rechaza
+     * cualquier otra llamada hasta que la cambie.
+     */
+    const mustChangePassword = computed(() => Boolean(user.value?.must_change_password));
+
     const userRoleLabel = computed(() => ({
         admin: 'Admin',
         teacher: 'Profesor',
         student: 'Estudiante',
     })[userRole.value] ?? 'Usuario');
+
+    /**
+     * Permisos efectivos ("subject.action") que el backend resolvió para el
+     * usuario. La interfaz los usa para decidir qué mostrar; la autorización
+     * real la sigue haciendo el servidor en cada petición.
+     */
+    const permissions = computed(() => user.value?.permissions ?? []);
+
+    /**
+     * Cuotas y ventanas de reserva del rol del usuario, para validar en
+     * cliente antes de enviar.
+     */
+    const reservationLimits = computed(() => user.value?.reservation_limits ?? null);
+
+    function can(permission) {
+        return permissions.value.includes(permission);
+    }
+
+    const canCreateLabReservation = computed(() => can('reservations.createLab'));
+    const canApproveReservations = computed(() => can('reservations.approve'));
 
     /**
      * Limpia el estado local. No llama al servidor.
@@ -178,6 +205,40 @@ export const useAuthStore = defineStore('auth', () => {
         errors.value = {};
     }
 
+    /**
+     * Edita nombre y correo. Los errores 422 los gestiona el formulario.
+     */
+    async function updateProfile(payload) {
+        const { data } = await apiClient.patch('/profile', payload);
+        user.value = data.data ?? data;
+
+        return user.value;
+    }
+
+    async function changePassword(payload) {
+        const { data } = await apiClient.put('/profile/password', payload);
+
+        // El servidor ya levantó la marca; reflejarlo aquí evita otra llamada
+        // a /me solo para que el guard deje pasar.
+        if (user.value) {
+            user.value = { ...user.value, must_change_password: false };
+        }
+
+        return data.message;
+    }
+
+    async function forgotPassword(email) {
+        const { data } = await apiClient.post('/forgot-password', { email });
+
+        return data.message;
+    }
+
+    async function resetPassword(payload) {
+        const { data } = await apiClient.post('/reset-password', payload);
+
+        return data.message;
+    }
+
     return {
         user,
         loading,
@@ -188,10 +249,20 @@ export const useAuthStore = defineStore('auth', () => {
         userRole,
         userName,
         userRoleLabel,
+        mustChangePassword,
+        permissions,
+        reservationLimits,
+        can,
+        canCreateLabReservation,
+        canApproveReservations,
         login,
         register,
         logout,
         restoreSession,
         clearErrors,
+        updateProfile,
+        changePassword,
+        forgotPassword,
+        resetPassword,
     };
 });

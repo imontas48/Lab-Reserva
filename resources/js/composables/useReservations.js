@@ -330,6 +330,242 @@ export function useReservations() {
     }
   };
 
+  // ============================================================================
+  // RESERVA DE LABORATORIO COMPLETO Y FLUJO DE APROBACIÓN
+  //
+  // Mismo dialecto que el resto del archivo (devuelven el objeto o null, o un
+  // booleano) para no mezclar dos contratos en un mismo composable. Deuda
+  // anotada: migrar useReservations entero a useResource (que lanza).
+  // ============================================================================
+
+  /**
+   * Ocupación de un laboratorio: sus clases y las reservas de sus equipos.
+   *
+   * @param {number} labId
+   * @param {string} startDate - YYYY-MM-DD
+   * @param {string} endDate - YYYY-MM-DD
+   * @returns {Promise<boolean>}
+   */
+  const fetchReservationsForLab = async (labId, startDate, endDate) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.get(`/labs/${labId}/reservations`, {
+        params: { start_date: startDate, end_date: endDate }
+      });
+
+      reservations.value = response.data.data || response.data;
+
+      return true;
+    } catch (err) {
+      handleApiError(err, 'Error al cargar la ocupación del laboratorio');
+      reservations.value = [];
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Solicita un laboratorio completo para una clase. Nace pendiente de
+   * aprobación salvo que quien la crea pueda aprobarla.
+   *
+   * @param {{ lab_id: number, start_time: string, end_time: string, purpose: string }} payload
+   * @returns {Promise<Object|null>}
+   */
+  const createLabReservation = async (payload) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.post('/lab-reservations', payload);
+      const newReservation = response.data.data || response.data;
+
+      reservations.value.push(newReservation);
+
+      return newReservation;
+    } catch (err) {
+      handleApiError(err, 'Error al solicitar el laboratorio');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Cola de solicitudes pendientes (requiere reservations.approve).
+   *
+   * @param {Object} params - page, search, lab_id, etc.
+   * @returns {Promise<boolean>}
+   */
+  const fetchPendingReservations = async (params = {}) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.get('/reservations/pending', { params });
+      reservations.value = response.data.data || response.data;
+      paginationMeta.value = response.data.meta || null;
+      return true;
+    } catch (err) {
+      handleApiError(err, 'Error al cargar las solicitudes pendientes');
+      reservations.value = [];
+      paginationMeta.value = null;
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * @param {number} reservationId
+   * @returns {Promise<Object|null>} la reserva ya confirmada, o null
+   */
+  const approveReservation = async (reservationId) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.patch(`/reservations/${reservationId}/approve`);
+      const approved = response.data.data || response.data;
+
+      replaceLocal(approved);
+
+      return approved;
+    } catch (err) {
+      handleApiError(err, 'No se pudo aprobar la solicitud');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * @param {number} reservationId
+   * @param {string} reason - motivo obligatorio que verá el solicitante
+   * @returns {Promise<Object|null>} la reserva rechazada, o null
+   */
+  const rejectReservation = async (reservationId, reason) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.patch(`/reservations/${reservationId}/reject`, { reason });
+      const rejected = response.data.data || response.data;
+
+      replaceLocal(rejected);
+
+      return rejected;
+    } catch (err) {
+      handleApiError(err, 'No se pudo rechazar la solicitud');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Serie semanal de clases. Devuelve { recurrence_group, created, skipped }
+   * o null si falló.
+   *
+   * @param {{ lab_id, start_time, end_time, purpose, repeat_until, weekdays? }} payload
+   */
+  const createRecurringLabReservation = async (payload) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.post('/lab-reservations/recurring', payload);
+
+      return response.data.data;
+    } catch (err) {
+      handleApiError(err, 'Error al crear la serie de clases');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Registra la llegada. El código es obligatorio para el dueño.
+   *
+   * @returns {Promise<Object|null>}
+   */
+  const checkIn = async (reservationId, code = null) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.post(`/reservations/${reservationId}/check-in`, code ? { code } : {});
+      const updated = response.data.data || response.data;
+
+      replaceLocal(updated);
+
+      return updated;
+    } catch (err) {
+      handleApiError(err, 'No se pudo registrar la llegada');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Marca una inasistencia (requiere reservations.approve).
+   *
+   * @returns {Promise<Object|null>}
+   */
+  const markNoShow = async (reservationId) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.post(`/reservations/${reservationId}/no-show`);
+      const updated = response.data.data || response.data;
+
+      replaceLocal(updated);
+
+      return updated;
+    } catch (err) {
+      handleApiError(err, 'No se pudo registrar la inasistencia');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Cancela las ocurrencias futuras de la serie a la que pertenece la reserva.
+   *
+   * @returns {Promise<number|null>} cuántas se cancelaron, o null si falló
+   */
+  const cancelSeries = async (reservationId) => {
+    clearErrors();
+    loading.value = true;
+
+    try {
+      const response = await api.patch(`/reservations/${reservationId}/cancel-series`);
+
+      return response.data.data?.cancelled ?? 0;
+    } catch (err) {
+      handleApiError(err, 'No se pudo cancelar la serie');
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Sustituye en la lista local la reserva que el servidor acaba de devolver.
+   */
+  const replaceLocal = (updated) => {
+    const index = reservations.value.findIndex(r => r.id === updated.id);
+    if (index !== -1) {
+      reservations.value.splice(index, 1, updated);
+    }
+  };
+
   return {
     // Estado reactivo
     reservations,
@@ -340,9 +576,18 @@ export function useReservations() {
 
     // Métodos
     fetchReservationsForEquipment,
+    fetchReservationsForLab,
     createReservation,
+    createLabReservation,
     fetchMyReservations,
     cancelMyReservation,
     fetchReservationsByRole,
+    fetchPendingReservations,
+    approveReservation,
+    rejectReservation,
+    createRecurringLabReservation,
+    checkIn,
+    markNoShow,
+    cancelSeries,
   };
 }

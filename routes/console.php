@@ -23,3 +23,9 @@ Artisan::command('inspire', function () {
 Schedule::command('reservations:complete-expired')
     ->everyFiveMinutes()
     ->withoutOverlapping();
+
+// Cada hora basta: el recordatorio avisa con un dia de antelacion, no con
+// precision de minutos, y cada reserva lo recibe una sola vez.
+Schedule::command('reservations:send-reminders')
+    ->hourly()
+    ->withoutOverlapping();

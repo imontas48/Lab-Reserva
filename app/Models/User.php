@@ -10,8 +10,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $role
+ * @property int $no_show_count
+ * @property bool $must_change_password
+ * @property Carbon|null $reservation_blocked_until
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -49,7 +59,27 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
+            'reservation_blocked_until' => 'datetime',
         ];
+    }
+
+    /**
+     * Todavia usa la contrasena temporal que le asigno un administrador:
+     * la API le exige cambiarla antes de hacer nada mas.
+     */
+    public function mustChangePassword(): bool
+    {
+        return (bool) $this->must_change_password;
+    }
+
+    /**
+     * Bloqueado para reservar por inasistencias reiteradas.
+     */
+    public function isBlockedFromReserving(): bool
+    {
+        return $this->reservation_blocked_until !== null
+            && $this->reservation_blocked_until->isFuture();
     }
 
     /**
@@ -61,11 +91,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Get active reservations for this user.
+     * Reservas que ocupan una franja todavia no terminada: pendientes o
+     * confirmadas con fin en el futuro. Es la base de la cuota por rol.
      */
     public function activeReservations(): HasMany
     {
-        return $this->hasMany(Reservation::class)->where('status', 'confirmed');
+        return $this->hasMany(Reservation::class)
+            ->whereIn('status', Reservation::BLOCKING_STATUSES)
+            ->where('end_time', '>=', now());
     }
 
     /**

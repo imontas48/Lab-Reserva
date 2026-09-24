@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Equipment
+ */
 class EquipmentResource extends JsonResource
 {
     /**
@@ -25,9 +29,13 @@ class EquipmentResource extends JsonResource
             'type' => $this->type,
             'specifications' => $this->specifications,
             'is_operational' => (bool) $this->is_operational,
+            'grid_row' => $this->grid_row,
+            'grid_col' => $this->grid_col,
 
             // Estado actual calculado dinámicamente
             'status' => $status,
+
+            'open_incidents_count' => $this->whenCounted('openIncidents'),
 
             // Compatibilidad legacy (deprecated - usar 'status' en su lugar)
             'is_available' => $status['status'] === 'available',

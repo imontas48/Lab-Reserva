@@ -41,6 +41,12 @@
       </BaseButton>
 
       <div class="text-center text-sm">
+        <router-link to="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+          ¿Olvidaste tu contraseña?
+        </router-link>
+      </div>
+
+      <div class="text-center text-sm">
         <span class="text-gray-600 dark:text-gray-400">¿No tienes cuenta?</span>
         <router-link
           to="/register"
@@ -94,6 +100,15 @@ const generalError = computed(() => authStore.errors.general?.[0] ?? null);
 const submit = handleSubmit(async (values) => {
   try {
     await authStore.login(values);
+
+    // Contraseña temporal: el guard lo forzaría igual, pero así el mensaje
+    // y el destino son coherentes desde el primer momento.
+    if (authStore.mustChangePassword) {
+      toast.info('Elige tu contraseña definitiva para continuar.');
+      await router.push({ name: 'password.change' });
+
+      return;
+    }
 
     toast.success(`¡Bienvenido, ${authStore.userName}!`);
 

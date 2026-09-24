@@ -1,0 +1,133 @@
+# Despliegue de Lab-Reserva en contenedores.
+#
+# Servicios:
+#   db        MariaDB propia del proyecto, sin puerto publicado: solo la ven los
+#             otros contenedores de esta red.
+#   app       php-fpm. Es el unico que ejecuta migraciones (LAB_RESERVA_ROLE=app).
+#   queue     Worker de la cola `database` (notificaciones por correo).
+#   scheduler Ejecuta el planificador de Laravel (routes/console.php) cada minuto.
+#   web       nginx con public/. Publica en 127.0.0.1:${WEB_PORT}: solo el nginx del
+#             host llega a el, que es quien pone TLS y el nombre publico. Docker
+#             salta las reglas de ufw en los puertos publicados, por eso NO se
+#             publica en 0.0.0.0.
+#
+# Endurecimiento: ningun contenedor puede ganar privilegios (no-new-privileges)
+# y los de PHP y nginx arrancan sin capacidades salvo las tres que necesitan
+# para cambiar de root a www-data/nginx tras abrir el socket.
+#
+# Las variables ${...} y el env_file salen del .env que vive junto a este fichero
+# en el servidor. Ese .env no se versiona (ver CLAUDE.md seccion 6).
+
+name: lab-reserva
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  cap_add:
+    - CHOWN
+    - SETUID
+    - SETGID
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-app-base: &app-base
+  <<: *hardening
+  image: lab-reserva/app:latest
+  build:
+    context: .
+    target: app
+    args:
+      APP_BASE_PATH: ${APP_BASE_PATH:-}
+  restart: unless-stopped
+  env_file: .env
+  depends_on:
+    db:
+      condition: service_healthy
+  volumes:
+    - app-storage:/var/www/html/storage/app
+  healthcheck:
+    test: ["CMD", "test", "-f", "/tmp/ready"]
+    interval: 5s
+    timeout: 3s
+    retries: 60
+    start_period: 10s
+  logging: *logging
+
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    logging: *logging
+
+  app:
+    <<: *app-base
+    environment:
+      LAB_RESERVA_ROLE: app
+
+  queue:
+    <<: *app-base
+    command: ["su-exec", "www-data", "php", "artisan", "queue:work", "--tries=3", "--sleep=3", "--max-time=3600"]
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+
+  scheduler:
+    <<: *app-base
+    command: ["su-exec", "www-data", "php", "artisan", "schedule:work"]
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+
+  web:
+    <<: *hardening
+    image: lab-reserva/web:latest
+    build:
+      context: .
+      target: web
+      args:
+        APP_BASE_PATH: ${APP_BASE_PATH:-}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8081}:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging: *logging
+
+volumes:
+  db-data:
+  app-storage:

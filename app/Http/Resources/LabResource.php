@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Lab;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Lab
+ */
 class LabResource extends JsonResource
 {
     /**
@@ -21,6 +25,8 @@ class LabResource extends JsonResource
             'capacity' => $this->capacity,
             'description' => $this->description,
             'is_active' => (bool) $this->is_active,
+            'grid_rows' => (int) $this->grid_rows,
+            'grid_cols' => (int) $this->grid_cols,
 
             // Contadores de equipos (solo si están cargados)
             'equipment_count' => $this->whenCounted('equipment'),
