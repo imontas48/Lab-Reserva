@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class RoleService
 {
+    public function __construct(
+        private readonly ActivityLogService $activity
+    ) {}
+
     /**
      * Lista todos los roles con filtros opcionales.
      */
@@ -61,6 +65,7 @@ class RoleService
 
             if (! empty($data['permission_ids'])) {
                 $role->permissions()->sync($data['permission_ids']);
+                $this->recordPermissionsSynced($role, []);
             }
 
             return $role->load('permissions');
@@ -119,12 +124,51 @@ class RoleService
             throw new \RuntimeException('Los permisos de un rol del sistema no pueden modificarse.');
         }
 
-        $role->permissions()->sync($permissionIds);
+        DB::transaction(function () use ($role, $permissionIds) {
+            $before = $this->permissionKeys($role);
+
+            $role->permissions()->sync($permissionIds);
+
+            $this->recordPermissionsSynced($role, $before);
+        });
 
         // sync() sobre la tabla pivote no dispara eventos de modelo, asi que la
         // invalidacion centralizada no la cubre.
         PermissionService::flushCache();
 
         return $role->load('permissions');
+    }
+
+    /**
+     * El pivote role_permissions no dispara eventos de modelo: el observer no
+     * lo ve y hay que registrarlo aqui.
+     *
+     * @param  array<int, string>  $before
+     */
+    private function recordPermissionsSynced(Role $role, array $before): void
+    {
+        $after = $this->permissionKeys($role);
+
+        if ($before === $after) {
+            return;
+        }
+
+        $this->activity->record('permissions_synced', $role, "Cambió los permisos del rol «{$role->display_name}»", [
+            'added' => array_values(array_diff($after, $before)),
+            'removed' => array_values(array_diff($before, $after)),
+        ]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function permissionKeys(Role $role): array
+    {
+        return $role->permissions()
+            ->orderBy('subject')
+            ->orderBy('action')
+            ->get(['permissions.subject', 'permissions.action'])
+            ->map(fn ($permission) => "{$permission->subject}.{$permission->action}")
+            ->all();
     }
 }

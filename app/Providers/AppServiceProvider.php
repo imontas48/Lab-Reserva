@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\AcademicPeriod;
+use App\Models\ActivityLog;
 use App\Models\Equipment;
 use App\Models\EquipmentIncident;
 use App\Models\GroupRoleAssignment;
@@ -15,6 +16,8 @@ use App\Models\Role;
 use App\Models\Software;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Observers\ActivityObserver;
+use App\Policies\ActivityLogPolicy;
 use App\Policies\EquipmentPolicy;
 use App\Policies\IncidentPolicy;
 use App\Policies\LabPolicy;
@@ -59,8 +62,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(EquipmentIncident::class, IncidentPolicy::class);
 
+        Gate::policy(ActivityLog::class, ActivityLogPolicy::class);
+
         $this->configureRateLimiting();
         $this->invalidatePermissionCacheOnRbacWrites();
+        $this->recordActivityOnModelWrites();
 
         // El enlace de recuperacion apunta a la SPA: no existe una ruta web
         // 'password.reset', que es la que usa la notificacion por defecto.
@@ -97,6 +103,25 @@ class AppServiceProvider extends ServiceProvider
         // La tabla pivote role_permissions se escribe con sync(), que no
         // dispara eventos de modelo, así que RoleService::syncPermissions
         // invalida de forma explícita.
+    }
+
+    /**
+     * Registra en el log de actividades toda escritura de estos modelos.
+     *
+     * Mismo razonamiento que la caché de permisos: engancharse a los eventos
+     * del modelo cubre servicios, comandos, tinker y código futuro sin que
+     * nadie tenga que acordarse de registrar. Lo que no pasa por eventos de
+     * modelo (sync de pivotes, updates masivos, autenticación) se registra
+     * de forma explícita en su servicio.
+     *
+     * LabOpeningHour queda fuera a propósito: su sync borra y recrea todas
+     * las filas, y LabScheduleService lo registra como un único evento.
+     */
+    private function recordActivityOnModelWrites(): void
+    {
+        foreach (ActivityLog::SUBJECTS as $model) {
+            $model::observe(ActivityObserver::class);
+        }
     }
 
     /**

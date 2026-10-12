@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AuthUserResource;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,10 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly ActivityLogService $activity
+    ) {}
+
     /**
      * Login user and create token.
      */
@@ -25,12 +30,19 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
+            // Se guarda el correo intentado, nunca la contrasena.
+            $this->activity->record('login_failed', $user, 'Intento fallido de inicio de sesión', [
+                'email' => $request->email,
+            ]);
+
             throw ValidationException::withMessages([
                 'email' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
+
+        $this->activity->record('login', $user, 'Inició sesión', actor: $user);
 
         return response()->json([
             'message' => 'Inicio de sesión exitoso',
@@ -77,6 +89,8 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
+
+        $this->activity->record('logout', $request->user(), 'Cerró sesión');
 
         return response()->json([
             'message' => 'Sesión cerrada exitosamente',

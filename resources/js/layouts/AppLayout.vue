@@ -17,7 +17,7 @@
             </div>
 
             <!-- Links de navegación -->
-            <div class="hidden space-x-8 sm:ml-10 sm:flex">
+            <div class="hidden space-x-5 sm:ml-6 sm:flex">
               <router-link
                 to="/dashboard"
                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-900 hover:border-blue-500 dark:text-gray-100"
@@ -164,37 +164,6 @@
                   </router-link>
                   <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
                   <router-link
-                    to="/roles"
-                    @click="adminMenuOpen = false"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    Roles
-                  </router-link>
-                  <router-link
-                    to="/permissions"
-                    @click="adminMenuOpen = false"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                    Permisos del Sistema
-                  </router-link>
-                  <router-link
-                    to="/group-role-assignments"
-                    @click="adminMenuOpen = false"
-                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Reglas de Grupo
-                  </router-link>
-                  <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
-                  <router-link
                     to="/closures"
                     @click="adminMenuOpen = false"
                     class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -216,11 +185,77 @@
                   </router-link>
                 </div>
               </div>
+
+              <!-- Menú Seguridad (solo admin) -->
+              <div
+                v-if="authStore.isAdmin"
+                class="relative flex h-full items-stretch"
+                v-click-outside="() => securityMenuOpen = false"
+              >
+                <button
+                  @click="securityMenuOpen = !securityMenuOpen"
+                  class="inline-flex items-center gap-1 border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:text-gray-200 focus:outline-none"
+                  :class="{ 'border-blue-500 !text-gray-900 dark:!text-white': isSecurityRoute }"
+                >
+                  Seguridad
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Dropdown Seguridad -->
+                <div
+                  v-if="securityMenuOpen"
+                  class="absolute left-0 top-full z-20 mt-1 w-56 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <router-link
+                    to="/roles"
+                    @click="securityMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Roles
+                  </router-link>
+                  <router-link
+                    to="/permissions"
+                    @click="securityMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    Permisos del Sistema
+                  </router-link>
+                  <router-link
+                    to="/group-role-assignments"
+                    @click="securityMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Reglas de Grupo
+                  </router-link>
+                  <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
+                  <router-link
+                    to="/activity-log"
+                    @click="securityMenuOpen = false"
+                    class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    Registro de actividad
+                  </router-link>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Menú de usuario y tema -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
             <NotificationBell />
 
             <!-- Toggle de tema -->
@@ -313,6 +348,7 @@ const toast = useToast();
 
 const adminMenuOpen = ref(false);
 const reservationsMenuOpen = ref(false);
+const securityMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
 
 // Enlaces del menú móvil, según permisos: mismo contenido que la barra.
@@ -338,6 +374,9 @@ const mobileLinks = computed(() => {
       { to: '/closures', label: 'Cierres y festivos' },
       { to: '/academic-periods', label: 'Periodos académicos' },
       { to: '/roles', label: 'Roles' },
+      { to: '/permissions', label: 'Permisos del Sistema' },
+      { to: '/group-role-assignments', label: 'Reglas de Grupo' },
+      { to: '/activity-log', label: 'Registro de actividad' },
     );
   }
 
@@ -349,7 +388,8 @@ watch(() => route.path, () => { mobileMenuOpen.value = false; });
 
 const userName = computed(() => authStore.userName || 'Usuario');
 const userRoleLabel = computed(() => authStore.userRoleLabel);
-const isAdminRoute  = computed(() => ['/roles', '/permissions', '/group-role-assignments', '/closures', '/academic-periods', '/users', '/reports', '/incidents'].some(p => route.path.startsWith(p)));
+const isAdminRoute  = computed(() => ['/closures', '/academic-periods', '/users', '/reports', '/incidents'].some(p => route.path.startsWith(p)));
+const isSecurityRoute = computed(() => ['/roles', '/permissions', '/group-role-assignments', '/activity-log'].some(p => route.path.startsWith(p)));
 const isReservationsRoute = computed(() => route.path.startsWith('/reservations'));
 
 
