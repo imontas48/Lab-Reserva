@@ -7,3 +7,8 @@
 # apartarlo temporalmente y devolverlo despues.
 allowBuilds:
   esbuild: true
+
+# Parche de seguridad en una dependencia transitiva: concurrently fija shell-quote 1.9.0
+# (inyeccion de comandos en quote()) incluso en su ultima 9.x.
+overrides:
+  shell-quote: ^1.11.0

@@ -5,12 +5,17 @@ namespace App\Services;
 use App\Exceptions\BusinessRuleException;
 use App\Models\Equipment;
 use App\Models\Lab;
+use App\Models\Software;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class EquipmentService
 {
+    public function __construct(
+        private readonly ActivityLogService $activity
+    ) {}
+
     /**
      * Get all equipment with optional filtering and pagination.
      */
@@ -130,7 +135,7 @@ class EquipmentService
 
         // Asociar el software si se proporcionó
         if (! empty($softwareIds)) {
-            $equipment->software()->sync($softwareIds);
+            $this->syncSoftware($equipment, $softwareIds);
         }
 
         // Recargar con relaciones
@@ -151,7 +156,7 @@ class EquipmentService
 
         // Sincronizar software si se proporcionó
         if ($softwareIds !== null) {
-            $equipment->software()->sync($softwareIds);
+            $this->syncSoftware($equipment, $softwareIds);
         }
 
         // Recargar con relaciones actualizadas
@@ -180,5 +185,29 @@ class EquipmentService
         // Las relaciones many-to-many se eliminan automáticamente (equipment_software)
         // Las reservas se eliminan en cascada según la migración
         return $equipment->delete();
+    }
+
+    /**
+     * El pivote equipment_software no dispara eventos de modelo: se registra
+     * aqui y solo si de verdad cambio algo.
+     *
+     * @param  array<int, int>  $softwareIds
+     */
+    private function syncSoftware(Equipment $equipment, array $softwareIds): void
+    {
+        $changes = $equipment->software()->sync($softwareIds);
+
+        if ($changes['attached'] === [] && $changes['detached'] === []) {
+            return;
+        }
+
+        $names = Software::withTrashed()
+            ->whereIn('id', [...$changes['attached'], ...$changes['detached']])
+            ->pluck('name', 'id');
+
+        $this->activity->record('software_synced', $equipment, "Cambió el software del equipo «{$equipment->identifier}»", [
+            'added' => array_values(array_map(fn ($id) => $names[$id] ?? "#{$id}", $changes['attached'])),
+            'removed' => array_values(array_map(fn ($id) => $names[$id] ?? "#{$id}", $changes['detached'])),
+        ]);
     }
 }

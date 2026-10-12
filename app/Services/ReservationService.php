@@ -40,7 +40,8 @@ class ReservationService
     ];
 
     public function __construct(
-        private readonly LabScheduleService $schedule
+        private readonly LabScheduleService $schedule,
+        private readonly ActivityLogService $activity,
     ) {}
 
     /**
@@ -587,9 +588,12 @@ class ReservationService
      */
     public function markExpiredReservationsAsCompleted(): int
     {
-        return Reservation::confirmed()
-            ->where('end_time', '<', now())
-            ->update(['status' => Reservation::STATUS_COMPLETED]);
+        return $this->bulkUpdateStatus(
+            Reservation::confirmed()->where('end_time', '<', now()),
+            Reservation::STATUS_COMPLETED,
+            'reservations_auto_completed',
+            'Marcó como completadas las reservas confirmadas ya terminadas',
+        );
     }
 
     /**
@@ -600,9 +604,39 @@ class ReservationService
      */
     public function expirePendingReservations(): int
     {
-        return Reservation::pending()
-            ->where('start_time', '<=', now())
-            ->update(['status' => Reservation::STATUS_EXPIRED]);
+        return $this->bulkUpdateStatus(
+            Reservation::pending()->where('start_time', '<=', now()),
+            Reservation::STATUS_EXPIRED,
+            'reservations_auto_expired',
+            'Expiró las solicitudes que llegaron a su franja sin decisión',
+        );
+    }
+
+    /**
+     * Update masivo, sin eventos de modelo: se registra como un unico evento
+     * con los ids afectados. Los ids se leen con bloqueo dentro de la misma
+     * transaccion para que el registro diga exactamente que filas cambio.
+     *
+     * @param  Builder<Reservation>  $query
+     */
+    private function bulkUpdateStatus(Builder $query, string $status, string $event, string $description): int
+    {
+        return DB::transaction(function () use ($query, $status, $event, $description) {
+            $ids = (clone $query)->lockForUpdate()->pluck('id')->all();
+
+            if ($ids === []) {
+                return 0;
+            }
+
+            $updated = Reservation::query()->whereKey($ids)->update(['status' => $status]);
+
+            $this->activity->record($event, null, $description, [
+                'count' => $updated,
+                'reservation_ids' => $ids,
+            ], subjectType: 'reservation');
+
+            return $updated;
+        });
     }
 
     /**

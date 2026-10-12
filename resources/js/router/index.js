@@ -440,7 +440,7 @@ const routes = [
             },
 
             // ─────────────────────────────────────────────────────────────────
-            // GESTIÓN DE ROLES Y PERMISOS (Solo administradores)
+            // SEGURIDAD: ROLES, PERMISOS Y REGISTRO DE ACTIVIDAD (Solo administradores)
             // ─────────────────────────────────────────────────────────────────
             {
                 path: '/roles',
@@ -489,6 +489,18 @@ const routes = [
                 meta: {
                     title: 'Reglas de Grupo',
                     requiresAuth: true,
+                    requiresAdmin: true,
+                }
+            },
+            {
+                path: '/activity-log',
+                name: 'activity-log.index',
+                component: () => import('@/views/security/ActivityLogView.vue'),
+                meta: {
+                    title: 'Registro de actividad',
+                    requiresAuth: true,
+                    // Por rol base y no por permiso, igual que la policy: el
+                    // registro audita al RBAC y no se concede con el RBAC.
                     requiresAdmin: true,
                 }
             },

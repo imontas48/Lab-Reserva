@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AcademicPeriodController;
+use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EquipmentController;
@@ -245,4 +246,9 @@ Route::middleware(['auth:sanctum', 'password.changed'])->prefix('v1')->group(fun
         Route::delete('/{permissionOverride}', [PermissionOverrideController::class, 'destroy'])
             ->name('destroy');
     });
+
+    // Registro de actividades: unica ruta y de solo lectura. A proposito no
+    // existe PUT, PATCH ni DELETE: nada de lo registrado se toca desde la API.
+    Route::get('/activity-logs', [ActivityLogController::class, 'index'])
+        ->name('api.activity-logs.index');
 });

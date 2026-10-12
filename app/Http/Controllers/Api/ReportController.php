@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportRangeRequest;
+use App\Services\ActivityLogService;
 use App\Services\ReportService;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -11,7 +12,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ReportController extends Controller
 {
     public function __construct(
-        private readonly ReportService $reports
+        private readonly ReportService $reports,
+        private readonly ActivityLogService $activity,
     ) {}
 
     /**
@@ -40,6 +42,12 @@ class ReportController extends Controller
         $from = $request->from();
         $to = $request->to();
         $filename = sprintf('reservas_%s_%s.csv', $from->toDateString(), $to->toDateString());
+
+        // Exportar saca datos personales del sistema: queda constancia de quien.
+        $this->activity->record('report_exported', null, "Exportó las reservas del {$from->toDateString()} al {$to->toDateString()}", [
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
+        ], subjectType: 'report');
 
         return response()->streamDownload(function () use ($from, $to) {
             $handle = fopen('php://output', 'w');

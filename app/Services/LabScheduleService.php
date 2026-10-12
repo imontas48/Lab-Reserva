@@ -21,14 +21,24 @@ use Illuminate\Support\Facades\DB;
  */
 class LabScheduleService
 {
+    public function __construct(
+        private readonly ActivityLogService $activity
+    ) {}
+
     /**
      * Sustituye el horario completo del laboratorio.
+     *
+     * Se registra como un unico evento con el horario antes y despues:
+     * LabOpeningHour no esta auditado fila a fila porque este borrado y
+     * recreado daria decenas de entradas por un solo guardado.
      *
      * @param  array<int, array{weekday: int, opens_at: string, closes_at: string}>  $hours
      */
     public function syncOpeningHours(Lab $lab, array $hours): Collection
     {
         return DB::transaction(function () use ($lab, $hours) {
+            $before = $this->describeOpeningHours($lab->openingHours()->get());
+
             $lab->openingHours()->delete();
 
             foreach ($hours as $row) {
@@ -39,8 +49,35 @@ class LabScheduleService
                 ]);
             }
 
-            return $lab->openingHours()->get();
+            $openingHours = $lab->openingHours()->get();
+            $after = $this->describeOpeningHours($openingHours);
+
+            if ($before !== $after) {
+                $this->activity->record('opening_hours_synced', $lab, "Cambió el horario de apertura del laboratorio «{$lab->name}»", [
+                    'old' => $before,
+                    'new' => $after,
+                ]);
+            }
+
+            return $openingHours;
         });
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function describeOpeningHours(Collection $openingHours): array
+    {
+        return $openingHours
+            ->sortBy(fn (LabOpeningHour $hour) => sprintf('%d %s', $hour->weekday, $hour->opens_at))
+            ->map(fn (LabOpeningHour $hour) => sprintf(
+                '%s %s-%s',
+                $hour->weekdayName(),
+                substr((string) $hour->opens_at, 0, 5),
+                substr((string) $hour->closes_at, 0, 5),
+            ))
+            ->values()
+            ->all();
     }
 
     /**

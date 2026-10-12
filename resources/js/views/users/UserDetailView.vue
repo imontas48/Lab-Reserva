@@ -3,6 +3,7 @@
     <DetailPanel title="Usuario" :subtitle="user?.name" :loading="loading && !user" :error="error" :fields="fields" @retry="load">
       <template #actions>
         <div v-if="user" class="flex flex-wrap gap-2">
+          <BaseButton v-if="authStore.isAdmin" variant="secondary" @click="router.push({ name: 'activity-log.index', query: { actor_id: user.id } })">Ver actividad</BaseButton>
           <BaseButton v-if="user.is_blocked" variant="secondary" :loading="busy === 'unblock'" @click="handleUnblock">Levantar bloqueo</BaseButton>
           <BaseButton variant="danger" :loading="busy === 'delete'" :disabled="isSelf" @click="handleDelete">Dar de baja</BaseButton>
         </div>
