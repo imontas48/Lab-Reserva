@@ -91,13 +91,13 @@
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead class="bg-gray-50 dark:bg-gray-700/50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">#</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ copy.personColumn }}</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Equipo / Laboratorio</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Inicio</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Fin</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Estado</th>
-            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Acciones</th>
+            <th class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">#</th>
+            <th class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ copy.personColumn }}</th>
+            <th class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Equipo / Laboratorio</th>
+            <th class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Inicio</th>
+            <th class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Fin</th>
+            <th class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Estado</th>
+            <th class="px-4 py-3 2xl:px-6 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -106,16 +106,16 @@
             :key="reservation.id"
             class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
           >
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+            <td class="whitespace-nowrap px-4 py-4 2xl:px-6 text-sm text-gray-500 dark:text-gray-400">
               #{{ reservation.id }}
             </td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 2xl:px-6">
               <div class="text-sm font-medium text-gray-900 dark:text-white">
                 {{ reservation.user?.name ?? '—' }}
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ reservation.user?.email ?? '' }}</div>
             </td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-4 2xl:px-6">
               <div class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
                 {{ targetLabel(reservation) }}
                 <span
@@ -129,13 +129,13 @@
                 {{ reservation.purpose }}
               </div>
             </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+            <td class="whitespace-nowrap px-4 py-4 2xl:px-6 text-sm text-gray-700 dark:text-gray-300">
               {{ formatDateTime(reservation.start_time) }}
             </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+            <td class="whitespace-nowrap px-4 py-4 2xl:px-6 text-sm text-gray-700 dark:text-gray-300">
               {{ formatDateTime(reservation.end_time) }}
             </td>
-            <td class="whitespace-nowrap px-6 py-4">
+            <td class="whitespace-nowrap px-4 py-4 2xl:px-6">
               <span
                 :class="statusClasses(reservation)"
                 class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -143,7 +143,7 @@
                 {{ statusLabel(reservation) }}
               </span>
             </td>
-            <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+            <td class="whitespace-nowrap px-4 py-4 2xl:px-6 text-right text-sm">
               <ReservationApprovalActions
                 v-if="isPending(reservation) && authStore.canApproveReservations"
                 :reservation="reservation"

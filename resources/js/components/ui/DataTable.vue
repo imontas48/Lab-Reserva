@@ -9,13 +9,13 @@
         <!-- Skeleton loader por defecto -->
         <div class="animate-pulse">
           <!-- Header del skeleton -->
-          <div class="border-b border-gray-200 bg-gray-50 px-6 py-3 dark:border-gray-700 dark:bg-gray-700">
+          <div class="border-b border-gray-200 bg-gray-50 px-4 py-3 2xl:px-6 dark:border-gray-700 dark:bg-gray-700">
             <div class="flex items-center space-x-4">
               <div v-for="col in columns" :key="col.key" class="h-4 flex-1 rounded bg-gray-300 dark:bg-gray-600"></div>
             </div>
           </div>
           <!-- Filas del skeleton -->
-          <div v-for="i in 5" :key="i" class="border-b border-gray-100 px-6 py-4 dark:border-gray-700">
+          <div v-for="i in 5" :key="i" class="border-b border-gray-100 px-4 py-4 2xl:px-6 dark:border-gray-700">
             <div class="flex items-center space-x-4">
               <div v-for="col in columns" :key="col.key" class="h-4 flex-1 rounded bg-gray-200 dark:bg-gray-600"></div>
             </div>
@@ -96,7 +96,7 @@
                 v-for="column in columns"
                 :key="column.key"
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                class="px-4 py-3 2xl:px-6 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
                 :class="column.headerClass"
               >
                 {{ column.label }}
@@ -105,7 +105,7 @@
               <th
                 v-if="hasActionsSlot"
                 scope="col"
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                class="px-4 py-3 2xl:px-6 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
               >
                 Acciones
               </th>
@@ -126,7 +126,7 @@
               <td
                 v-for="column in columns"
                 :key="column.key"
-                class="whitespace-nowrap px-6 py-4 text-sm"
+                class="whitespace-nowrap px-4 py-4 2xl:px-6 text-sm"
                 :class="column.cellClass"
               >
                 <!-- Slot personalizado para cada celda si existe -->
@@ -147,7 +147,7 @@
               <!-- Celda de acciones -->
               <td
                 v-if="hasActionsSlot"
-                class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium"
+                class="whitespace-nowrap px-4 py-4 2xl:px-6 text-right text-sm font-medium"
               >
                 <slot name="actions" :item="item" :index="index" />
               </td>
