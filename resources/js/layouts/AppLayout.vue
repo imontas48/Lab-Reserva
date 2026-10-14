@@ -1,8 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-    <!-- Navbar -->
+    <!-- Navbar: mismo contenedor que el contenido para que ambos alineen.
+         Antes era max-w-7xl (1280 px) y las tablas anchas se desplazaban
+         en horizontal aunque sobraba pantalla; ahora llega a 1920 px. -->
     <nav class="border-b border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto w-full max-w-[120rem] px-4 sm:px-6 lg:px-8 2xl:px-12">
         <div class="flex h-16 justify-between">
           <!-- Logo y navegación principal -->
           <div class="flex">
@@ -290,7 +292,7 @@
 
     <!-- Contenido principal -->
     <main class="py-10">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto w-full max-w-[120rem] px-4 sm:px-6 lg:px-8 2xl:px-12">
         <router-view />
       </div>
     </main>
